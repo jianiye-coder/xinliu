@@ -261,7 +261,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 .coinbig{font:400 34px/1 var(--num);color:#9a6400}
 .shop-top .mute{color:#8a6a3a}
 .rw{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper);margin-bottom:8px}
-.rw .rn{flex:1;min-width:0;font-weight:600}
+.rw .rn{flex:1;min-width:0;font-weight:600}.rw .rn small{display:block;font-size:11px;font-weight:500;color:var(--mute)}
 .rw .buy{padding:7px 12px;font-size:13px;border-radius:12px;box-shadow:0 3px 0 var(--d);white-space:nowrap}
 .rw .buy:active{transform:translateY(3px)}
 .x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:18px;padding:0 4px}
@@ -608,6 +608,9 @@ S.settings=Object.assign(blank().settings,S.settings||{});
 if(typeof S.coins!=='number')S.coins=S.xp||0;
 S.parked=S.parked||[];S.purchases=S.purchases||[];
 S.rewards=S.rewards||[{name:'玩一局游戏',cost:80},{name:'刷 15 分钟 X',cost:60},{name:'看一集剧',cost:150},{name:'买杯奶茶',cost:200}];
+// 想看的剧：一集一集用岛币换，换完可以直接去 B 站搜
+const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q);
+if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupterino','Cupterino'],['无穷的开始','无穷的开始'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
@@ -1203,12 +1206,12 @@ $('pkAddBtn').onclick=()=>{if(parkAdd($('pkAdd').value)){$('pkAdd').value='';toa
 $('pkAdd').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('pkAddBtn').click()}};
 function parkReview(){const l=S.parked.filter(p=>!p.done&&p.sess===focusStart);if(!l.length)return;queueModal(`<h3>这轮停了 ${l.length} 个念头</h3><p class="mute">现在可以去处理了。处理完的在「念头停车场」里打个勾。</p>${l.map(p=>`<div class="pk"><span>${esc(p.text)}</span></div>`).join('')}<div class="row center"><button class="btn p" onclick="closeModal()">知道了</button></div>`)}
 // ---------- 奖励商店 ----------
-function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>`<div class="rw"><span class="rn">${esc(r.name)}</span><button class="btn sun buy" data-buy="${i}" ${S.coins<r.cost?'disabled':''}>${r.cost} 岛币</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
+function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>{const times=S.purchases.filter(x=>x.name===r.name).length;return`<div class="rw"><span class="rn">${esc(r.name)}${times?`<small>已换 ${times} 次</small>`:''}</span><button class="btn sun buy" data-buy="${i}" ${S.coins<r.cost?'disabled':''}>${r.cost} 岛币</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`}).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
  const p=S.purchases.slice(0,6);$('rLog').textContent=p.length?'最近兑换：'+p.map(x=>{const d=new Date(x.at);return(d.getMonth()+1)+'/'+d.getDate()+' '+x.name}).join('、'):''}
 $('rList').onclick=e=>{const del=e.target.closest('[data-rdel]');if(del){const r=S.rewards[+del.dataset.rdel];if(confirm('删除奖励「'+r.name+'」？')){S.rewards.splice(+del.dataset.rdel,1);save();renderShop()}return}
  const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
  S.coins-=r.cost;S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
- modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center"><button class="btn p" onclick="closeModal()">好</button></div>`)};
+ modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center">${r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" rel="noopener" onclick="closeModal()" style="text-decoration:none">去 B 站看</a>`:''}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
 $('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value);if(!n||!(c>0)){toast('写上奖励名称和价格');return}S.rewards.push({name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
 // ---------- 一年热力图 ----------
 function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
