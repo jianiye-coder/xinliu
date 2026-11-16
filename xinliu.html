@@ -308,6 +308,12 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .rep tr.h td{border-top:0;font-size:12px;color:var(--mute)}
 .rep td.up{color:var(--leaf-d);font-weight:700}.rep td.down{color:var(--coral);font-weight:700}
 .repnote{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--leaf-l);font-size:13.5px}.repnote p{margin:4px 0}
+/* reward timer */
+.rtbar{display:flex;align-items:center;gap:12px;margin:-6px 0 16px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#fff3dc,#ffe0a8);border:1.5px solid #f3d6a4;font-weight:600;font-size:14px}
+.rtbar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rtbar b{font:400 22px var(--num);color:#9a6400}
+.rtbar button{border:1.5px solid #e6c48a;background:#fffaf0;border-radius:10px;padding:5px 10px;font-weight:700;font-size:12.5px;cursor:pointer;color:#9a6400}
+.tmrow{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;flex-wrap:wrap}.tmrow input{width:84px}.tmrow b{font:400 20px var(--num);color:#9a6400}
+.radd select{flex:none}
 /* tasks / chests / decos */
 .chestinfo{margin-top:8px;font-size:12.5px;color:var(--mute)}.chestinfo summary{cursor:pointer;color:var(--sea);font-weight:700}
 .chestinfo table{width:100%;border-collapse:collapse;margin:6px 0}.chestinfo td{padding:4px 6px;border-top:1px solid var(--line);text-align:center;font-weight:600}.chestinfo tr:first-child td{border-top:0;font-weight:500}.chestinfo p{margin:4px 0 0}
@@ -434,6 +440,7 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
   <button data-tab="badges"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M9 10h6M12 7v6M8 17l-1 4 5-2 5 2-1-4"/></svg>成就</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>提醒</button>
 </nav>
+<div class="rtbar hide" id="rtBar"></div>
 
 <!-- FOCUS -->
 <section id="tab-focus">
@@ -558,10 +565,10 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 <section id="tab-badges" class="hide">
   <div class="card" style="margin-bottom:16px"><h2>能力报告<span class="k">近 7 天 vs 前 7 天 · 看本事的变化，不看分数</span></h2><div id="reportBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>月度赛季<span class="k">靠专注分钟升级，奖励永久保留</span></h2><div id="seasonBox"></div></div>
-  <div class="card" style="margin-bottom:16px"><h2>奖励商店<span class="k">用岛币换，换来的不用内疚</span></h2>
+  <div class="card" style="margin-bottom:16px"><h2>奖励商店<span class="k">看剧、玩游戏 6 岛币/分钟，刷信息流 9 岛币/分钟</span></h2>
     <div class="shop-top"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffc93c"/><circle cx="12" cy="12" r="7" fill="#ffb21f"/><path d="M12 7.5l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z" fill="#fff3c4"/></svg><div><div class="coinbig" id="coinBig">0</div><div class="mute">岛币 · 每挣 1 XP 得 1 枚，分心扣 XP 也扣岛币</div></div></div>
     <div id="rList"></div>
-    <div class="radd"><input type="text" id="rName" placeholder="新奖励，比如「再玩一局」"><input type="number" id="rCost" min="1" placeholder="价格"><button class="btn s" id="rAdd">添加</button></div>
+    <div class="radd"><input type="text" id="rName" placeholder="新奖励，比如「再玩一局」"><select id="rType"><option value="fixed">固定价格</option><option value="rate">按分钟</option></select><input type="number" id="rCost" min="1" placeholder="价格"><button class="btn s" id="rAdd">添加</button></div>
     <p class="mute" id="rLog" style="margin-bottom:0"></p>
   </div>
   <div class="card" style="margin-bottom:16px"><h2>岛屿进化<span class="k">升级解锁新的岛</span></h2><div class="road" id="islandRoad"></div></div>
@@ -625,18 +632,23 @@ S.settings=Object.assign(blank().settings,S.settings||{});
 // 新字段：旧数据第一次打开时补上（已有的 XP 一次性换成等量岛币）
 if(typeof S.coins!=='number')S.coins=S.xp||0;
 S.parked=S.parked||[];S.purchases=S.purchases||[];
-S.rewards=S.rewards||[{name:'玩一局游戏',cost:80},{name:'刷 15 分钟 X',cost:60},{name:'看一集剧',cost:150},{name:'买杯奶茶',cost:200}];
+S.rewards=S.rewards||[{name:'玩一局游戏',cost:30},{name:'刷 15 分钟 X',cost:135},{name:'看一集剧',cost:270},{name:'买杯奶茶',cost:200}];
 // 想看的剧：一集一集用岛币换，换完可以直接去 B 站搜
 const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q);
-if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
+if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:270,link:bsearch(q)})});S.rewardSeed=1}
 // 改名：之前拼错成 Cupterino
 S.rewards.forEach(r=>{if(r.name==='看一集《Cupterino》'){r.name='看一集《Cupertino》';r.link=bsearch('Cupertino')}});S.purchases.forEach(x=>{if(x.name==='看一集《Cupterino》')x.name='看一集《Cupertino》'});
 // 正版观看地址（2026-11 核对）：重启人生在 B 站有正版；Homeland 在腾讯视频；Cupertino 是 CBS 新剧，在 Paramount+
 // 《无穷的开始》是 David Deutsch 的书。读书是要做的事，不是奖励：从商店拿掉，放进「每天的任务」
 S.rewards=S.rewards.filter(r=>!/《无穷的开始》/.test(r.name));
 S.myTasks=S.myTasks||[];if(!S.taskSeed){if(!S.myTasks.some(t=>/无穷的开始/.test(t.t)))S.myTasks.push({id:1,t:'读一章《无穷的开始》',link:'https://book.douban.com/subject/26184242/'});S.taskSeed=1}
+// 定价（2026-11）：每分钟娱乐 ≈ 6 岛币（约 2 分钟专注换 1 分钟娱乐）；没有尽头的信息流 ×1.5。一次性改掉旧价格
+if((S.priceSeed||0)<1){const NP={'玩一局游戏':30,'刷 15 分钟 X':135,'看一集剧':270,'看一集《Homeland》':270,'看一集《Cupertino》':270,'看一集《重启人生》':270};S.rewards.forEach(r=>{if(NP[r.name]!==undefined)r.cost=NP[r.name]});S.priceSeed=1}
 const SHOW_LINKS={'看一集《重启人生》':['https://www.bilibili.com/bangumi/play/ss46356','去 B 站看（正版）'],'看一集《Homeland》':['https://v.qq.com/detail/s/sdp001998jkthte.html','去腾讯视频看'],'看一集《Cupertino》':['https://www.paramountplus.com/shows/cupertino/','去 Paramount+ 看']};
 S.rewards.forEach(r=>{const L=SHOW_LINKS[r.name];if(L){r.link=L[0];r.linkLabel=L[1]}});
+// 看剧、玩游戏、刷 X 改成按分钟计费：每次自己填多久，价格自动算（娱乐 6 岛币/分钟，信息流 9 岛币/分钟）
+const PER_MIN={'玩一局游戏':['玩游戏',6,5],'刷 15 分钟 X':['刷 X',9,15],'看一集剧':['看剧',6,45],'看一集《Homeland》':['看《Homeland》',6,45],'看一集《Cupertino》':['看《Cupertino》',6,45],'看一集《重启人生》':['看《重启人生》',6,45]};
+if((S.priceSeed||0)<2){S.rewards.forEach(r=>{const m=PER_MIN[r.name];if(m){S.purchases.forEach(x=>{if(x.name===r.name)x.name=m[0]});r.name=m[0];r.rate=m[1];r.mins=m[2];delete r.cost}});S.priceSeed=2}
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
@@ -1257,13 +1269,35 @@ $('pkAddBtn').onclick=()=>{if(parkAdd($('pkAdd').value)){$('pkAdd').value='';toa
 $('pkAdd').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('pkAddBtn').click()}};
 function parkReview(){const l=S.parked.filter(p=>!p.done&&p.sess===focusStart);if(!l.length)return;queueModal(`<h3>这轮停了 ${l.length} 个念头</h3><p class="mute">现在可以去处理了。处理完的在「念头停车场」里打个勾。</p>${l.map(p=>`<div class="pk"><span>${esc(p.text)}</span></div>`).join('')}<div class="row center"><button class="btn p" onclick="closeModal()">知道了</button></div>`)}
 // ---------- 奖励商店 ----------
-function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>{const times=S.purchases.filter(x=>x.name===r.name).length;return`<div class="rw"><span class="rn">${esc(r.name)}${times?`<small>已换 ${times} 次</small>`:''}</span><button class="btn sun buy" data-buy="${i}" ${S.coins<r.cost?'disabled':''}>${r.cost} 岛币</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`}).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
- const p=S.purchases.slice(0,6);$('rLog').textContent=p.length?'最近兑换：'+p.map(x=>{const d=new Date(x.at);return(d.getMonth()+1)+'/'+d.getDate()+' '+x.name}).join('、'):''}
+function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>{const P=S.purchases.filter(x=>x.name===r.name),used=r.rate?P.reduce((a,x)=>a+(x.mins||0),0):P.length;const unit=r.rate||r.cost;
+  return`<div class="rw"><span class="rn">${esc(r.name)}<small>${r.rate?`按分钟计费${used?' · 已用 '+used+' 分钟':''}`:(used?'已换 '+used+' 次':'固定价格')}</small></span><button class="btn sun buy" data-buy="${i}" ${S.coins<unit?'disabled':''}>${r.rate?r.rate+' 岛币/分钟':r.cost+' 岛币'}</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`}).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
+ const p=S.purchases.slice(0,6);$('rLog').textContent=p.length?'最近兑换：'+p.map(x=>{const d=new Date(x.at);return(d.getMonth()+1)+'/'+d.getDate()+' '+x.name+(x.mins?' '+x.mins+' 分钟':'')}).join('、'):''}
+const linkBtn=r=>r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" rel="noopener" onclick="closeModal()" style="text-decoration:none">${esc(r.linkLabel||'去 B 站搜')}</a>`:'';
 $('rList').onclick=e=>{const del=e.target.closest('[data-rdel]');if(del){const r=S.rewards[+del.dataset.rdel];if(confirm('删除奖励「'+r.name+'」？')){S.rewards.splice(+del.dataset.rdel,1);save();renderShop()}return}
- const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
+ const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(r.rate){buyTimed(r);return}
+ if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
  S.coins-=r.cost;S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
- modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center">${r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" rel="noopener" onclick="closeModal()" style="text-decoration:none">${esc(r.linkLabel||'去 B 站搜')}</a>`:''}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
-$('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value);if(!n||!(c>0)){toast('写上奖励名称和价格');return}S.rewards.push({name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
+ modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><div class="row center">${linkBtn(r)}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
+function buyTimed(r){if(S.rt&&S.rt.end>Date.now()){toast('「'+S.rt.name+'」的奖励时间还没用完');return}const def=r.mins||15,verb=/看/.test(r.name)?'看':/刷/.test(r.name)?'刷':'玩';
+ modal(`<h3>${esc(r.name)}</h3><p class="mute">要${verb}多久？说好多久就多久，到点会提醒你回来。</p>
+ <div class="row" id="tmChips">${[5,15,30,45,60].map(m=>`<span class="chip" data-m="${m}">${m} 分钟</span>`).join('')}</div>
+ <div class="tmrow"><input type="number" id="tmIn" min="1" max="240" value="${def}"> 分钟 × ${r.rate} 岛币 = <b id="tmCost"></b></div><p class="mute" id="tmHave" style="margin:4px 0 0"></p>
+ <div class="row center"><button class="btn s" onclick="closeModal()">算了</button><button class="btn sun" id="tmGo">开始</button></div>`);
+ const mins=()=>Math.min(240,Math.max(1,Math.round(+$('tmIn').value||0)));
+ const upd=()=>{const m=mins(),c=m*r.rate,ok=S.coins>=c;$('tmCost').textContent=c+' 岛币';$('tmHave').textContent=ok?`你有 ${S.coins} 岛币，换完还剩 ${S.coins-c}`:`你有 ${S.coins} 岛币，还差 ${c-S.coins}。现在最多能换 ${Math.floor(S.coins/r.rate)} 分钟`;$('tmGo').disabled=!ok;$('tmGo').textContent=ok?`开始（花 ${c} 岛币）`:'岛币不够';document.querySelectorAll('#tmChips .chip').forEach(x=>x.classList.toggle('on',+x.dataset.m===m))};
+ $('tmIn').oninput=upd;$('tmChips').onclick=e=>{const c=e.target.closest('[data-m]');if(c){$('tmIn').value=c.dataset.m;upd()}};upd();setTimeout(()=>$('tmIn')&&$('tmIn').select(),60);
+ $('tmGo').onclick=()=>{const m=mins(),c=m*r.rate;if(S.coins<c)return;S.coins-=c;S.purchases.unshift({at:Date.now(),name:r.name,cost:c,mins:m});S.rt={name:r.name,end:Date.now()+m*60000,mins:m};save();render();renderShop();renderRT();beep();
+  modal(`<h3>开始：${esc(r.name)} · ${m} 分钟</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">倒计时在页面最上面，到点会提醒你回来。</p><div class="row center">${linkBtn(r)}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)}}
+// 奖励倒计时：到点提醒回来
+let rtTick=null;
+function renderRT(){const b=$('rtBar'),t=S.rt;clearInterval(rtTick);if(!t){b.classList.add('hide');return}
+ const step=()=>{const left=t.end-Date.now();if(left<=0){clearInterval(rtTick);S.rt=null;save();b.classList.add('hide');notify('奖励时间到','说好的 '+t.mins+' 分钟到了，回来开始下一个番茄');
+   queueModal(`<h3>奖励时间到 ⏰</h3><p>「${esc(t.name)}」的 ${t.mins} 分钟用完了。</p><p class="mute">现在回来，比过半小时再回来容易得多。先做 5 分钟热身也行。</p><div class="row center"><button class="btn s" onclick="closeModal()">再缓一下</button><button class="btn sun" onclick="closeModal();startNext()">开始下一个番茄</button></div>`);return}
+  b.classList.remove('hide');b.innerHTML=`<span>🎁 奖励时间 · ${esc(t.name)}</span><b>${fmt(left)}</b><button id="rtEnd">提前结束</button>`;$('rtEnd').onclick=()=>{S.rt=null;save();renderRT();toast('提前回来了，很好')}};
+ step();rtTick=setInterval(step,1000)}
+window.startNext=()=>{tabTo('focus');if(mode==='idle')setTimeout(askGoal,250)};
+$('rType').onchange=e=>{$('rCost').placeholder=e.target.value==='rate'?'每分钟':'价格'};
+$('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value),rate=$('rType').value==='rate';if(!n||!(c>0)){toast('写上奖励名称和'+(rate?'每分钟的价格':'价格'));return}S.rewards.push(rate?{name:n.slice(0,30),rate:c,mins:15}:{name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
 // ---------- 一年热力图 ----------
 function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
  let cols='',months='',lastM=-1,activeDays=0,mins=0;
@@ -1302,7 +1336,7 @@ renderMusic();
 $('urgeUrl').textContent=location.origin+location.pathname.replace(/index\.html$/,'xinliu.html').replace(/\/$/,'/xinliu.html')+'#urge';
 $('copyUrge').onclick=async()=>{try{await navigator.clipboard.writeText($('urgeUrl').textContent);toast('已复制')}catch(e){toast('复制失败，长按手动复制')}};
 // 启动：所有模块都定义好之后再渲染
-renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();
+renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();renderRT();
 const hashTab=()=>{const h=location.hash.slice(1);if(h==='warm'){history.replaceState(null,'',location.pathname+location.search);window.startWarm();return}if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
