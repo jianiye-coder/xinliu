@@ -613,6 +613,9 @@ const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q
 if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['无穷的开始','无穷的开始'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
 // 改名：之前拼错成 Cupterino
 S.rewards.forEach(r=>{if(r.name==='看一集《Cupterino》'){r.name='看一集《Cupertino》';r.link=bsearch('Cupertino')}});S.purchases.forEach(x=>{if(x.name==='看一集《Cupterino》')x.name='看一集《Cupertino》'});
+// 正版观看地址（2026-11 核对）：重启人生在 B 站有正版；Homeland 在腾讯视频；Cupertino 是 CBS 新剧，在 Paramount+
+const SHOW_LINKS={'看一集《重启人生》':['https://www.bilibili.com/bangumi/play/ss46356','去 B 站看（正版）'],'看一集《Homeland》':['https://v.qq.com/detail/s/sdp001998jkthte.html','去腾讯视频看'],'看一集《Cupertino》':['https://www.paramountplus.com/shows/cupertino/','去 Paramount+ 看']};
+S.rewards.forEach(r=>{const L=SHOW_LINKS[r.name];if(L){r.link=L[0];r.linkLabel=L[1]}});
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
@@ -1213,7 +1216,7 @@ function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.re
 $('rList').onclick=e=>{const del=e.target.closest('[data-rdel]');if(del){const r=S.rewards[+del.dataset.rdel];if(confirm('删除奖励「'+r.name+'」？')){S.rewards.splice(+del.dataset.rdel,1);save();renderShop()}return}
  const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
  S.coins-=r.cost;S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
- modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center">${r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" rel="noopener" onclick="closeModal()" style="text-decoration:none">去 B 站看</a>`:''}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
+ modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center">${r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" rel="noopener" onclick="closeModal()" style="text-decoration:none">${esc(r.linkLabel||'去 B 站搜')}</a>`:''}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
 $('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value);if(!n||!(c>0)){toast('写上奖励名称和价格');return}S.rewards.push({name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
 // ---------- 一年热力图 ----------
 function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
