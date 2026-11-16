@@ -168,6 +168,7 @@ textarea{width:100%;min-height:300px;border:1.5px solid var(--line);border-radiu
  background:repeating-linear-gradient(180deg,transparent 0,transparent calc(2.1em - 1px),#efe3cc calc(2.1em - 1px),#efe3cc 2.1em) local,#fffdf7;background-position:0 6px}
 textarea:focus,input:focus{outline:none;border-color:var(--sea);box-shadow:0 0 0 4px rgba(45,135,163,.15)}
 input[type=text],input[type=number],input[type=time]{border:1.5px solid var(--line);border-radius:12px;padding:8px 11px;font-size:14px;font-family:inherit;background:#fffdf7;color:var(--ink)}
+select{border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;font-size:14px;font-family:inherit;background:#fffdf7;color:var(--ink);max-width:60vw}
 input[type=checkbox]{width:22px;height:22px;accent-color:var(--leaf)}
 #wTimer{font-weight:600;color:var(--sea)}
 .fb{font-size:14px;display:flex;flex-direction:column;gap:6px}
@@ -271,6 +272,11 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 .hc i.l1{background:#cdebc2}.hc i.l2{background:#97d388}.hc i.l3{background:#55ad6c}.hc i.l4{background:#2b7148}.hc i.e{visibility:hidden}
 .hleg{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--mute);margin-top:8px}
 .hleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* floating window button */
+.pipbtn{position:absolute;left:16px;top:16px;display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.28);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:var(--scene-ink);border-radius:12px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:2}
+.pipbtn svg{width:15px;height:15px}.pipbtn:hover{background:rgba(255,255,255,.45)}
+body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+@media(max-width:820px){.pipbtn{display:none!important}}
 /* pomodoro dots */
 .pomos{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:12px;font-weight:600}
 .pomos i{width:15px;height:15px;border-radius:50%;border:2px dashed currentColor;opacity:.45;position:relative;transition:all .4s}
@@ -353,6 +359,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
     <div class="sky sky-idle"></div><div class="sky sky-focus"><i class="stars"></i></div><div class="sky sky-break"></div>
     <div class="orb"></div><div class="cloud c1"></div><div class="cloud c2"></div>
     <div class="scene-in">
+      <button class="pipbtn hide" id="pipBtn" title="把计时器变成一个悬浮在所有窗口上面的小窗"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="12" y="11" width="7" height="6" rx="1.2" fill="currentColor"/></svg>悬浮小窗</button>
       <div class="seg" id="durRow">
         <span class="chip" data-min="15">15 分</span>
         <span class="chip on" data-min="25">25 分</span>
@@ -399,7 +406,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
       <div class="tracks" id="mList"></div>
       <div class="addrow"><input type="text" id="mUrl" placeholder="粘贴 B 站视频链接（含 BV 号）"><button class="btn b" id="mAdd">添加</button></div>
     </div>
-    <p class="rules">规则：专注中切走页面超过 15 秒记一次「分心」，扣 5 XP；扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。</p>
+    <p class="rules" id="rules">规则：专注中切走页面超过 15 秒记一次「分心」，扣 5 XP；扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。</p>
   </div>
 </div>
 </section>
@@ -476,6 +483,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
     <label class="set">长休息（分钟）<input type="number" id="pLong" min="5" max="60" style="width:84px"></label>
     <label class="set">每几个番茄后长休息一次<input type="number" id="pEvery" min="2" max="8" style="width:84px"></label>
     <label class="set">休息结束后自动开始下一个番茄<input type="checkbox" id="pAuto"></label>
+    <label class="set">专注中离开页面算分心吗<select id="awayMode"><option value="phone">只在手机上算（推荐）</option><option value="all">电脑和手机都算</option><option value="off">都不算</option></select></label>
     <p class="mute">番茄时长在专注页的岛上选（默认 25 分钟）。中途放弃的那一轮不算一个番茄。</p>
   </div>
   <div class="card" style="margin-top:16px">
@@ -490,7 +498,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
   </div>
   <div class="card" style="margin-top:16px">
     <h2>数据</h2>
-    <div class="row"><button class="btn s" id="exportBtn">导出全部数据</button><button class="btn s" id="importBtn">导入数据</button><input type="file" id="importFile" accept="application/json,.json" class="hide"><button class="btn s" id="resetBtn" style="color:var(--seal)">清空重来</button></div>
+    <div class="row"><button class="btn s" id="exportBtn">导出全部数据</button><button class="btn s" id="importBtn">导入数据</button><input type="file" id="importFile" accept="application/json,.json" class="hide"><button class="btn s" id="resetXpBtn">XP 和岛币清零</button><button class="btn s" id="resetBtn" style="color:var(--seal)">清空重来</button></div>
     <p class="mute">数据只存在当前这个浏览器里。换设备或换网址打开时，先在旧的地方导出，再到新的地方导入。</p>
   </div>
 </section>
@@ -622,7 +630,7 @@ function focusUI(){$('startBtn').classList.add('hide');$('giveupBtn').classList.
 function breakUI(){$('phaseTxt').textContent=(brkLong?'长休息 ':'短休息 ')+brkLen+' 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始'+nextLabel();$('startBtn').classList.remove('hide');renderPomos()}
 function startFocus(){runCleanupIfBreak();mode='focus';focusStart=Date.now();focusEnd=focusStart+dur*60000;$('startBtn').textContent='开始专注';focusUI();persistTimer();clearInterval(tick);tick=setInterval(loop,500);loop()}
 function runCleanupIfBreak(){if(mode==='break'&&$('mSkip'))closeModal()}
-function scene(){document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=mode==='focus'?1-t/(dur*60000):mode==='break'?1-t/(brkLen*60000):0;$('halo').style.setProperty('--p',Math.max(0,Math.min(1,p)).toFixed(4))}
+function scene(){pipUpdate();document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=mode==='focus'?1-t/(dur*60000):mode==='break'?1-t/(brkLen*60000):0;$('halo').style.setProperty('--p',Math.max(0,Math.min(1,p)).toFixed(4))}
 function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0)finishFocus()}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);const wasLong=brkLong;resetUI();if(P().auto&&!document.hidden){notify('休息结束','自动开始'+nextLabel());startFocus()}else notify('休息结束',wasLong?'新一组番茄，从第 1 个开始':'回来开始'+nextLabel())}}}
 function flashBusy(){return document.title.startsWith('●')}
 function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;const pm=pomo();pm.c++;save();const cfg=P();brkLong=pm.c%cfg.every===0;brkLen=brkLong?cfg.long:cfg.short;const bEnd=focusEnd+brkLen*60000;
@@ -636,8 +644,12 @@ $('startBtn').onclick=startFocus;
 $('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI();parkReview()};
 // 分心检测：记下离开的时刻（也存进 localStorage）。回来时按「离开到本轮结束」之间的时长算，
 // 这样就算本轮在后台已经结束了，离开的那段也照样算分心。
-function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
+// 离开页面算不算分心：电脑上常常要切到别的窗口查资料、写代码，所以默认只在手机上算
+const IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent)&&matchMedia('(pointer:coarse)').matches);
+function awayOn(){const m=S.settings.awayMode||'phone';return m==='all'||(m==='phone'&&IS_PHONE)}
+function renderRules(){const on=awayOn();$('rules').textContent='规则：'+(on?'专注中切走页面超过 15 秒记一次「分心」，扣 5 XP；':'这台设备上切走页面不算分心（可在「提醒设置 → 番茄钟」修改）；')+'扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。'}
+function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();if(!awayOn())return;const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&awayOn()&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
 function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle'){resetUI();return}selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;brkLen=t.blen||5;brkLong=!!t.long;
   if(t.mode==='focus'){mode='focus';focusUI();tick=setInterval(loop,500);loop()}
   else if(t.mode==='break'){if(Date.now()<t.end){mode='break';breakUI();tick=setInterval(loop,500);loop()}else{S.timer=null;save();resetUI()}}}
@@ -868,6 +880,7 @@ $('wGoalIn').value=wGoal();$('coursesIn').value=S.settings.courses||'';
 $('wGoalIn').onchange=e=>{S.settings.wordGoal=Math.max(50,+e.target.value||300);e.target.value=S.settings.wordGoal;save();renderGoal()};
 $('coursesIn').onchange=e=>{S.settings.courses=e.target.value.trim();save();if(cur&&!cur.rw&&/\{课\}/.test(cur.tpl)){cur.q=fillCourse(cur.tpl);showPrompt()}};
 [['pShort','shortBreak',5,1,30],['pLong','longBreak',15,5,60],['pEvery','longEvery',4,2,8]].forEach(([id,k,def,lo,hi])=>{$(id).value=S.settings[k]||def;$(id).onchange=e=>{S.settings[k]=Math.min(hi,Math.max(lo,Math.round(+e.target.value)||def));e.target.value=S.settings[k];save();if(mode==='idle')resetUI();else renderPomos()}});
+$('awayMode').value=S.settings.awayMode||'phone';$('awayMode').onchange=e=>{S.settings.awayMode=e.target.value;if(!awayOn())S.away=null;save();renderRules();toast(awayOn()?'这台设备上，专注中离开页面会算分心':'这台设备上，离开页面不再算分心')};renderRules();
 $('pAuto').checked=!!S.settings.autoNext;$('pAuto').onchange=e=>{S.settings.autoNext=e.target.checked;save()};
 $('idleMin').value=S.settings.idleMin;$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
 $('idleMin').onchange=e=>{S.settings.idleMin=+e.target.value||0;save()};$('writeTime').onchange=e=>{S.settings.writeTime=e.target.value;save()};$('sound').onchange=e=>{S.settings.sound=e.target.checked;save()};
@@ -875,11 +888,41 @@ function notifState(){if(!('Notification' in window)){$('notifBtn').textContent=
 $('notifBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(e){}notifState();if(!('Notification' in window)||Notification.permission!=='granted')toast('系统通知不可用，会用页面弹窗+提示音提醒你')};notifState();
 $('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='xinliu-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
 $('resetBtn').onclick=()=>{if(confirm('确定清空所有数据？树会回到种子。')){clearInterval(tick);S=blank();save();location.reload()}};
+$('resetXpBtn').onclick=()=>{if(!confirm('把 XP 和岛币都清零？树会回到种子。写作、间隙卡、成就和打卡记录都保留。'))return;S.xp=0;S.coins=0;S.lostXp=0;save();render();if(!$('tab-badges').classList.contains('hide'))renderBadges();toast('XP 和岛币已清零，从种子重新开始')};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(typeof data!=='object'||!data||typeof data.xp!=='number'||typeof data.days!=='object')throw 0;if(!confirm('用这个文件覆盖当前数据？（当前 '+S.xp+' XP → 文件里 '+data.xp+' XP）'))return;clearInterval(tick);S=Object.assign(blank(),data);S.settings=Object.assign(blank().settings,data.settings||{});save();location.reload()}catch(err){toast('这个文件不是心流岛导出的数据')}};
 $('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
 
 renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();
+
+// ---------- 悬浮小窗（Chrome / Edge 的 Document Picture-in-Picture：小窗永远在所有窗口最上面） ----------
+var pipWin=null;
+const PIP_CSS=`*{box-sizing:border-box}body{margin:0;height:100vh;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:10px 14px;font:13px/1.4 -apple-system,"PingFang SC",sans-serif;transition:background 1s,color 1s;user-select:none}
+body[data-mode=idle]{background:linear-gradient(180deg,#bfe3ee,#f6e9d3);color:#17403a}body[data-mode=focus]{background:linear-gradient(180deg,#0f2a3d,#1f5a63);color:#eaf7f1}body[data-mode=break]{background:linear-gradient(180deg,#ffd2a3,#fde2c0);color:#4b2a16}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:600;opacity:.85;gap:8px}.top span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t{font:400 44px/1 "Young Serif","Songti SC",Georgia,serif;letter-spacing:1px;font-variant-numeric:tabular-nums;text-align:center}
+.bar{height:5px;border-radius:9px;background:rgba(127,127,127,.22);overflow:hidden}.bar i{display:block;height:100%;background:#ffd76a;border-radius:9px;transition:width .5s}body[data-mode=break] .bar i{background:#fff}body[data-mode=idle] .bar i{background:#3f9a62}
+.row{display:flex;gap:6px}button,input{font:inherit;border-radius:9px;border:1px solid rgba(127,127,127,.35);padding:5px 8px;background:rgba(255,255,255,.18);color:inherit}button{cursor:pointer;font-weight:700;flex:none}button.go{flex:1;background:#ffb547;border-color:#d9871c;color:#4a2c05}input{flex:1;min-width:0;outline:none}input::placeholder{color:inherit;opacity:.6}`;
+async function openPip(){if(pipWin){pipWin.close();return}
+ const slow=setTimeout(()=>{if(!pipWin)toast('悬浮窗没打开。请用 Chrome 或 Edge 的普通窗口打开心流岛再试')},3000);
+ try{pipWin=await documentPictureInPicture.requestWindow({width:260,height:168})}catch(e){clearTimeout(slow);toast('打不开悬浮窗：'+(e.message||e));return}clearTimeout(slow);
+ const d=pipWin.document;d.title='心流岛';
+ const f=d.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Young+Serif&display=swap';d.head.appendChild(f);
+ const st=d.createElement('style');st.textContent=PIP_CSS;d.head.appendChild(st);
+ d.body.innerHTML=`<div class="top"><span id="ph"></span><span id="pm"></span></div><div class="t" id="tt">25:00</div><div class="bar"><i id="pb"></i></div><div class="row" id="act"></div>`;
+ pipWin.addEventListener('pagehide',()=>{pipWin=null;$('pipBtn').lastChild.textContent='悬浮小窗'});
+ $('pipBtn').lastChild.textContent='关掉小窗';pipAct='';pipUpdate()}
+var pipAct='';
+function pipUpdate(){if(!pipWin)return;const d=pipWin.document,q=id=>d.getElementById(id);if(!q('tt'))return;
+ d.body.dataset.mode=mode;const left=focusEnd-Date.now();
+ q('tt').textContent=mode==='idle'?String(dur).padStart(2,'0')+':00':fmt(left);
+ q('ph').textContent=mode==='focus'?nextLabel():mode==='break'?(brkLong?'长休息':'短休息'):'准备开始'+nextLabel();
+ q('pm').textContent='🍅 '+pomo().c;
+ const p=mode==='focus'?1-left/(dur*60000):mode==='break'?1-left/(brkLen*60000):0;q('pb').style.width=(Math.max(0,Math.min(1,p))*100)+'%';
+ if(pipAct!==mode){pipAct=mode;const a=q('act');
+  if(mode==='focus'){a.innerHTML='<input id="pk" placeholder="冒出个念头？写下，回车" maxlength="120">';const i=q('pk');i.onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&parkAdd(i.value)){i.value='';i.placeholder='停好了 ✓ 回到题目';setTimeout(()=>{if(i.isConnected)i.placeholder='冒出个念头？写下，回车'},2500)}}}
+  else{a.innerHTML=`<button class="go" id="go">${mode==='break'?'跳过休息，开始下一个':'开始专注'}</button>`;q('go').onclick=()=>{closeModal();startFocus()}}}}
+if('documentPictureInPicture' in window){$('pipBtn').classList.remove('hide');$('pipBtn').onclick=openPip}
 
 // ---------- 念头停车场 ----------
 function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span>${esc(p.text)}</span><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
