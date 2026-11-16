@@ -560,7 +560,7 @@ body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba
   </div>
   <div class="card" style="margin-top:16px">
     <h2>数据</h2>
-    <div class="row"><button class="btn s" id="exportBtn">导出全部数据</button><button class="btn s" id="importBtn">导入数据</button><input type="file" id="importFile" accept="application/json,.json" class="hide"><button class="btn s" id="resetXpBtn">XP 和岛币清零</button><button class="btn s" id="resetBtn" style="color:var(--seal)">清空重来</button></div>
+    <div class="row"><button class="btn s" id="exportBtn">导出全部数据</button><button class="btn s" id="importBtn">导入数据</button><input type="file" id="importFile" accept="application/json,.json" class="hide"><button class="btn s" id="resetXpBtn">XP、等级和岛币清零</button><button class="btn s" id="resetBtn" style="color:var(--seal)">清空重来</button></div>
     <p class="mute">数据只存在当前这个浏览器里。换设备或换网址打开时，先在旧的地方导出，再到新的地方导入。</p>
   </div>
 </section>
@@ -952,7 +952,7 @@ function notifState(){if(!('Notification' in window)){$('notifBtn').textContent=
 $('notifBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(e){}notifState();if(!('Notification' in window)||Notification.permission!=='granted')toast('系统通知不可用，会用页面弹窗+提示音提醒你')};notifState();
 $('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='xinliu-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
 $('resetBtn').onclick=()=>{if(confirm('确定清空所有数据？树会回到种子。')){clearInterval(tick);S=blank();save();location.reload()}};
-$('resetXpBtn').onclick=()=>{if(!confirm('把 XP 和岛币都清零？树会回到种子。写作、间隙卡、成就和打卡记录都保留。'))return;S.xp=0;S.coins=0;S.lostXp=0;save();render();if(!$('tab-badges').classList.contains('hide'))renderBadges();toast('XP 和岛币已清零，从种子重新开始')};
+$('resetXpBtn').onclick=()=>{if(!confirm('把 XP、等级、赛季等级和岛币都清零？树会回到种子，岛回到小海岛，这个月的赛季从 0 级重新算。\n\n写作、间隙卡、成就印章、打卡记录、宝箱和装饰都保留。'))return;S.xp=0;S.coins=0;S.lostXp=0;S.season={m:monthKey(),got:0,base:monthMinutesRaw()};save();render();if(!$('tab-badges').classList.contains('hide'))renderBadges();toast('XP、等级和岛币已清零，从种子重新开始')};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(typeof data!=='object'||!data||typeof data.xp!=='number'||typeof data.days!=='object')throw 0;if(!confirm('用这个文件覆盖当前数据？（当前 '+S.xp+' XP → 文件里 '+data.xp+' XP）'))return;clearInterval(tick);S=Object.assign(blank(),data);S.settings=Object.assign(blank().settings,data.settings||{});save();location.reload()}catch(err){toast('这个文件不是心流岛导出的数据')}};
 $('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
@@ -1065,7 +1065,9 @@ function renderDecos(){const L=levelOf(S.xp),cur=islandTheme(L);$('islandRoad').
 const SEASONS=['雪夜季','灯笼季','春芽季','樱花季','绿荫季','萤火季','海风季','星河季','桂香季','枫叶季','落叶季','暖炉季'];
 const SEASON_MIN=25,SEASON_TIERS=30;
 function monthKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
-function monthMinutes(){const mk=monthKey();let m=0;for(const k in S.days)if(k.startsWith(mk))m+=S.days[k].min||0;return m}
+function monthMinutesRaw(){const mk=monthKey();let m=0;for(const k in S.days)if(k.startsWith(mk))m+=S.days[k].min||0;return m}
+// 赛季分钟：从这个月开始算；如果你这个月清零过，就从清零那一刻算
+function monthMinutes(){const b=S.season&&S.season.m===monthKey()?S.season.base||0:0;return Math.max(0,monthMinutesRaw()-b)}
 function tierReward(t){return t===30?{chest:3}:t===20?{chest:2}:t===10?{chest:1}:t%5===0?{chest:0}:{coins:15}}
 function checkSeason(){const mk=monthKey();if(!S.season||S.season.m!==mk)S.season={m:mk,got:0};const tier=Math.min(SEASON_TIERS,Math.floor(monthMinutes()/SEASON_MIN));if(S.season.got>=tier)return;
  let coins=0,chests=0;while(S.season.got<tier){const t=++S.season.got,rw=tierReward(t);
