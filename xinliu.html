@@ -610,7 +610,9 @@ S.parked=S.parked||[];S.purchases=S.purchases||[];
 S.rewards=S.rewards||[{name:'玩一局游戏',cost:80},{name:'刷 15 分钟 X',cost:60},{name:'看一集剧',cost:150},{name:'买杯奶茶',cost:200}];
 // 想看的剧：一集一集用岛币换，换完可以直接去 B 站搜
 const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q);
-if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupterino','Cupterino'],['无穷的开始','无穷的开始'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
+if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['无穷的开始','无穷的开始'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
+// 改名：之前拼错成 Cupterino
+S.rewards.forEach(r=>{if(r.name==='看一集《Cupterino》'){r.name='看一集《Cupertino》';r.link=bsearch('Cupertino')}});S.purchases.forEach(x=>{if(x.name==='看一集《Cupterino》')x.name='看一集《Cupertino》'});
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
