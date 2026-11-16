@@ -640,7 +640,7 @@ S.settings=Object.assign(blank().settings,S.settings||{});
 // 新字段：旧数据第一次打开时补上（已有的 XP 一次性换成等量岛币）
 if(typeof S.coins!=='number')S.coins=S.xp||0;
 S.parked=S.parked||[];S.purchases=S.purchases||[];
-S.rewards=S.rewards||[{name:'玩一局游戏',cost:30},{name:'刷 15 分钟 X',cost:135},{name:'看一集剧',cost:270},{name:'买杯奶茶',cost:200}];
+S.rewards=S.rewards||[{name:'玩一局游戏',cost:30},{name:'刷 15 分钟 X',cost:135},{name:'看一集剧',cost:270}];
 // 想看的剧：一集一集用岛币换，换完可以直接去 B 站搜
 const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q);
 if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:270,link:bsearch(q)})});S.rewardSeed=1}
@@ -664,6 +664,9 @@ S.watch=S.watch||[];
 if((S.priceSeed||0)<4){const OLD={'看《Homeland》':'Homeland','看《Cupertino》':'Cupertino','看《重启人生》':'重启人生','看一集《Homeland》':'Homeland','看一集《Cupertino》':'Cupertino','看一集《重启人生》':'重启人生','看一集《Cupterino》':'Cupertino'};
  S.purchases.forEach(x=>{const w=OLD[x.name];if(w){S.watch.push({id:x.at,at:x.at,kind:'看剧',mins:x.mins||0,what:w});x.name='看剧'}});
  S.rewards=S.rewards.filter(r=>!OLD[r.name]);if(!S.rewards.some(r=>r.name==='看剧'))S.rewards.splice(2,0,{name:'看剧',rate:6,mins:45});S.watch.sort((a,b)=>b.at-a.at);S.priceSeed=4}
+if((S.priceSeed||0)<5){S.rewards=S.rewards.filter(r=>r.name!=='买杯奶茶');S.priceSeed=5}
+// 已经按分钟计费了，名字里不用再写「20分钟」：看b站20分钟 → 看 B 站
+if((S.priceSeed||0)<6){const fix=n=>/^看\s*b\s*站/i.test(n)?'看 B 站':n;S.rewards.forEach(r=>{const n=fix(r.name);if(n!==r.name){r.name=n;r.rate=r.rate||9;r.mins=r.mins||20;delete r.cost;r.link=r.link||'https://www.bilibili.com';r.linkLabel=r.linkLabel||'打开 B 站'}});S.purchases.forEach(x=>x.name=fix(x.name));S.watch.forEach(x=>x.kind=fix(x.kind));S.priceSeed=6}
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
@@ -1323,7 +1326,7 @@ function askWhat(wid,timeUp){const e=S.watch.find(x=>x.id===wid);if(!e)return;co
   const ok=()=>{const v2=$('wIn').value.trim();if(v2){Object.assign(e,parseWhat(v2));save();renderWatch()}closeModal();if(timeUp)startNext()};
   $('wOk').onclick=ok;$('wIn').onkeydown=ev=>{if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();ok()}};$('wSkip').onclick=()=>{closeModal();renderWatch()}};bind()}
 // 观看记录
-function renderWatch(){if(!$('wList'))return;const W=S.watch,wk=Date.now()-7*86400000,sum={};W.filter(e=>e.at>=wk).forEach(e=>{const k=/看/.test(e.kind)?'看剧':/刷/.test(e.kind)?'刷信息流':'玩游戏';sum[k]=(sum[k]||0)+(e.used||e.mins||0)});
+function renderWatch(){if(!$('wList'))return;const W=S.watch,wk=Date.now()-7*86400000,sum={};W.filter(e=>e.at>=wk).forEach(e=>{const k=/b\s*站|bilibili|刷|(^|\s)X$/i.test(e.kind)?'刷信息流':/看/.test(e.kind)?'看剧':'玩游戏';sum[k]=(sum[k]||0)+(e.used||e.mins||0)});
  const top={};W.filter(e=>e.what).forEach(e=>{const k=e.what.replace(/\s*(S\d+)?\s*E?\d+\s*$/i,'').trim()||e.what;top[k]=(top[k]||0)+(e.used||e.mins||0)});const T=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
  $('wSum').innerHTML=Object.keys(sum).length?Object.entries(sum).map(([k,v])=>`<div><b>${v}</b><span>近 7 天${k}（分钟）</span></div>`).join(''):'<p class="mute" style="margin:0">还没有记录。在奖励商店兑换看剧、玩游戏、刷 X / B 站后，这里会记下你看了什么、花了多久。</p>';
  $('wTop').innerHTML=T.length?'最常看 / 玩：'+T.map(([k,v])=>`<b>${esc(k)}</b> ${v} 分钟`).join('、'):'';
