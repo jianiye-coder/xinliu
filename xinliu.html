@@ -513,9 +513,9 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
       </div>
     </div>
     <div class="card">
-      <h2>念头停车场<span class="k">专注时冒出的事，结束后再处理</span></h2>
+      <h2>念头停车场<span class="k">要做的事停在这里 · 冒出的想法存进写作</span></h2>
       <div id="pList"></div>
-      <div class="addrow"><input type="text" id="pkAdd" maxlength="120" placeholder="想到要做的事，先写在这里"><button class="btn s" id="pkAddBtn">停好</button></div>
+      <div class="addrow"><input type="text" id="pkAdd" maxlength="200" placeholder="写一句。回车会自动判断是待办还是想法"><button class="btn s" id="pkAddBtn" title="要去做的事">☐ 待办</button><button class="btn s" id="pkIdeaBtn" title="一个想法，以后可以写成一篇">💡 想法</button></div>
     </div>
     <div class="card music">
       <h2>学习歌单<span class="k">在页面里播放，不进 B 站首页</span></h2>
@@ -565,7 +565,7 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 <section id="tab-journal" class="hide">
   <div class="card">
     <h2>我的输出<span class="k">写作 + 间隙卡</span></h2>
-    <div class="row" style="margin-bottom:10px"><span class="chip on" data-jf="all">全部</span><span class="chip" data-jf="write">写作</span><span class="chip" data-jf="gap">间隙卡</span></div>
+    <div class="row" style="margin-bottom:10px"><span class="chip on" data-jf="all">全部</span><span class="chip" data-jf="write">写作</span><span class="chip" data-jf="gap">间隙卡</span><span class="chip" data-jf="idea">💡 想法</span></div>
     <div id="jList"></div>
   </div>
   <div class="card" style="margin-top:16px"><h2>我的观看记录<span class="k">WATCH LIST · 看了什么、花了多久</span></h2><div class="wsum" id="wSum"></div><p class="mute" id="wTop" style="margin:8px 0"></p><div id="wList"></div></div>
@@ -880,7 +880,7 @@ function showRemedy(r,resist){const box=$('uRem');if(!box)return;const cheap=S.r
   '卡题了':{t:'卡住的时候，把卡点写下来，往往写着写着就通了。',input:'我卡在……',btn:'存成间隙卡',act:v=>{S.journal.unshift({type:'gap',at:Date.now(),text:'卡点：'+v});day().words+=countZh(v);save();toast('卡点存好了。回去再看一遍题目')}},
   '累了':mode==='focus'?{t:'累的时候需要的是真正的休息，信息流只会更累。现在提前休息，不算放弃。',btn:'现在提前休息 '+P().short+' 分钟',act:()=>earlyBreak()}:{t:'站起来，离开桌子走 5 分钟。别带手机。'},
   '无聊':{t:'无聊说明难度不对。换一道更难的题，或者切去写作训练。',btn:'去写作训练场',act:()=>tabTo('write')},
-  '焦虑':{t:'把担心的事写下来，停进念头停车场。现在先不处理它。',input:'我在担心……',btn:'停进停车场',act:v=>parkAdd(v)},
+  '焦虑':{t:'把担心的事写下来，停进念头停车场。现在先不处理它。',input:'我在担心……',btn:'停进停车场',act:v=>parkAdd(v,'todo')},
   '习惯性':{t:'这是手的习惯，不是你真想要的。把手机放到够不着的地方，再跟着圆圈呼吸一次。'},
   '想奖励自己':{t:cheap?(S.coins>=cheap.cost?`你有 ${S.coins} 岛币，够换「${cheap.name}」了。挣来的奖励，好好享受。`:`再挣 ${cheap.cost-S.coins} 岛币就能换「${cheap.name}」。完成这一轮再奖励自己。`):'在奖励商店里设一个奖励，用岛币换。',btn:'去奖励商店',act:()=>tabTo('badges')}
  }[r];if(!R){box.classList.add('hide');return}
@@ -1024,7 +1024,7 @@ $('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<(cur&&
  const st=textStats(t),secs=ws.first?Math.max(1,(ws.last-ws.first)/1000):0,before=day().words||0;
  const e={type:'write',at:Date.now(),text:t,vague:st.v,secs:Math.round(secs),pauses:ws.pauses,pauseSecs:Math.round(ws.pauseMs/1000)};
  const rw=cur&&cur.rw?cur:null;
- if(rw){Object.assign(e,{prompt:'改写：'+(rw.orig.prompt||'旧文'),tag:'改写',pt:'__rewrite',rewriteOf:rw.orig.at});S.rwWeek=weekKey(new Date())}else if(cur)Object.assign(e,{prompt:cur.q,tag:cur.tag,pt:cur.tpl,group:cur.g});
+ if(rw){Object.assign(e,{prompt:'改写：'+(rw.orig.prompt||'旧文'),tag:'改写',pt:'__rewrite',rewriteOf:rw.orig.at});S.rwWeek=weekKey(new Date())}else if(cur)Object.assign(e,{prompt:cur.q,tag:cur.tag,pt:cur.tpl,group:cur.g,ideaOf:cur.ideaOf});
  S.journal.unshift(e);const d=day();d.words+=n;d.writes++;save();
  let xp,why;
  if(rw){const ok=n<=rw.target;xp=Math.floor(n/10)+(ok?15:0);why='改写 '+n+' 字'+(ok?' · 压缩达标':'')}
@@ -1040,6 +1040,9 @@ function showSummary(e,hit){const n=countZh(e.text),past=S.journal.filter(x=>x.t
  <p class="mute">${sp&&avgSp?`比你最近的平均速度（${avgSp} 字/分钟）${sp>=avgSp?'快':'慢'} ${Math.abs(sp-avgSp)} 字。`:''}${e.pauses>=3?'停顿比较多：卡住的地方往往就是还没想清楚的地方，回头看看是哪几句。':e.secs?'写得很连贯。':''}</p>
  <div class="row center"><button class="btn p" onclick="closeModal()">好</button></div>`)}
 // ----- 改写旧文：每周一次，拿一周前或一个月前的一篇压缩到一半 -----
+function startIdeaWrite(at){const o=S.journal.find(e=>e.at===at);if(!o)return;if(countZh($('wText').value)>0&&!confirm('写作框里还有没存的内容，清空它开始写这个想法？'))return;
+ document.querySelector('nav [data-tab=write]').click();cur={g:'我的想法',tag:'💡 想法',q:'把这个想法写清楚：「'+o.text+'」',tip:'它是什么？你为什么会这么想？举一个具体的例子。如果它是对的，意味着什么？',tpl:'__idea',ideaOf:at,times:0};
+ $('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
 function weekKey(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return keyOf(x)}
 function rwCandidate(){const now=Date.now(),D=86400000,done=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
  const c=S.journal.filter(e=>e.type==='write'&&!e.rewriteOf&&!done.has(e.at)&&countZh(e.text)>=60&&now-e.at>=6*D);if(!c.length)return null;
@@ -1061,10 +1064,10 @@ function showCompare(o,e){const a=textStats(o.text),b=textStats(e.text),d1=new D
 let jf='all';document.querySelectorAll('[data-jf]').forEach(c=>c.onclick=()=>{jf=c.dataset.jf;document.querySelectorAll('[data-jf]').forEach(x=>x.classList.toggle('on',x===c));renderJournal()});
 function renderJournal(){const list=S.journal.filter(e=>jf==='all'||e.type===jf);const rewritten=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
  $('jList').innerHTML=list.length?list.map(e=>{const d=new Date(e.at);const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const n=countZh(e.text);
-  const meta=e.type==='gap'?'间隙卡':esc(e.tag||'写作')+' · '+n+'字 · 模糊词 '+e.vague+(e.secs?' · 用时 '+mmss(e.secs)+' · 停顿 '+(e.pauses||0)+' 次':'');
-  let acts='';if(e.type==='write'){if(e.rewriteOf){const o=S.journal.find(x=>x.at===e.rewriteOf);if(o)acts=`<button data-cmp="${e.at}">对比改写前后</button>`}else if(n>=40)acts=rewritten.has(e.at)?'<span class="mute">已改写</span>':`<button data-rw="${e.at}">改写成一半</button>`}
+  const meta=e.type==='idea'?'💡 想法':e.type==='gap'?'间隙卡':esc(e.tag||'写作')+' · '+n+'字 · 模糊词 '+e.vague+(e.secs?' · 用时 '+mmss(e.secs)+' · 停顿 '+(e.pauses||0)+' 次':'');
+  let acts='';if(e.type==='idea'){const w=S.journal.find(x=>x.ideaOf===e.at);acts=w?'<span class="mute">已经写成一篇了</span>':`<button data-idea="${e.at}">✍️ 写成一篇</button>`}else if(e.type==='write'){if(e.rewriteOf){const o=S.journal.find(x=>x.at===e.rewriteOf);if(o)acts=`<button data-cmp="${e.at}">对比改写前后</button>`}else if(n>=40)acts=rewritten.has(e.at)?'<span class="mute">已改写</span>':`<button data-rw="${e.at}">改写成一半</button>`}
   return`<div class="entry"><div class="m">${d.getMonth()+1}月${d.getDate()}日 ${hm} · ${meta}</div>${e.prompt?`<div class="m"><b>${esc(e.prompt)}</b></div>`:''}<div class="t">${esc(e.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div>`}).join(''):'<p class="mute">还没有输出。从一张间隙卡开始。</p>'}
-$('jList').onclick=e=>{const r=e.target.closest('[data-rw]');if(r){startRewrite(+r.dataset.rw);return}const c=e.target.closest('[data-cmp]');if(c){const n=S.journal.find(x=>x.at===+c.dataset.cmp),o=n&&S.journal.find(x=>x.at===n.rewriteOf);if(o)showCompare(o,n)}};
+$('jList').onclick=e=>{const ib=e.target.closest('[data-idea]');if(ib){startIdeaWrite(+ib.dataset.idea);return}const r=e.target.closest('[data-rw]');if(r){startRewrite(+r.dataset.rw);return}const c=e.target.closest('[data-cmp]');if(c){const n=S.journal.find(x=>x.at===+c.dataset.cmp),o=n&&S.journal.find(x=>x.at===n.rewriteOf);if(o)showCompare(o,n)}};
 
 // ---------- badges ----------
 function totals(){let t={min:0,q:0,urge:0,words:0,writes:0,sessions:0};Object.values(S.days).forEach(d=>{for(const k in t)t[k]+=d[k]||0});t.gap=S.journal.filter(e=>e.type==='gap').length;t.precise=S.journal.filter(e=>e.type==='write'&&countZh(e.text)>=150&&e.vague/countZh(e.text)<0.01).length;return t}
@@ -1148,7 +1151,7 @@ function pipUpdate(){if(!pipWin)return;const d=pipWin.document,q=id=>d.getElemen
  q('pm').textContent='🍅 '+pomo().c;
  const p=mode==='focus'?1-left/(dur*60000):mode==='break'?1-left/(brkLen*60000):0;q('pb').style.width=(Math.max(0,Math.min(1,p))*100)+'%';
  if(pipAct!==mode){pipAct=mode;const a=q('act');
-  if(mode==='focus'){a.innerHTML='<input id="pk" placeholder="冒出个念头？写下，回车" maxlength="120">';const i=q('pk');i.onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing&&parkAdd(i.value)){i.value='';i.placeholder='停好了 ✓ 回到题目';setTimeout(()=>{if(i.isConnected)i.placeholder='冒出个念头？写下，回车'},2500)}}}
+  if(mode==='focus'){a.innerHTML='<input id="pk" placeholder="冒出个念头？写下，回车" maxlength="120">';const i=q('pk');i.onkeydown=e=>{let k;if(e.key==='Enter'&&!e.isComposing&&(k=parkAdd(i.value))){i.value='';i.placeholder=k==='idea'?'💡 存成想法了':'☐ 待办停好了，回到题目';setTimeout(()=>{if(i.isConnected)i.placeholder='冒出个念头？写下，回车'},2500)}}}
   else{a.innerHTML=`<button class="go" id="go">${mode==='break'?'跳过休息，开始下一个':'开始专注'}</button>`;q('go').onclick=()=>{closeModal();startFocus()}}}}
 if('documentPictureInPicture' in window){$('pipBtn').classList.remove('hide');$('pipBtn').onclick=openPip}
 
@@ -1211,7 +1214,7 @@ function openChest(c){S.chests=S.chests.filter(x=>x!==c);const r=c.r,base=[12,30
 const TASKS=[
  {k:'p2',g:0,t:'完成 2 个番茄',need:2,v:()=>pomo().c},{k:'p3',g:0,t:'完成 3 个番茄',need:3,v:()=>pomo().c},
  {k:'w150',g:1,t:'写满 150 字',need:150,v:d=>d.words||0},{k:'w1',g:1,t:'完成 1 篇写作训练',need:1,v:d=>d.writes||0},{k:'gap2',g:1,t:'写 2 张间隙卡',need:2,v:()=>S.journal.filter(e=>e.type==='gap'&&keyOf(new Date(e.at))===today()).length},
- {k:'u1',g:2,t:'扛住 1 次刷手机的冲动',need:1,v:d=>d.urge||0},{k:'q3',g:2,t:'做完 3 道题',need:3,v:d=>d.q||0},{k:'clean',g:2,t:'完成 1 个番茄，且今天没有分心',need:1,v:d=>(pomo().c>=1&&!d.distract)?1:0},{k:'park',g:2,t:'用念头停车场停下 1 个念头',need:1,v:()=>S.parked.filter(p=>keyOf(new Date(p.at))===today()).length}
+ {k:'u1',g:2,t:'扛住 1 次刷手机的冲动',need:1,v:d=>d.urge||0},{k:'q3',g:2,t:'做完 3 道题',need:3,v:d=>d.q||0},{k:'clean',g:2,t:'完成 1 个番茄，且今天没有分心',need:1,v:d=>(pomo().c>=1&&!d.distract)?1:0},{k:'park',g:2,t:'用念头停车场停下 1 个念头',need:1,v:()=>S.parked.filter(p=>keyOf(new Date(p.at))===today()).length+S.journal.filter(e=>e.type==='idea'&&keyOf(new Date(e.at))===today()).length}
 ];
 function todayTasks(){const t=today();if(!S.tasks||S.tasks.date!==t){let h=0;for(const ch of t)h=(h*31+ch.charCodeAt(0))>>>0;const ks=[0,1,2].map(g=>{const p=TASKS.filter(x=>x.g===g);return p[(h>>>(g*4))%p.length].k});S.tasks={date:t,ks,done:{},bonus:false};save()}return S.tasks}
 let taskMsgs=[];
@@ -1281,13 +1284,19 @@ function renderReport(){if(!$('reportBox'))return;const A=weekStats(1),B=weekSta
 // ---------- 念头停车场 ----------
 function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span>${esc(p.text)}</span><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
 $('pList').onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;const p=S.parked.find(x=>x.at===+b.dataset.pk);if(p){p.done=true;save();renderPark()}};
-$('parkBtn').onclick=()=>{modal(`<h3>先停在这里</h3><p class="mute">写一句就好，本轮结束再处理。你不用离开这一页。</p><input type="text" id="pkIn" placeholder="比如：查一下拉格朗日乘子的条件" maxlength="120"><div class="row center"><button class="btn s" onclick="closeModal()">算了</button><button class="btn p" id="pkOk">停好了</button></div>`);setTimeout(()=>$('pkIn')&&$('pkIn').focus(),50);
- const ok=()=>{const t=$('pkIn').value.trim();if(!t){closeModal();return}S.parked.unshift({at:Date.now(),text:t,done:false,sess:focusStart});save();closeModal();renderPark();toast('停好了，回到题目')};
- $('pkOk').onclick=ok;$('pkIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();ok()}}};
-function parkAdd(t){t=t.trim();if(!t)return false;S.parked.unshift({at:Date.now(),text:t,done:false,sess:mode==='focus'?focusStart:0});save();renderPark();checkTasks();renderTasks();return true}
-$('pkAddBtn').onclick=()=>{if(parkAdd($('pkAdd').value)){$('pkAdd').value='';toast(mode==='focus'?'停好了，回到题目':'停好了')}};
-$('pkAdd').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('pkAddBtn').click()}};
-function parkReview(){const l=S.parked.filter(p=>!p.done&&p.sess===focusStart);if(!l.length)return;queueModal(`<h3>这轮停了 ${l.length} 个念头</h3><p class="mute">现在可以去处理了。处理完的在「念头停车场」里打个勾。</p>${l.map(p=>`<div class="pk"><span>${esc(p.text)}</span></div>`).join('')}<div class="row center"><button class="btn p" onclick="closeModal()">知道了</button></div>`)}
+// 待办 vs 想法：动词开头、带截止时间的是「要做的事」；其余算「想法」，存进写作，以后可以写成一篇
+function guessKind(t){return /^(去|要|得|记得|别忘|查|回|买|交|发|约|问|打|联系|预约|下载|提交|订|报名|付|还|取|改|做|打印|复习|整理|准备|看一下|看看|找|带|拿|寄|充|续|申请|填|签|洗|收拾|订正)|ddl|deadline|截止|明天|今晚|今天|下周|周[一二三四五六日天]|\d+\s*[点号]/i.test(t.trim())?'todo':'idea'}
+function parkAdd(t,kind){t=t.trim();if(!t)return false;kind=kind||guessKind(t);let now=Date.now();while(S.journal.some(e=>e.at===now)||S.parked.some(p=>p.at===now))now++;const sess=mode==='focus'?focusStart:0;
+ if(kind==='idea')S.journal.unshift({type:'idea',at:now,text:t,sess});else S.parked.unshift({at:now,text:t,done:false,sess});
+ save();renderPark();checkTasks();renderTasks();return kind}
+const parkMsg=k=>k==='idea'?'💡 存成想法了，在「输出 → 想法」里可以写成一篇':(mode==='focus'?'☐ 待办停好了，回到题目':'☐ 待办停好了');
+$('parkBtn').onclick=()=>{modal(`<h3>先停在这里</h3><p class="mute">写一句就好，不用离开这一页。要去做的事停成待办，本轮结束会提醒你；冒出的想法存进写作。</p><input type="text" id="pkIn" placeholder="比如：查一下拉格朗日乘子的条件" maxlength="200"><div class="row center"><button class="btn s" onclick="closeModal()">算了</button><button class="btn s" id="pkIdea">💡 想法</button><button class="btn p" id="pkOk">☐ 待办</button></div>`);setTimeout(()=>$('pkIn')&&$('pkIn').focus(),50);
+ const ok=k=>{const t=$('pkIn').value.trim();if(!t){closeModal();return}const kind=parkAdd(t,k);closeModal();toast(parkMsg(kind))};
+ $('pkOk').onclick=()=>ok('todo');$('pkIdea').onclick=()=>ok('idea');$('pkIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();ok()}}};
+$('pkAddBtn').onclick=()=>{const k=parkAdd($('pkAdd').value,'todo');if(k){$('pkAdd').value='';toast(parkMsg(k))}};
+$('pkIdeaBtn').onclick=()=>{const k=parkAdd($('pkAdd').value,'idea');if(k){$('pkAdd').value='';toast(parkMsg(k))}};
+$('pkAdd').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();const k=parkAdd($('pkAdd').value);if(k){$('pkAdd').value='';toast(parkMsg(k))}}};
+function parkReview(){const l=S.parked.filter(p=>!p.done&&p.sess===focusStart),ideas=S.journal.filter(e=>e.type==='idea'&&e.sess===focusStart);if(!l.length&&!ideas.length)return;queueModal(`<h3>这轮停下了 ${l.length?l.length+' 件要做的事':''}${l.length&&ideas.length?'、':''}${ideas.length?ideas.length+' 个想法':''}</h3>${l.length?`<p class="mute">要做的事现在可以去处理了，处理完在「念头停车场」里打个勾。</p>${l.map(p=>`<div class="pk"><span>☐ ${esc(p.text)}</span></div>`).join('')}`:''}${ideas.length?`<p class="mute">想法存在「输出 → 想法」里，有空可以写成一篇：</p>${ideas.map(p=>`<div class="pk"><span>💡 ${esc(p.text)}</span></div>`).join('')}`:''}<div class="row center"><button class="btn p" onclick="closeModal()">知道了</button></div>`)}
 // ---------- 奖励商店 ----------
 function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>{const P=S.purchases.filter(x=>x.name===r.name),used=r.rate?P.reduce((a,x)=>a+(x.mins||0),0):P.length;const unit=r.rate||r.cost;
   return`<div class="rw"><span class="rn">${esc(r.name)}<small>${r.rate?`按分钟计费${used?' · 已用 '+used+' 分钟':''}`:(used?'已换 '+used+' 次':'固定价格')}</small></span><button class="btn sun buy" data-buy="${i}" ${S.coins<unit?'disabled':''}>${r.rate?r.rate+' 岛币/分钟':r.cost+' 岛币'}</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`}).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
