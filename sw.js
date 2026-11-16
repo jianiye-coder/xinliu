@@ -1,6 +1,6 @@
 // 心流岛 service worker：离线可用 + 手机上发系统通知
 // 改了 xinliu.html 之后，把 VERSION 加 1，用户下次打开就会拿到新版本。
-const VERSION = 'xinliu-v6';
+const VERSION = 'xinliu-v7';
 const FILES = ['./', './xinliu.html', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
