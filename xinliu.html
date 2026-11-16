@@ -303,9 +303,12 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .rep td.up{color:var(--leaf-d);font-weight:700}.rep td.down{color:var(--coral);font-weight:700}
 .repnote{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--leaf-l);font-size:13.5px}.repnote p{margin:4px 0}
 /* tasks / chests / decos */
+.chestinfo{margin-top:8px;font-size:12.5px;color:var(--mute)}.chestinfo summary{cursor:pointer;color:var(--sea);font-weight:700}
+.chestinfo table{width:100%;border-collapse:collapse;margin:6px 0}.chestinfo td{padding:4px 6px;border-top:1px solid var(--line);text-align:center;font-weight:600}.chestinfo tr:first-child td{border-top:0;font-weight:500}.chestinfo p{margin:4px 0 0}
 .task{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:12px;background:var(--paper);margin-bottom:6px;font-size:14px}
 .task .tk{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #d6c9ae;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
 .task .tt{flex:1}.task .tp{font:12px var(--num);color:var(--mute)}
+.task.mine{cursor:pointer}.task .tl{color:var(--sea);text-decoration:none;font-weight:700;padding:0 4px}.task .x{margin-left:2px}
 .task.ok{background:var(--leaf-l)}.task.ok .tk{background:var(--leaf);border-color:var(--leaf)}.task.ok .tt{color:var(--leaf-d);text-decoration:line-through;text-decoration-color:rgba(43,113,72,.4)}.task.ok .tp{color:var(--leaf-d);font-weight:700}
 .chests{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .slot{aspect-ratio:1;border-radius:16px;border:0;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;cursor:pointer;font-size:11.5px;font-weight:700;color:var(--mute);position:relative;transition:transform .15s}
@@ -463,11 +466,18 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
     <div class="card">
       <h2>今日任务<span class="k" id="taskSum"></span></h2>
       <div id="taskList"></div>
+      <p class="mute" style="margin:10px 0 6px;font-weight:700">我每天的任务 <span style="font-weight:500">· 自己打勾，每个 +15 岛币</span></p>
+      <div id="myTaskList"></div>
+      <div class="addrow"><input type="text" id="mtIn" maxlength="40" placeholder="加一个每天都要做的事，比如背 20 个单词"><button class="btn s" id="mtAdd">添加</button></div>
     </div>
     <div class="card">
       <h2>专注宝箱<span class="k">完成下一个番茄就能解锁</span></h2>
       <div class="chests" id="chestRow"></div>
       <p class="mute" id="chestTip" style="margin:8px 0 0"></p>
+      <details class="chestinfo"><summary>宝箱里有什么？</summary><table><tr><td></td><td>岛币</td><td>装饰</td></tr>
+        <tr><td style="color:#b07a45">普通</td><td>12–18</td><td>35% 机会</td></tr><tr><td style="color:#3b82c4">稀有</td><td>30–45</td><td>65% 机会</td></tr>
+        <tr><td style="color:#7c4dcc">史诗</td><td>60–90</td><td>一定有</td></tr><tr><td style="color:#e39a12">传说</td><td>150–225</td><td>一定有</td></tr></table>
+        <p>开出的装饰一般和宝箱同级，有时低一级。开到已经有的装饰会换成岛币。一组 4 个番茄、每日任务全完成、赛季升级送的宝箱至少是稀有。</p></details>
     </div>
     <div class="card">
       <h2>今天<span class="k">TODAY</span></h2>
@@ -610,10 +620,13 @@ S.parked=S.parked||[];S.purchases=S.purchases||[];
 S.rewards=S.rewards||[{name:'玩一局游戏',cost:80},{name:'刷 15 分钟 X',cost:60},{name:'看一集剧',cost:150},{name:'买杯奶茶',cost:200}];
 // 想看的剧：一集一集用岛币换，换完可以直接去 B 站搜
 const bsearch=q=>'https://search.bilibili.com/all?keyword='+encodeURIComponent(q);
-if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['无穷的开始','无穷的开始'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
+if((S.rewardSeed||0)<1){[['Homeland','Homeland 国土安全'],['Cupertino','Cupertino'],['重启人生','重启人生']].forEach(([n,q])=>{const name='看一集《'+n+'》';if(!S.rewards.some(r=>r.name===name))S.rewards.push({name,cost:150,link:bsearch(q)})});S.rewardSeed=1}
 // 改名：之前拼错成 Cupterino
 S.rewards.forEach(r=>{if(r.name==='看一集《Cupterino》'){r.name='看一集《Cupertino》';r.link=bsearch('Cupertino')}});S.purchases.forEach(x=>{if(x.name==='看一集《Cupterino》')x.name='看一集《Cupertino》'});
 // 正版观看地址（2026-11 核对）：重启人生在 B 站有正版；Homeland 在腾讯视频；Cupertino 是 CBS 新剧，在 Paramount+
+// 《无穷的开始》是 David Deutsch 的书。读书是要做的事，不是奖励：从商店拿掉，放进「每天的任务」
+S.rewards=S.rewards.filter(r=>!/《无穷的开始》/.test(r.name));
+S.myTasks=S.myTasks||[];if(!S.taskSeed){if(!S.myTasks.some(t=>/无穷的开始/.test(t.t)))S.myTasks.push({id:1,t:'读一章《无穷的开始》',link:'https://book.douban.com/subject/26184242/'});S.taskSeed=1}
 const SHOW_LINKS={'看一集《重启人生》':['https://www.bilibili.com/bangumi/play/ss46356','去 B 站看（正版）'],'看一集《Homeland》':['https://v.qq.com/detail/s/sdp001998jkthte.html','去腾讯视频看'],'看一集《Cupertino》':['https://www.paramountplus.com/shows/cupertino/','去 Paramount+ 看']};
 S.rewards.forEach(r=>{const L=SHOW_LINKS[r.name];if(L){r.link=L[0];r.linkLabel=L[1]}});
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -1132,7 +1145,7 @@ function openChest(c){S.chests=S.chests.filter(x=>x!==c);const r=c.r,base=[12,30
  if(Math.random()<[.35,.65,1,1][r]){const dr=Math.random()<.6?r:Math.floor(Math.random()*(r+1));const pool=DECOS.filter(d=>d.r===dr);const d=pool[Math.floor(Math.random()*pool.length)];
   if(d&&!S.decos.includes(d.id)){S.decos.push(d.id);got=d}else if(d){dupCoins=[10,20,40,80][d.r]}}
  S.coins+=coins+dupCoins;save();render();
- lines.push(`<div class="loot"><b>+${coins}</b> 岛币</div>`);if(got)lines.push(`<div class="loot new" style="--rc:${RAR[got.r].c}">${decoMini(got,true)}<div><b>新装饰：${got.name}</b><span>${RAR[got.r].n} · 已经放到你的岛上了</span></div></div>`);if(dupCoins)lines.push(`<div class="loot"><b>+${dupCoins}</b> 岛币（开到了已有的装饰）</div>`);
+ lines.push(`<div class="loot"><b>+${coins}</b> 岛币</div>`);if(got)lines.push(`<div class="loot new" style="--rc:${RAR[got.r].c}">${decoMini(got,true)}<div><b>新装饰：${got.name}</b><span>${RAR[got.r].n} · 已经放到你的岛上了</span></div></div>`);if(dupCoins)lines.push(`<div class="loot"><b>+${dupCoins}</b> 岛币（开到了已有的装饰）</div>`);if(!got&&!dupCoins)lines.push(`<p class="mute" style="margin:2px 0 0">这次没开出装饰。${RAR[r].n}宝箱有 ${['35%','65%','100%','100%'][r]} 的机会开出装饰。</p>`);
  modal(`<div class="chestopen" style="--rc:${RAR[r].c}"><div class="cbox">${chestSVG(r,false)}</div><h3>${RAR[r].n}宝箱</h3><div class="loots">${lines.join('')}</div>${got?`<div class="cprev">${treeSVG(levelOf(S.xp))}</div>`:''}<div class="row center"><button class="btn p" onclick="closeModal()">收下</button></div></div>`);beep()}
 // ---------- 每日任务：每天 3 个，零点刷新；全部完成再送一个宝箱 ----------
 const TASKS=[
@@ -1145,7 +1158,12 @@ let taskMsgs=[];
 function checkTasks(){const st=todayTasks(),d=day();let changed=false;st.ks.forEach(k=>{const T=TASKS.find(x=>x.k===k);if(!T||st.done[k])return;if(T.v(d)>=T.need){st.done[k]=true;S.coins+=10;changed=true;taskMsgs.push('每日任务完成：'+T.t+' · +10 岛币')}});
  if(!st.bonus&&st.ks.every(k=>st.done[k])){st.bonus=true;changed=true;if(S.chests.length<4){S.chests.push({id:Date.now()+1,r:rollRarity(1),ready:true});taskMsgs.push('今天 3 个任务全部完成！送你一个宝箱，已经可以打开')}else{S.coins+=40;taskMsgs.push('今天 3 个任务全部完成！宝箱槽满了，换成 40 岛币')}}
  if(changed)save();if(taskMsgs.length){const m=taskMsgs.slice();taskMsgs=[];m.forEach((x,i)=>setTimeout(()=>{beep();toast(x)},2800*(i+1)))}}
-function renderTasks(){if(!$('taskList'))return;const st=todayTasks(),d=day();$('taskList').innerHTML=st.ks.map(k=>{const T=TASKS.find(x=>x.k===k);if(!T)return'';const v=Math.min(T.need,T.v(d)),ok=!!st.done[k];return`<div class="task ${ok?'ok':''}"><span class="tk">${ok?'✓':''}</span><span class="tt">${T.t}</span><span class="tp">${ok?'+10':v+'/'+T.need}</span></div>`}).join('');
+$('myTaskList').onclick=e=>{const del=e.target.closest('[data-mtdel]');if(del){const t=S.myTasks.find(x=>x.id===+del.dataset.mtdel);if(t&&confirm('删除每天的任务「'+t.t+'」？')){S.myTasks=S.myTasks.filter(x=>x!==t);save();renderTasks()}return}
+ if(e.target.closest('a'))return;const row=e.target.closest('[data-mt]');if(!row)return;const st=todayTasks();st.mine=st.mine||{};const id=+row.dataset.mt;
+ if(st.mine[id]){delete st.mine[id];S.coins=Math.max(0,S.coins-15)}else{st.mine[id]=true;S.coins+=15;beep();toast('完成：'+(S.myTasks.find(x=>x.id===id)||{}).t+' · +15 岛币')}save();render()};
+$('mtAdd').onclick=()=>{const t=$('mtIn').value.trim();if(!t)return;S.myTasks.push({id:Date.now(),t});save();$('mtIn').value='';renderTasks()};
+$('mtIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('mtAdd').click()}};
+function renderTasks(){if(!$('taskList'))return;const st=todayTasks(),d=day();st.mine=st.mine||{};$('myTaskList').innerHTML=S.myTasks.map(t=>{const ok=!!st.mine[t.id];return`<div class="task mine ${ok?'ok':''}" data-mt="${t.id}"><span class="tk">${ok?'✓':''}</span><span class="tt">${esc(t.t)}</span>${t.link?`<a class="tl" href="${esc(t.link)}" target="_blank" rel="noopener" title="打开">↗</a>`:''}<span class="tp">${ok?'+15':'点一下打勾'}</span><button class="x" data-mtdel="${t.id}" title="删除">×</button></div>`}).join('');$('taskList').innerHTML=st.ks.map(k=>{const T=TASKS.find(x=>x.k===k);if(!T)return'';const v=Math.min(T.need,T.v(d)),ok=!!st.done[k];return`<div class="task ${ok?'ok':''}"><span class="tk">${ok?'✓':''}</span><span class="tt">${T.t}</span><span class="tp">${ok?'+10':v+'/'+T.need}</span></div>`}).join('');
  const n=st.ks.filter(k=>st.done[k]).length;$('taskSum').textContent=st.bonus?'全部完成 🎁':n+'/3 · 全部完成送宝箱'}
 // ---------- 5 分钟热身：拖延的时候，先只做 5 分钟；做完可以直接接成一个完整番茄 ----------
 function warmDone(){clearInterval(tick);$('timer').textContent='00:00';beep();
