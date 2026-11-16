@@ -271,6 +271,40 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 .hc i.l1{background:#cdebc2}.hc i.l2{background:#97d388}.hc i.l3{background:#55ad6c}.hc i.l4{background:#2b7148}.hc i.e{visibility:hidden}
 .hleg{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--mute);margin-top:8px}
 .hleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* pomodoro dots */
+.pomos{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:12px;font-weight:600}
+.pomos i{width:15px;height:15px;border-radius:50%;border:2px dashed currentColor;opacity:.45;position:relative;transition:all .4s}
+.pomos i.done{border:0;opacity:1;background:radial-gradient(circle at 35% 35%,#ff8a73,#e04b37);box-shadow:0 2px 4px rgba(150,30,20,.3)}
+.pomos i.done::after{content:"";position:absolute;width:6px;height:4px;left:5px;top:-2px;border-radius:50% 50% 0 0;background:#3f9a62}
+.pomos i.now{opacity:1;border-style:solid;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.25)}}
+.pomos span{margin-left:4px;opacity:.75}
+/* writing extras */
+.wgoal{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;flex-wrap:wrap}
+.wgbar{position:relative;flex:1;min-width:120px;height:10px;background:#ebe2d0;border-radius:99px;overflow:hidden}
+.wgbar i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;transition:width .5s}
+#wgFill{background:#bfe3ea}#wgFill2{background:linear-gradient(90deg,#7fd0dd,#2d87a3)}
+.wgoal.met #wgFill2{background:linear-gradient(90deg,#7ccf6d,#3f9a62)}
+#wgTxt{font:13px var(--num);white-space:nowrap}#wgStreak{color:var(--sea);font-weight:700;white-space:nowrap}
+.pgrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;scrollbar-width:none}.pgrow::-webkit-scrollbar{display:none}
+.pgrow .chip{white-space:nowrap;flex:none}.pgrow .chip.add{border-style:dashed;color:var(--sea)}
+.prompt .meta{font-size:11.5px;color:var(--mute);margin-top:8px;display:flex;gap:12px;flex-wrap:wrap}
+.prompt .meta button{border:0;background:none;color:var(--seal);cursor:pointer;font-size:11.5px;padding:0;text-decoration:underline}
+.prompt details{margin-top:10px;font:14px/1.8 var(--serif);background:rgba(255,255,255,.65);border-radius:12px;padding:8px 12px;max-height:220px;overflow:auto;white-space:pre-wrap}
+.prompt summary{cursor:pointer;font:600 12px var(--sans);color:var(--sea)}
+.rwbanner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#fff3dc,#ffe7c4);border:1.5px solid #f3d6a4;margin-bottom:12px;font-size:13.5px;line-height:1.6}
+.rwbanner b{font-family:var(--serif)}.rwbanner .row{margin-left:auto}.rwbanner .btn{padding:8px 14px;font-size:13px}
+.modal.wide{max-width:880px}
+.cmpsum{font-size:14px;padding:10px 12px;border-radius:12px;background:var(--sun-l);line-height:1.7}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.cmp>div{background:var(--paper);border-radius:14px;padding:12px}.cmp>div.new{background:var(--leaf-l)}
+.cmp h4{margin:0 0 2px;font:700 14px var(--serif)}.cmp .st{font-size:12px;color:var(--mute);margin-bottom:6px}
+.cmp .tx{font:14px/1.8 var(--serif);white-space:pre-wrap;max-height:40vh;overflow:auto}
+.sumgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.sumgrid div{background:var(--paper);border-radius:12px;padding:8px 4px;text-align:center}.sumgrid b{display:block;font:400 22px/1.2 var(--num)}.sumgrid span{font-size:11.5px;color:var(--mute)}
+.entry .acts{margin-top:6px;display:flex;gap:6px}
+.entry .acts button{border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--sea)}
+@media(max-width:820px){.cmp{grid-template-columns:1fr}.cmp .tx{max-height:22vh}.modal.wide{max-height:92vh;overflow:auto}}
 /* responsive */
 @media(max-width:820px){
  .focus-grid,.grid{grid-template-columns:1fr}
@@ -326,6 +360,7 @@ body[data-mode=focus] #parkBtn{display:inline-block}
         <span class="chip" data-min="60">60 分</span>
       </div>
       <div class="stage"><div class="halo" id="halo"></div><div id="treeBox"></div></div>
+      <div class="pomos" id="pomos"></div>
       <div class="phase" id="phaseTxt">准备开始一轮专注</div>
       <div class="timer" id="timer">25:00</div>
       <div class="row center">
@@ -373,6 +408,9 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 <section id="tab-write" class="hide">
 <div class="grid">
   <div class="card">
+    <div class="wgoal" id="wGoalBox"><div class="wgbar"><i id="wgFill"></i><i id="wgFill2"></i></div><span id="wgTxt"></span><span id="wgStreak"></span></div>
+    <div class="rwbanner hide" id="rwBanner"></div>
+    <div class="pgrow" id="pGroups"></div>
     <div class="prompt" id="promptBox"></div>
     <div class="row" style="margin-bottom:10px">
       <button class="chip" id="newPrompt">↻ 换一题</button>
@@ -431,6 +469,19 @@ body[data-mode=focus] #parkBtn{display:inline-block}
     <label class="set">每日写作提醒时间<input type="time" id="writeTime"></label>
     <label class="set">提醒时播放提示音<input type="checkbox" id="sound"></label>
     <p class="mute">网页里的提醒只在页面开着时有效。Mac 上可以装 <code>mac/</code> 文件夹里的定时弹窗，页面关了也会提醒；手机上用 Safari「分享 → 添加到主屏幕」。</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2>番茄钟</h2>
+    <label class="set">短休息（分钟）<input type="number" id="pShort" min="1" max="30" style="width:84px"></label>
+    <label class="set">长休息（分钟）<input type="number" id="pLong" min="5" max="60" style="width:84px"></label>
+    <label class="set">每几个番茄后长休息一次<input type="number" id="pEvery" min="2" max="8" style="width:84px"></label>
+    <label class="set">休息结束后自动开始下一个番茄<input type="checkbox" id="pAuto"></label>
+    <p class="mute">番茄时长在专注页的岛上选（默认 25 分钟）。中途放弃的那一轮不算一个番茄。</p>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2>写作</h2>
+    <label class="set">每日字数目标<input type="number" id="wGoalIn" min="50" max="5000" step="50" style="width:96px"></label>
+    <label class="set" style="flex-wrap:wrap">我在学的课（用逗号隔开，题库里的课程题会用到）<input type="text" id="coursesIn" placeholder="比如：微观经济学，线性代数，社会学理论" style="flex:1;min-width:220px"></label>
   </div>
   <div class="card" style="margin-top:16px">
     <h2>手机拦截<span class="k">打开 App 时先冲浪</span></h2>
@@ -539,7 +590,7 @@ function treeSVG(l){
 
 // ---------- render ----------
 function render(){
-  $('coinTxt').textContent=S.coins;renderPark();
+  $('coinTxt').textContent=S.coins;renderPark();if(typeof renderGoal==='function')renderGoal();
   const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
   $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
   $('streakTxt').textContent='连续 '+streak()+' 天';
@@ -557,28 +608,39 @@ function selectDur(m){dur=m;document.querySelectorAll('#durRow .chip').forEach(x
 document.querySelectorAll('#durRow .chip').forEach(c=>c.onclick=()=>{if(mode!=='idle')return;selectDur(+c.dataset.min)});
 function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 // 计时状态存进 localStorage：刷新页面、手机把后台页面杀掉，回来都能接着算
-function persistTimer(){S.timer={mode,dur,start:focusStart,end:focusEnd};save()}
-function focusUI(){$('startBtn').classList.add('hide');$('giveupBtn').classList.remove('hide');$('phaseTxt').textContent='专注中 · 手机放远一点'}
-function breakUI(){$('phaseTxt').textContent='休息 5 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始下一轮';$('startBtn').classList.remove('hide')}
+// ---------- 番茄钟：专注 → 短休；每 N 个番茄后一次长休。中途放弃的不算一个番茄 ----------
+let brkLen=5,brkLong=false;
+function P(){const st=S.settings;return{short:+st.shortBreak||5,long:+st.longBreak||15,every:+st.longEvery||4,auto:!!st.autoNext}}
+function pomo(){if(!S.pomo||S.pomo.date!==today())S.pomo={date:today(),c:0};return S.pomo}
+function renderPomos(){const e=P().every,c=pomo().c,pos=c%e,full=mode==='break'&&brkLong;const n=full?e:pos;
+ let h='';for(let i=0;i<e;i++){const cls=i<n?'done':(i===pos&&mode==='focus'&&!full)?'now':'';h+=`<i class="${cls}"></i>`}
+ $('pomos').innerHTML=h+`<span>今天 ${c} 个番茄</span>`}
+function nextLabel(){return '第 '+(pomo().c%P().every+1)+' 个番茄'}
+// 计时状态存进 localStorage：刷新页面、手机把后台页面杀掉，回来都能接着算
+function persistTimer(){S.timer={mode,dur,start:focusStart,end:focusEnd,blen:brkLen,long:brkLong};save()}
+function focusUI(){$('startBtn').classList.add('hide');$('giveupBtn').classList.remove('hide');$('phaseTxt').textContent=nextLabel()+' · 手机放远一点';renderPomos()}
+function breakUI(){$('phaseTxt').textContent=(brkLong?'长休息 ':'短休息 ')+brkLen+' 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始'+nextLabel();$('startBtn').classList.remove('hide');renderPomos()}
 function startFocus(){runCleanupIfBreak();mode='focus';focusStart=Date.now();focusEnd=focusStart+dur*60000;$('startBtn').textContent='开始专注';focusUI();persistTimer();clearInterval(tick);tick=setInterval(loop,500);loop()}
 function runCleanupIfBreak(){if(mode==='break'&&$('mSkip'))closeModal()}
-function scene(){document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=mode==='focus'?1-t/(dur*60000):mode==='break'?1-t/300000:0;$('halo').style.setProperty('--p',Math.max(0,Math.min(1,p)).toFixed(4))}
-function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0)finishFocus()}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);resetUI();notify('休息结束','回来开始下一轮吧')}}}
+function scene(){document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=mode==='focus'?1-t/(dur*60000):mode==='break'?1-t/(brkLen*60000):0;$('halo').style.setProperty('--p',Math.max(0,Math.min(1,p)).toFixed(4))}
+function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0)finishFocus()}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);const wasLong=brkLong;resetUI();if(P().auto&&!document.hidden){notify('休息结束','自动开始'+nextLabel());startFocus()}else notify('休息结束',wasLong?'新一组番茄，从第 1 个开始':'回来开始'+nextLabel())}}}
 function flashBusy(){return document.title.startsWith('●')}
-function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;save();const bEnd=focusEnd+5*60000;
-  if(Date.now()>=bEnd){resetUI();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP');return}
-  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP，休息 5 分钟')}
-function resetUI(){mode='idle';$('startBtn').textContent='开始专注';$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');$('phaseTxt').textContent='准备开始一轮专注';$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer();scene()}
-function breakModal(){const ideas=['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','用一句话说出这轮最大的收获（可以写在「间隙卡」里）','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];modal(`<h3>休息 5 分钟</h3><p>休息的意思是让大脑空下来，信息流会把它塞得更满。试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一轮</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();startFocus()}}
+function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;const pm=pomo();pm.c++;save();const cfg=P();brkLong=pm.c%cfg.every===0;brkLen=brkLong?cfg.long:cfg.short;const bEnd=focusEnd+brkLen*60000;
+  const msg=brkLong?`完成一组 ${cfg.every} 个番茄！`:`第 ${(pm.c-1)%cfg.every+1} 个番茄完成`;
+  if(Date.now()>=bEnd){resetUI();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify(msg,'+'+m*2+' XP');return}
+  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();parkReview();addXP(m*2+(brkLong?10:0),'完成 '+m+' 分钟专注'+(brkLong?' · 一组番茄奖励':''));notify(msg,'+'+m*2+' XP，休息 '+brkLen+' 分钟')}
+function resetUI(){mode='idle';brkLong=false;$('startBtn').textContent='开始'+nextLabel();$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');$('phaseTxt').textContent='准备开始'+nextLabel();$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer();scene();renderPomos()}
+function breakModal(){const ideas=brkLong?['走出去 10 分钟，看看远处','吃点东西，喝杯水','做一组拉伸，从脖子到小腿','闭眼躺 5 分钟，什么都不想']:['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','用一句话说出这轮最大的收获（可以写在「间隙卡」里）','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];
+ modal(`<h3>${brkLong?'一组番茄完成 🍅 长休息 '+brkLen+' 分钟':'短休息 '+brkLen+' 分钟'}</h3><p>${brkLong?'连续专注了 '+P().every+' 个番茄，大脑需要真正的恢复。':'休息的意思是让大脑空下来，信息流会把它塞得更满。'}试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一个</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();startFocus()}}
 $('startBtn').onclick=startFocus;
 $('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI();parkReview()};
 // 分心检测：记下离开的时刻（也存进 localStorage）。回来时按「离开到本轮结束」之间的时长算，
 // 这样就算本轮在后台已经结束了，离开的那段也照样算分心。
 function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
-function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle')return;selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;
+function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle'){resetUI();return}selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;brkLen=t.blen||5;brkLong=!!t.long;
   if(t.mode==='focus'){mode='focus';focusUI();tick=setInterval(loop,500);loop()}
-  else if(t.mode==='break'){if(Date.now()<t.end){mode='break';breakUI();tick=setInterval(loop,500);loop()}else{S.timer=null;save()}}}
+  else if(t.mode==='break'){if(Date.now()<t.end){mode='break';breakUI();tick=setInterval(loop,500);loop()}else{S.timer=null;save();resetUI()}}}
 
 // urge surfing
 // 冲动冲浪：吸 4 秒、呼 6 秒（呼气比吸气长，更容易平静下来），一共 6 次 = 60 秒
@@ -615,36 +677,107 @@ $('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题');le
 setInterval(()=>{const st=S.settings;if(mode==='idle'&&st.idleMin>0&&!idleNotified&&Date.now()-lastActivity>st.idleMin*60000){idleNotified=true;notify('心流岛','已经 '+st.idleMin+' 分钟没开始新一轮了。手机在手上吗？')}const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
 
 // ---------- writing ----------
+// 题库：[题型, 小标签, 题目, 写法提示]。题目里的 {课} 会换成你在设置里填的课程。
+const PGROUPS=['解释概念','构建论证','比较理论','反驳观点','精简改写','具体描写','复盘反思'];
 const PROMPTS=[
- ['结论先行','用一句话（30 字以内）说清：今天做的最难的一道题，难在哪？','先写结论，再写原因。删掉所有「我觉得」。'],
- ['PREP 结构','卸载小红书之后，你的注意力真的变好了吗？','观点 → 理由 → 例子 → 回到观点。四段，每段一两句。'],
- ['精准定义','不用「很」「感觉」「状态」这几个词，定义一下：对你来说，什么叫「专注」？','好定义 = 它属于哪一类 + 它跟相近东西的区别。'],
- ['费曼解释','把你最近学的一个概念，讲给一个 12 岁的小孩听。','不能用专业术语；如果必须用，先解释它。'],
- ['三点说清','今天学到的三件事。每件一句话，按重要性排序。','用「第一、第二、第三」。排序本身就是思考。'],
- ['反方论证','写一个你相信的观点，然后写出反对它的最强理由。','好的思考者能把对手的观点说得比对手还好。'],
- ['具体化','描述你此刻的情绪，不许用「烦」「累」「还好」。','用身体感受、具体场景或比喻代替形容词。'],
- ['比较','比较两种你用过的学习方法，哪个更适合你？为什么？','先说比较的标准，再逐条比较，最后下结论。'],
- ['因果链','你最近一次拖延，是怎么一步步发生的？','用「因为……所以……于是……」串成一条链，至少 4 环。'],
- ['一页读书笔记','你最近读/看过的一个内容，它的核心观点是什么？你同意吗？','第一句复述观点，第二部分给你的判断和理由。'],
- ['问题拆解','你现在最大的一个困扰，把它拆成 3 个更小、可以行动的问题。','每个小问题都要能回答「明天我可以做什么」。'],
- ['改写练习','写一段话，然后把它压缩到一半字数，意思不变。','先写出来，再删：删重复、删形容词、删「然后」。'],
- ['类比','用一个生活中的类比，解释你所学专业里的一个难点。','说清类比在哪里成立、在哪里不成立。'],
- ['复盘','今天哪件事做得好？哪件事下次会换个做法？','事实 → 原因 → 下次怎么做。不写空话。'],
- ['说服','说服一个朋友每天写 10 分钟东西。','对方会拒绝的理由是什么？先回应它。'],
- ['观察','描写你此刻所在的空间，让没去过的人能想象出来。','从大到小，从远到近，至少写一个声音或气味。']
+ ['解释概念','费曼解释','把{课}里最近学的一个概念，讲给一个 12 岁的小孩听。','不能用专业术语；如果必须用，先解释它。'],
+ ['解释概念','精准定义','不用「很」「感觉」「状态」这几个词，定义一下：对你来说，什么叫「专注」？','好定义 = 它属于哪一类 + 它跟相近东西的区别。'],
+ ['解释概念','类比','用一个生活中的类比，解释{课}里的一个难点。','说清类比在哪里成立、在哪里不成立。'],
+ ['解释概念','三句讲清','{课}这周最重要的一个概念是什么？用三句话讲清：它是什么、为什么需要它、怎么用。','三句各管一件事，不要混在一起。'],
+ ['解释概念','精准定义','从{课}里挑一个你常用、但其实说不清的术语，给它下一个你自己的定义。','属于哪一类 + 和最相近的那个概念差在哪。'],
+ ['解释概念','文字讲公式','{课}里经常出现的一个公式或模型，不写公式，只用文字说清它在算什么。','先说输入是什么、输出是什么，再说中间发生了什么。'],
+ ['解释概念','边界条件','{课}里的某个规则或定理，在什么条件下会不成立？举一个反例。','先写规则，再写它依赖的条件，最后写反例。'],
+ ['解释概念','讲给同学','你最近卡住的一道题，假设同学来问你，你怎么讲才能让对方 3 分钟听懂？','先讲思路，再讲步骤，最后讲最容易错在哪。'],
+ ['构建论证','结论先行','用一句话（30 字以内）说清：今天做的最难的一道题，难在哪？','先写结论，再写原因。删掉所有「我觉得」。'],
+ ['构建论证','PREP 结构','卸载小红书之后，你的注意力真的变好了吗？','观点 → 理由 → 例子 → 回到观点。四段，每段一两句。'],
+ ['构建论证','因果链','你最近一次拖延，是怎么一步步发生的？','用「因为……所以……于是……」串成一条链，至少 4 环。'],
+ ['构建论证','说服','说服一个朋友每天写 10 分钟东西。','对方会拒绝的理由是什么？先回应它。'],
+ ['构建论证','前提到结论','选{课}里的一个结论，写出支撑它的论证：前提是什么，怎么一步步推到结论。','前提 1 + 前提 2 → 结论。检查每一步是不是真的推得出。'],
+ ['构建论证','结论先行','用一句话回答：你为什么要学{课}？然后用三句话支撑它。','第一句就是答案，后面每一句都要能回到它。'],
+ ['构建论证','选立场','「大学生应该在课堂上禁用手机」——选一个立场，写出你最有力的两个理由和一个证据。','理由要能被检验；证据可以是数据、研究或你自己的经历。'],
+ ['构建论证','因果链','你某门课的状态最近变好或变差了，背后真正的原因是什么？写出至少 3 环因果。','区分「原因」和「借口」：原因是你能改变的那部分。'],
+ ['比较理论','比较','比较两种你用过的学习方法，哪个更适合你？为什么？','先说比较的标准，再逐条比较，最后下结论。'],
+ ['比较理论','两种理论','{课}里有没有两个解释同一现象的理论或方法？比较它们各自解释得好、和解释不了的地方。','先定比较维度（假设、适用范围、预测力），再逐条比。'],
+ ['比较理论','比较','「多刷题」和「整理笔记」，哪个对{课}更有用？','先说你在这门课上的目标，再比较两者对目标的贡献。'],
+ ['比较理论','可观察的比较','比较你在图书馆和在宿舍学习的状态，差别具体在哪？','用能观察到的事实比较：时长、分心次数、完成量。'],
+ ['比较理论','两位作者','选两个你读过的作者或学者，他们对同一个问题的看法有什么不同？','先找到共同的问题，再写各自的答案和理由。'],
+ ['比较理论','前后对比','一年前的你和现在的你，在思考问题的方式上有什么不同？','举一个具体的例子前后对比，不说空话。'],
+ ['比较理论','取舍','你面前的两个选择（选课、实习、项目……），各自的代价是什么？','列代价，而不只是好处。最后说你选哪个、为什么。'],
+ ['比较理论','分维度比较','中文写作和英文写作，在你身上最大的差别是什么？','选 3 个维度（结构、用词、速度）逐项写。'],
+ ['反驳观点','反方论证','写一个你相信的观点，然后写出反对它的最强理由。','好的思考者能把对手的观点说得比对手还好。'],
+ ['反驳观点','反驳','找一个你不同意的常见说法（比如「熬夜学习效率更高」），写一段反驳。','先公平地复述对方，再指出哪一步推不出来。'],
+ ['反驳观点','质疑课本','{课}的教材或课上，有没有一个你觉得说得不够对的地方？写出你的质疑。','指出具体是哪句话，再给理由或反例。'],
+ ['反驳观点','钢人论证','选一个你反对的观点，把它写成最强版本，强到持这个观点的人会说「对，我就是这个意思」。','不许稻草人。写完再加一句：你仍然不同意的理由。'],
+ ['反驳观点','反驳','「我天生不擅长写作」——反驳这句话。','用证据，不用鸡汤。'],
+ ['反驳观点','找漏洞','回看你最近写的一段话，找出其中最弱的一个论点，并把它补强。','最弱 = 最容易被追问「为什么」的地方。'],
+ ['反驳观点','回应质疑','有人说「卸载 App 没用，换个 App 照样刷」。你怎么回应？','先承认对方说对的部分，再说你的不同看法。'],
+ ['反驳观点','预先找错','你对{课}的一个判断，可能错在哪里？写出你可能错的三种方式。','提前想好自己会怎么错，是最好的检验。'],
+ ['精简改写','改写练习','写一段话，然后把它压缩到一半字数，意思不变。','先写出来，再删：删重复、删形容词、删「然后」。'],
+ ['精简改写','三点说清','今天学到的三件事。每件一句话，按重要性排序。','用「第一、第二、第三」。排序本身就是思考。'],
+ ['精简改写','一句话摘要','用一句话（40 字以内）概括{课}上周的全部内容。','先写长的，再一刀一刀砍到一句。'],
+ ['精简改写','电梯演讲','你的一个想法或项目，用 30 秒（约 100 字）讲给一个陌生人听。','问题 → 你的办法 → 为什么值得做。'],
+ ['精简改写','起标题','给你今天读过的一篇东西起 5 个不同的标题，选出最好的一个，说明为什么。','好标题 = 具体 + 有信息量。'],
+ ['精简改写','删到骨架','写一段 150 字左右的话，然后删掉所有形容词和副词，看看意思还剩多少。','留下来的才是骨架。'],
+ ['精简改写','三点说清','如果只能记住{课}的三件事，是哪三件？按重要性排序。','排序本身就是理解。'],
+ ['精简改写','只说一件事','用 100 字告诉一个月后的自己：现在最该坚持的一件事是什么。','只说一件事，说清为什么。'],
+ ['具体描写','具体化','描述你此刻的情绪，不许用「烦」「累」「还好」。','用身体感受、具体场景或比喻代替形容词。'],
+ ['具体描写','观察','描写你此刻所在的空间，让没去过的人能想象出来。','从大到小，从远到近，至少写一个声音或气味。'],
+ ['具体描写','具体化','描述你今天专注得最好的那 10 分钟，发生了什么？','写动作和环境，不写「状态很好」。'],
+ ['具体描写','只写行为','写一个你身边的人，只写这个人做了什么，不写你对这个人的评价。','用动词和细节，让读者自己得出判断。'],
+ ['具体描写','把抽象写具体','「我最近很焦虑」——把这句话改写成一段具体的描述。','什么时候、在哪、身体什么感觉、脑子里在想什么。'],
+ ['具体描写','慢镜头','写你想刷手机的一个瞬间：手在干什么，眼睛在看哪，你在想什么。','慢镜头，越细越好。'],
+ ['具体描写','观察','描述一个你每天都经过、但从没认真看过的地方。','至少写三个你今天才注意到的细节。'],
+ ['具体描写','用数字说话','用数字描述你的一天（几点起、学了多久、走了多少步……），再写一句你从这些数字看出了什么。','数字是事实，最后一句是判断。'],
+ ['复盘反思','复盘','今天哪件事做得好？哪件事下次会换个做法？','事实 → 原因 → 下次怎么做。不写空话。'],
+ ['复盘反思','问题拆解','你现在最大的一个困扰，把它拆成 3 个更小、可以行动的问题。','每个小问题都要能回答「明天我可以做什么」。'],
+ ['复盘反思','读书笔记','你最近读或看过的一个内容，它的核心观点是什么？你同意吗？','第一句复述观点，第二部分给你的判断和理由。'],
+ ['复盘反思','投入产出','这周你在{课}上花的时间，值吗？','投入了什么、得到了什么、下周怎么调整。'],
+ ['复盘反思','错题复盘','写一道你最近做错的题：错在哪一步？你当时为什么会那样想？','找到「当时的想法」比找到正确答案更重要。'],
+ ['复盘反思','第一步','把下一个截止日期前要做的事，拆出一个今天就能开始的第一步。','第一步要小到 10 分钟内能完成。'],
+ ['复盘反思','冲动复盘','今天你哪一次差点去刷手机？最后发生了什么？','触发 → 冲动 → 你的选择 → 结果。'],
+ ['复盘反思','阅读核心','{课}这周的阅读材料里，作者最核心的一个论点是什么？你同意吗？','先复述到作者会点头，再给你的判断。']
 ];
 const VAGUE=['非常','特别','十分','很','挺','比较','有点','有些','一些','东西','什么的','之类','感觉','好像','似乎','可能','其实','就是','然后','反正','各种','等等','某种','一定程度','某些','觉得','还行','还好','蛮'];
+const VAGUE_RE=()=>new RegExp('('+VAGUE.slice().sort((a,b)=>b.length-a.length).join('|')+')','g');
 const CONNECT={'因果':['因为','所以','因此','导致','于是','由于'],'举例':['比如','例如','举个例子','譬如'],'转折':['但是','但','然而','不过','可是'],'顺序':['首先','其次','第一','第二','最后','然后']};
-let pIdx=Math.floor(Math.random()*PROMPTS.length),wMin=10,wEnd=0,wTick=null;
-function showPrompt(){const p=PROMPTS[pIdx];$('promptBox').innerHTML=`<span class="tag">${p[0]}</span><b>${p[1]}</b><div class="tip">写法提示：${p[2]}</div>`}
-$('newPrompt').onclick=()=>{pIdx=(pIdx+1+Math.floor(Math.random()*(PROMPTS.length-1)))%PROMPTS.length;showPrompt()};
+S.myPrompts=S.myPrompts||[];
+let wMin=10,wEnd=0,wTick=null,pGroup='all',cur=null;
+// ----- 选题：按题型筛，优先没写过的，绝不连着出同一道 -----
+function courses(){return (S.settings.courses||'').split(/[,，、;；\/\n]+/).map(x=>x.trim()).filter(Boolean)}
+function fillCourse(q){const cs=courses();return q.replace(/\{课\}/g,()=>cs.length?'「'+cs[Math.floor(Math.random()*cs.length)]+'」':'你正在学的一门课')}
+function allPrompts(){return PROMPTS.map(p=>({g:p[0],tag:p[1],tpl:p[2],tip:p[3]})).concat(S.myPrompts.map(p=>({g:'我的题目',tag:'自定义',tpl:p.q,tip:p.tip||'',mine:true})))}
+function writtenCount(){const c={};S.journal.forEach(e=>{if(e.type==='write'){const k=e.pt||e.prompt;c[k]=(c[k]||0)+1}});return c}
+function pickPrompt(){const c=writtenCount();let pool=allPrompts().filter(p=>pGroup==='all'||p.g===pGroup);if(!pool.length){cur=null;showPrompt();return}
+ if(pool.length>1&&cur)pool=pool.filter(p=>p.tpl!==cur.tpl);const min=Math.min(...pool.map(p=>c[p.tpl]||0));const best=pool.filter(p=>(c[p.tpl]||0)===min);
+ const p=best[Math.floor(Math.random()*best.length)];cur=Object.assign({},p,{q:fillCourse(p.tpl),times:c[p.tpl]||0});showPrompt()}
+function showPrompt(){const b=$('promptBox');if(!cur){b.innerHTML=`<b>「我的题目」里还没有题。</b><div class="tip">点上面的「＋ 加题」写一道你自己想练的题。</div>`;return}
+ if(cur.rw){const o=cur.orig;b.innerHTML=`<span class="tag">改写 · 压缩到一半</span><b>把 ${new Date(o.at).getMonth()+1} 月 ${new Date(o.at).getDate()} 日写的这篇（${countZh(o.text)} 字）重写到 ${cur.target} 字以内，意思不变。</b><div class="tip">写法提示：删重复、删形容词、删「然后」；保留论点和例子。写完会把两个版本放在一起比。</div><details open><summary>原文${o.prompt?' · '+esc(o.prompt):''}</summary>${esc(o.text)}</details><div class="meta"><button id="rwCancel">不改了，换回普通题目</button></div>`;$('rwCancel').onclick=()=>{cur=null;pickPrompt();analyze()};return}
+ b.innerHTML=`<span class="tag">${esc(cur.tag)}</span><b>${esc(cur.q)}</b>${cur.tip?`<div class="tip">写法提示：${esc(cur.tip)}</div>`:''}<div class="meta"><span>${cur.g} · ${cur.times?'写过 '+cur.times+' 次':'还没写过'}</span>${/\{课\}/.test(cur.tpl)&&!courses().length?'<span>在「提醒设置 → 写作」填上你的课程，题目会更具体</span>':''}${cur.mine?'<button id="delMine">删除这道题</button>':''}</div>`;
+ if(cur.mine)$('delMine').onclick=()=>{if(!confirm('删除这道自定义题目？'))return;S.myPrompts=S.myPrompts.filter(p=>p.q!==cur.tpl);save();cur=null;renderPGroups();pickPrompt()}}
+function renderPGroups(){const gs=['all',...PGROUPS,'我的题目'];$('pGroups').innerHTML=gs.map(g=>`<span class="chip ${g===pGroup?'on':''}" data-pg="${g}">${g==='all'?'全部题型':g}${g==='我的题目'?' '+S.myPrompts.length:''}</span>`).join('')+'<span class="chip add" id="addMine">＋ 加题</span>'}
+$('pGroups').onclick=e=>{if(e.target.closest('#addMine')){addMine();return}const c=e.target.closest('[data-pg]');if(!c)return;if(cur&&cur.rw&&!confirm('正在改写旧文，要换成普通题目吗？'))return;pGroup=c.dataset.pg;cur=null;renderPGroups();pickPrompt()};
+function addMine(){modal(`<h3>加一道你自己的题</h3><p class="mute">比如这周课上没想明白的问题、想练的论证、老师布置的论文题。可以用 {课} 代表你的课程。</p><textarea id="myQ" style="min-height:90px;background:#fffdf7" maxlength="200" placeholder="题目"></textarea><input type="text" id="myTip" maxlength="80" placeholder="写法提示（可不填）" style="margin-top:8px"><div class="row center"><button class="btn s" onclick="closeModal()">取消</button><button class="btn p" id="myOk">加进题库</button></div>`);setTimeout(()=>$('myQ')&&$('myQ').focus(),50);
+ $('myOk').onclick=()=>{const q=$('myQ').value.trim();if(q.length<4){toast('题目至少写几个字');return}S.myPrompts.push({q,tip:$('myTip').value.trim(),at:Date.now()});save();closeModal();pGroup='我的题目';renderPGroups();cur=null;pickPrompt();toast('加好了')}}
+$('newPrompt').onclick=()=>{if(cur&&cur.rw)return toast('正在改写旧文。不想改了，点题目下面的「换回普通题目」');pickPrompt()};
 document.querySelectorAll('[data-wm]').forEach(c=>c.onclick=()=>{wMin=+c.dataset.wm;document.querySelectorAll('[data-wm]').forEach(x=>x.classList.toggle('on',x===c))});
 $('wStart').onclick=()=>{wEnd=Date.now()+wMin*60000;clearInterval(wTick);$('wText').focus();wTick=setInterval(()=>{const l=wEnd-Date.now();$('wTimer').textContent='剩 '+fmt(l)+' · 别停笔，别回头改';if(l<=0){clearInterval(wTick);$('wTimer').textContent='时间到！看看右边的反馈，改一遍再存档';notify('写作时间到','回头读一遍，删掉模糊词')}},500)};
-function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function countZh(t){return t.replace(/\s/g,'').length}
+// ----- 每日字数目标 + 写作连续天数 -----
+function wGoal(){return Math.max(50,+S.settings.wordGoal||300)}
+function writeStreak(){const g=wGoal(),d=new Date();const ok=x=>(S.days[keyOf(x)]||{}).words>=g;if(!ok(d))d.setDate(d.getDate()-1);let n=0;while(ok(d)){n++;d.setDate(d.getDate()-1)}return n}
+function renderGoal(){if(!$('wgTxt'))return;const g=wGoal(),done=day().words||0,draft=countZh($('wText').value),tot=done+draft;$('wgFill').style.width=Math.min(100,tot/g*100)+'%';$('wgFill2').style.width=Math.min(100,done/g*100)+'%';
+ $('wGoalBox').classList.toggle('met',done>=g);$('wgTxt').textContent=`今日 ${done}${draft?' + '+draft:''} / ${g} 字`;const st=writeStreak();$('wgStreak').textContent=st?'写作连续 '+st+' 天':''}
+// ----- 写作过程统计：用时、速度、停顿（停下超过 10 秒算一次） -----
+let ws={first:0,last:0,pauses:0,pauseMs:0};
+function trackTyping(){const now=Date.now();if(!ws.first)ws.first=now;else if(now-ws.last>10000){ws.pauses++;ws.pauseMs+=now-ws.last}ws.last=now}
+function textStats(t){const n=countZh(t),v=(t.match(VAGUE_RE())||[]).length,sents=t.split(/[。！？!?\n]+/).filter(s=>s.trim()).length||1;return{n,v,avg:Math.round(n/sents),dens:n?v/n*100:0}}
+function mmss(sec){sec=Math.round(sec);return sec>=60?Math.floor(sec/60)+' 分 '+(sec%60?sec%60+' 秒':''):sec+' 秒'}
 function analyze(){
-  const t=$('wText').value,n=countZh(t);$('wCount').textContent=n+' 字';
-  const vr=new RegExp('('+VAGUE.slice().sort((a,b)=>b.length-a.length).join('|')+')','g');
+  const t=$('wText').value,n=countZh(t);
+  if(cur&&cur.rw){const ok=n<=cur.target;$('wCount').innerHTML=`${n} / 目标 ≤ ${cur.target} 字 <b style="color:${n&&ok?'var(--leaf-d)':'var(--coral)'}">${n?ok?'✓ 达标':'还要删 '+(n-cur.target)+' 字':''}</b>`}else $('wCount').textContent=n+' 字';
+  renderGoal();
+  const vr=VAGUE_RE();
   const found={};(t.match(vr)||[]).forEach(w=>found[w]=(found[w]||0)+1);
   const vc=Object.values(found).reduce((a,b)=>a+b,0);
   $('preview').innerHTML=esc(t).replace(vr,'<span class="hl">$1</span>')||'<span class="mute">（空）</span>';
@@ -661,15 +794,55 @@ function analyze(){
   const first=(sents[0]||'').trim();
   if(first.length>40)fb.push(`<div class="item">第一句有 ${first.length} 字。试着让第一句就是你的结论，读者一眼就知道你要说什么。</div>`);
   const iThink=(t.match(/我觉得|我认为|我感觉/g)||[]).length;if(iThink>=2)fb.push(`<div class="item">「我觉得/我认为」出现 ${iThink} 次。观点本来就是你的，直接说。</div>`);
-  if(n>=150)fb.push(`<div class="item" style="background:var(--g2);color:var(--g)">已达到 150 字，可以存档拿完成奖励了。</div>`);
+  if(n>=150&&!(cur&&cur.rw))fb.push(`<div class="item" style="background:var(--leaf-l);color:var(--leaf-d)">已达到 150 字，可以存档拿完成奖励了。</div>`);
   $('fb').innerHTML=fb.join('');
 }
-$('wText').addEventListener('input',analyze);
-$('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<30){toast('至少写 30 字再存档');return}const vr=new RegExp('('+VAGUE.slice().sort((a,b)=>b.length-a.length).join('|')+')','g');const vc=(t.match(vr)||[]).length;S.journal.unshift({type:'write',at:Date.now(),prompt:PROMPTS[pIdx][1],tag:PROMPTS[pIdx][0],text:t,vague:vc});const d=day();d.words+=n;d.writes++;save();let xp=Math.floor(n/10)+(n>=150?20:0)+(n>=50&&vc/n<0.015?10:0);addXP(xp,'写作 '+n+' 字'+(n>=150?' · 完成奖励':'')+(n>=50&&vc/n<0.015?' · 精准奖励':''));$('wText').value='';analyze();clearInterval(wTick);$('wTimer').textContent='';$('newPrompt').click()};
+$('wText').addEventListener('input',()=>{trackTyping();analyze()});
+$('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<(cur&&cur.rw?15:30)){toast('至少写 '+(cur&&cur.rw?15:30)+' 字再存档');return}
+ const st=textStats(t),secs=ws.first?Math.max(1,(ws.last-ws.first)/1000):0,before=day().words||0;
+ const e={type:'write',at:Date.now(),text:t,vague:st.v,secs:Math.round(secs),pauses:ws.pauses,pauseSecs:Math.round(ws.pauseMs/1000)};
+ const rw=cur&&cur.rw?cur:null;
+ if(rw){Object.assign(e,{prompt:'改写：'+(rw.orig.prompt||'旧文'),tag:'改写',pt:'__rewrite',rewriteOf:rw.orig.at});S.rwWeek=weekKey(new Date())}else if(cur)Object.assign(e,{prompt:cur.q,tag:cur.tag,pt:cur.tpl,group:cur.g});
+ S.journal.unshift(e);const d=day();d.words+=n;d.writes++;save();
+ let xp,why;
+ if(rw){const ok=n<=rw.target;xp=Math.floor(n/10)+(ok?15:0);why='改写 '+n+' 字'+(ok?' · 压缩达标':'')}
+ else{xp=Math.floor(n/10)+(n>=150?20:0)+(n>=50&&st.v/n<0.015?10:0);why='写作 '+n+' 字'+(n>=150?' · 完成奖励':'')+(n>=50&&st.v/n<0.015?' · 精准奖励':'')}
+ const g=wGoal(),hitGoal=before<g&&d.words>=g;if(hitGoal){xp+=10;why+=' · 今日目标达成'}
+ addXP(xp,why);
+ $('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};clearInterval(wTick);$('wTimer').textContent='';
+ if(rw){showCompare(rw.orig,e);cur=null;pickPrompt()}else{pickPrompt();showSummary(e,hitGoal)}
+ analyze();renderRwBanner()};
+function showSummary(e,hit){const n=countZh(e.text),past=S.journal.filter(x=>x.type==='write'&&x.secs>=60&&x!==e).slice(0,10);const sp=e.secs>=30?Math.round(n/(e.secs/60)):0;
+ const avgSp=past.length?Math.round(past.reduce((a,x)=>a+countZh(x.text)/(x.secs/60),0)/past.length):0;const g=wGoal(),done=day().words;
+ modal(`<h3>${hit?'今日目标达成 🎯':'存好了'}</h3><div class="sumgrid"><div><b>${n}</b><span>字</span></div><div><b>${e.secs?mmss(e.secs).replace(/ 秒$/,'″').replace(' 分 ','′').replace(' 分','′'):'—'}</b><span>用时</span></div><div><b>${sp||'—'}</b><span>字 / 分钟</span></div><div><b>${e.pauses}</b><span>停顿超过 10 秒</span></div><div><b>${e.vague}</b><span>模糊词</span></div><div><b>${Math.min(100,Math.round(done/g*100))}%</b><span>今日目标</span></div></div>
+ <p class="mute">${sp&&avgSp?`比你最近的平均速度（${avgSp} 字/分钟）${sp>=avgSp?'快':'慢'} ${Math.abs(sp-avgSp)} 字。`:''}${e.pauses>=3?'停顿比较多：卡住的地方往往就是还没想清楚的地方，回头看看是哪几句。':e.secs?'写得很连贯。':''}</p>
+ <div class="row center"><button class="btn p" onclick="closeModal()">好</button></div>`)}
+// ----- 改写旧文：每周一次，拿一周前或一个月前的一篇压缩到一半 -----
+function weekKey(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return keyOf(x)}
+function rwCandidate(){const now=Date.now(),D=86400000,done=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
+ const c=S.journal.filter(e=>e.type==='write'&&!e.rewriteOf&&!done.has(e.at)&&countZh(e.text)>=60&&now-e.at>=6*D);if(!c.length)return null;
+ const m=c.filter(e=>now-e.at>=25*D);const by=t=>(a,b)=>Math.abs(now-a.at-t*D)-Math.abs(now-b.at-t*D);return (m.length?m.sort(by(30)):c.sort(by(7)))[0]}
+function renderRwBanner(){const b=$('rwBanner');const wk=weekKey(new Date());const c=(S.rwWeek===wk||S.rwSkip===wk||(cur&&cur.rw))?null:rwCandidate();if(!c){b.classList.add('hide');return}
+ const d=new Date(c.at),days=Math.round((Date.now()-c.at)/86400000);b.classList.remove('hide');
+ b.innerHTML=`<span>✂️ <b>本周改写挑战</b>：${days} 天前（${d.getMonth()+1} 月 ${d.getDate()} 日）你写了 ${countZh(c.text)} 字${c.prompt?'「'+esc(c.prompt.slice(0,18))+(c.prompt.length>18?'…':'')+'」':''}。把它压缩到一半，看看自己有没有进步。</span><span class="row"><button class="btn s" id="rwSkip">这周跳过</button><button class="btn sun" id="rwGo">开始改写</button></span>`;
+ $('rwGo').onclick=()=>startRewrite(c.at);$('rwSkip').onclick=()=>{S.rwSkip=wk;save();renderRwBanner()}}
+function startRewrite(at){const o=S.journal.find(e=>e.at===at);if(!o)return;if(countZh($('wText').value)>0&&!confirm('写作框里还有没存的内容，清空它开始改写？'))return;
+ document.querySelector('nav [data-tab=write]').click();cur={rw:true,orig:o,target:Math.floor(countZh(o.text)/2),tpl:'__rewrite'};$('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();renderRwBanner();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
+function showCompare(o,e){const a=textStats(o.text),b=textStats(e.text),d1=new Date(o.at),d2=new Date(e.at),pct=Math.round(b.n/a.n*100);
+ const arrow=(x,y,lowerBetter)=>`${x} → <b style="color:${(lowerBetter?y<=x:y>=x)?'var(--leaf-d)':'var(--coral)'}">${y}</b>`;
+ modal(`<h3>改写前后对比</h3><div class="cmpsum">篇幅 ${arrow(a.n,b.n,true)} 字（原来的 ${pct}%${pct<=50?'，压缩达标 ✓':''}）· 模糊词 ${arrow(a.v,b.v,true)} · 平均句长 ${arrow(a.avg,b.avg,true)} 字</div>
+ <div class="cmp"><div><h4>原文 · ${d1.getMonth()+1}/${d1.getDate()}</h4><div class="st">${a.n} 字 · 模糊词 ${a.v} · 每句 ${a.avg} 字</div><div class="tx">${esc(o.text).replace(VAGUE_RE(),'<span class="hl">$1</span>')}</div></div>
+ <div class="new"><h4>改写 · ${d2.getMonth()+1}/${d2.getDate()}</h4><div class="st">${b.n} 字 · 模糊词 ${b.v} · 每句 ${b.avg} 字</div><div class="tx">${esc(e.text).replace(VAGUE_RE(),'<span class="hl">$1</span>')}</div></div></div>
+ <p class="mute">读一遍两边：删掉的那些，真的不需要吗？留下的那些，是不是原文最重要的意思？</p><div class="row center"><button class="btn p" onclick="closeModal()">看完了</button></div>`,()=>$('modal').classList.remove('wide'));$('modal').classList.add('wide')}
 
 // ---------- journal ----------
 let jf='all';document.querySelectorAll('[data-jf]').forEach(c=>c.onclick=()=>{jf=c.dataset.jf;document.querySelectorAll('[data-jf]').forEach(x=>x.classList.toggle('on',x===c));renderJournal()});
-function renderJournal(){const list=S.journal.filter(e=>jf==='all'||e.type===jf);$('jList').innerHTML=list.length?list.map(e=>{const d=new Date(e.at);return`<div class="entry"><div class="m">${d.getMonth()+1}月${d.getDate()}日 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} · ${e.type==='gap'?'间隙卡':e.tag+' · '+countZh(e.text)+'字 · 模糊词 '+e.vague}</div>${e.prompt?`<div class="m"><b>${esc(e.prompt)}</b></div>`:''}<div class="t">${esc(e.text)}</div></div>`}).join(''):'<p class="mute">还没有输出。从一张间隙卡开始。</p>'}
+function renderJournal(){const list=S.journal.filter(e=>jf==='all'||e.type===jf);const rewritten=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
+ $('jList').innerHTML=list.length?list.map(e=>{const d=new Date(e.at);const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const n=countZh(e.text);
+  const meta=e.type==='gap'?'间隙卡':esc(e.tag||'写作')+' · '+n+'字 · 模糊词 '+e.vague+(e.secs?' · 用时 '+mmss(e.secs)+' · 停顿 '+(e.pauses||0)+' 次':'');
+  let acts='';if(e.type==='write'){if(e.rewriteOf){const o=S.journal.find(x=>x.at===e.rewriteOf);if(o)acts=`<button data-cmp="${e.at}">对比改写前后</button>`}else if(n>=40)acts=rewritten.has(e.at)?'<span class="mute">已改写</span>':`<button data-rw="${e.at}">改写成一半</button>`}
+  return`<div class="entry"><div class="m">${d.getMonth()+1}月${d.getDate()}日 ${hm} · ${meta}</div>${e.prompt?`<div class="m"><b>${esc(e.prompt)}</b></div>`:''}<div class="t">${esc(e.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div>`}).join(''):'<p class="mute">还没有输出。从一张间隙卡开始。</p>'}
+$('jList').onclick=e=>{const r=e.target.closest('[data-rw]');if(r){startRewrite(+r.dataset.rw);return}const c=e.target.closest('[data-cmp]');if(c){const n=S.journal.find(x=>x.at===+c.dataset.cmp),o=n&&S.journal.find(x=>x.at===n.rewriteOf);if(o)showCompare(o,n)}};
 
 // ---------- badges ----------
 function totals(){let t={min:0,q:0,urge:0,words:0,writes:0,sessions:0};Object.values(S.days).forEach(d=>{for(const k in t)t[k]+=d[k]||0});t.gap=S.journal.filter(e=>e.type==='gap').length;t.precise=S.journal.filter(e=>e.type==='write'&&countZh(e.text)>=150&&e.vague/countZh(e.text)<0.01).length;return t}
@@ -691,6 +864,11 @@ function renderBadges(){renderShop();renderHeat();$('bList').innerHTML=BADGES.ma
  const rs=Object.entries(reasons).sort((a,b)=>b[1]-a[1]);rows+=rs.length?`<p class="mute" style="margin-top:12px">这周你想刷手机最常见的原因：<b>${rs.map(([r,c])=>r+' '+c+' 次').join('、')}</b>。${rs[0][0]==='卡题了'?'卡题时试试先把卡点写下来——写出来往往就通了。':rs[0][0]==='累了'?'累的时候需要的是真正的休息（走动、闭眼），信息流不会让你恢复。':rs[0][0]==='无聊'?'无聊说明题目难度不合适，试试换一道更有挑战的。':''}</p>`:'';$('week').innerHTML=rows}
 
 // ---------- settings ----------
+$('wGoalIn').value=wGoal();$('coursesIn').value=S.settings.courses||'';
+$('wGoalIn').onchange=e=>{S.settings.wordGoal=Math.max(50,+e.target.value||300);e.target.value=S.settings.wordGoal;save();renderGoal()};
+$('coursesIn').onchange=e=>{S.settings.courses=e.target.value.trim();save();if(cur&&!cur.rw&&/\{课\}/.test(cur.tpl)){cur.q=fillCourse(cur.tpl);showPrompt()}};
+[['pShort','shortBreak',5,1,30],['pLong','longBreak',15,5,60],['pEvery','longEvery',4,2,8]].forEach(([id,k,def,lo,hi])=>{$(id).value=S.settings[k]||def;$(id).onchange=e=>{S.settings[k]=Math.min(hi,Math.max(lo,Math.round(+e.target.value)||def));e.target.value=S.settings[k];save();if(mode==='idle')resetUI();else renderPomos()}});
+$('pAuto').checked=!!S.settings.autoNext;$('pAuto').onchange=e=>{S.settings.autoNext=e.target.checked;save()};
 $('idleMin').value=S.settings.idleMin;$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
 $('idleMin').onchange=e=>{S.settings.idleMin=+e.target.value||0;save()};$('writeTime').onchange=e=>{S.settings.writeTime=e.target.value;save()};$('sound').onchange=e=>{S.settings.sound=e.target.checked;save()};
 function notifState(){if(!('Notification' in window)){$('notifBtn').textContent='此环境不支持';$('notifBtn').disabled=true}else if(Notification.permission==='granted'){$('notifBtn').textContent='已开启';$('notifBtn').disabled=true}}
@@ -701,7 +879,7 @@ $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(typeof data!=='object'||!data||typeof data.xp!=='number'||typeof data.days!=='object')throw 0;if(!confirm('用这个文件覆盖当前数据？（当前 '+S.xp+' XP → 文件里 '+data.xp+' XP）'))return;clearInterval(tick);S=Object.assign(blank(),data);S.settings=Object.assign(blank().settings,data.settings||{});save();location.reload()}catch(err){toast('这个文件不是心流岛导出的数据')}};
 $('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
 
-showPrompt();render();analyze();restoreTimer();scene();checkAway();
+renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();
 
 // ---------- 念头停车场 ----------
 function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span>${esc(p.text)}</span><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
