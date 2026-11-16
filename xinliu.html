@@ -325,16 +325,18 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .slot.ready::before{content:"";position:absolute;inset:-3px;border-radius:18px;box-shadow:0 0 14px color-mix(in srgb,var(--rc) 60%,transparent);opacity:.7}
 @keyframes bob{50%{transform:translateY(-4px)}}
 .chestopen{text-align:center}
-.chestopen .cbox{width:120px;margin:4px auto 6px;animation:shake .7s ease both,popc .5s .7s cubic-bezier(.2,1.6,.4,1) both;filter:drop-shadow(0 0 20px color-mix(in srgb,var(--rc) 70%,transparent))}
+.chestopen .cbox{width:120px;margin:4px auto 6px;animation:shake .6s ease;filter:drop-shadow(0 0 20px color-mix(in srgb,var(--rc) 70%,transparent))}
 @keyframes shake{20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(5deg)}}
 @keyframes popc{from{transform:scale(1)}50%{transform:scale(1.25)}to{transform:scale(1)}}
 .chestopen h3{color:var(--rc)}
-.loots{display:flex;flex-direction:column;gap:8px;margin:10px 0;animation:rise .5s 1s both}
+.loots{display:flex;flex-direction:column;gap:8px;margin:10px 0;transition:opacity .35s,transform .35s cubic-bezier(.2,1.4,.4,1)}
+.chestopen:not(.revealed) .loots,.chestopen:not(.revealed) .cprev{opacity:0;transform:translateY(12px) scale(.96)}
+.chestopen:not(.revealed) h3{opacity:.5}.chestopen.revealed .cbox{animation:popc .45s cubic-bezier(.2,1.6,.4,1)}
 .loot{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;border-radius:14px;background:var(--sun-l);font-size:14px}
 .loot b{font:400 22px var(--num);color:#9a6400}
 .loot.new{background:color-mix(in srgb,var(--rc) 12%,#fff);text-align:left}
 .loot.new svg{width:54px;height:54px;flex:none}.loot.new b{display:block;font:700 15px var(--serif);color:var(--ink)}.loot.new span{font-size:12px;color:var(--rc);font-weight:700}
-.cprev{width:200px;margin:0 auto;animation:rise .5s 1.3s both}.cprev svg{width:100%;height:auto}
+.cprev{width:200px;margin:0 auto;transition:opacity .4s .15s,transform .4s .15s}.cprev svg{width:100%;height:auto}
 .decos{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
 .deco{border-radius:16px;padding:10px 6px;text-align:center;background:var(--paper);display:flex;flex-direction:column;align-items:center;gap:2px}
 .deco svg{width:54px;height:54px}.deco b{font-size:12.5px}.deco span{font-size:11px;font-weight:700;color:var(--rc)}
@@ -1156,6 +1158,7 @@ function treeSVG(l,own){own=own||S.decos||[];const th=islandTheme(l);let s=treeB
 function decoMini(d,own){return `<svg viewBox="${d.box.join(' ')}" xmlns="http://www.w3.org/2000/svg">${own?d.svg:d.svg.replace(/fill="[^"]*"/g,'fill="#d9ccb2"').replace(/stroke="#[^"]*"/g,'stroke="#d9ccb2"')}</svg>`}
 // ---------- 专注宝箱：每完成一个番茄得一个宝箱；宝箱靠「完成下一个番茄」解锁，不靠等待 ----------
 function chestSVG(r,locked){const k=RAR[r];return `<svg viewBox="0 0 40 34" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="13" width="32" height="18" rx="3" fill="${k.c}"/><path d="M4 15 Q4 3 20 3 Q36 3 36 15Z" fill="${k.c2}"/><rect x="4" y="13" width="32" height="3.5" fill="#000" opacity=".18"/><rect x="9" y="17" width="2" height="12" fill="#000" opacity=".12"/><rect x="29" y="17" width="2" height="12" fill="#000" opacity=".12"/><rect x="17" y="11.5" width="6" height="8" rx="1.5" fill="#ffd36a" stroke="#9a6400" stroke-width=".8"/>${locked?'<circle cx="20" cy="15.5" r="1.3" fill="#7a4a00"/>':'<path d="M8 6 l2 2 M32 6 l-2 2 M20 0 v2.4" stroke="#fff3c4" stroke-width="1.4" stroke-linecap="round"/>'}</svg>`}
+function chestOpenSVG(r){const k=RAR[r];return `<svg viewBox="0 -14 40 48" xmlns="http://www.w3.org/2000/svg"><path d="M20 12 L6 -12 M20 12 L20 -14 M20 12 L34 -12 M20 12 L-2 0 M20 12 L42 0" stroke="#ffe9a8" stroke-width="2.2" stroke-linecap="round" opacity=".85"/><ellipse cx="20" cy="14" rx="14" ry="4" fill="#fff3c4"/><rect x="4" y="13" width="32" height="18" rx="3" fill="${k.c}"/><rect x="4" y="13" width="32" height="3.5" fill="#000" opacity=".18"/><rect x="9" y="17" width="2" height="12" fill="#000" opacity=".12"/><rect x="29" y="17" width="2" height="12" fill="#000" opacity=".12"/><g transform="rotate(-28 4 13)"><path d="M4 13 Q4 1 20 1 Q36 1 36 13Z" fill="${k.c2}"/><rect x="17" y="9.5" width="6" height="5" rx="1.5" fill="#ffd36a" stroke="#9a6400" stroke-width=".8"/></g></svg>`}
 function rollRarity(min){const x=Math.random();return Math.max(min||0,x<.03?3:x<.15?2:x<.45?1:0)}
 function chestOnSession(isSet){const lock=S.chests.find(c=>!c.ready);let msg='';if(lock){lock.ready=true;msg=RAR[lock.r].n+'宝箱解锁了，去点开'}
  if(S.chests.length<4){const r=rollRarity(isSet?1:0);S.chests.push({id:Date.now(),r,ready:false});msg+=(msg?'；':'')+'获得一个'+RAR[r].n+'宝箱，完成下一个番茄就能打开'}else msg+=(msg?'；':'')+'宝箱槽满了，先打开已解锁的'
@@ -1170,7 +1173,8 @@ function openChest(c){S.chests=S.chests.filter(x=>x!==c);const r=c.r,base=[12,30
   if(d&&!S.decos.includes(d.id)){S.decos.push(d.id);got=d}else if(d){dupCoins=[10,20,40,80][d.r]}}
  S.coins+=coins+dupCoins;save();render();
  lines.push(`<div class="loot"><b>+${coins}</b> 岛币</div>`);if(got)lines.push(`<div class="loot new" style="--rc:${RAR[got.r].c}">${decoMini(got,true)}<div><b>新装饰：${got.name}</b><span>${RAR[got.r].n} · 已经放到你的岛上了</span></div></div>`);if(dupCoins)lines.push(`<div class="loot"><b>+${dupCoins}</b> 岛币（开到了已有的装饰）</div>`);if(!got&&!dupCoins)lines.push(`<p class="mute" style="margin:2px 0 0">这次没开出装饰。${RAR[r].n}宝箱有 ${['35%','65%','100%','100%'][r]} 的机会开出装饰。</p>`);
- modal(`<div class="chestopen" style="--rc:${RAR[r].c}"><div class="cbox">${chestSVG(r,false)}</div><h3>${RAR[r].n}宝箱</h3><div class="loots">${lines.join('')}</div>${got?`<div class="cprev">${treeSVG(levelOf(S.xp))}</div>`:''}<div class="row center"><button class="btn p" onclick="closeModal()">收下</button></div></div>`);beep()}
+ modal(`<div class="chestopen" id="chestOpen" style="--rc:${RAR[r].c}"><div class="cbox" id="cbox">${chestSVG(r,false)}</div><h3>${RAR[r].n}宝箱 · 你开到了</h3><div class="loots">${lines.join('')}</div>${got?`<div class="cprev">${treeSVG(levelOf(S.xp))}</div>`:''}<div class="row center"><button class="btn p" onclick="closeModal()">收下</button></div></div>`);
+ setTimeout(()=>{const b=$('cbox'),w=$('chestOpen');if(!b||!w)return;b.innerHTML=chestOpenSVG(r);w.classList.add('revealed');beep()},620)}
 // ---------- 每日任务：每天 3 个，零点刷新；全部完成再送一个宝箱 ----------
 const TASKS=[
  {k:'p2',g:0,t:'完成 2 个番茄',need:2,v:()=>pomo().c},{k:'p3',g:0,t:'完成 3 个番茄',need:3,v:()=>pomo().c},
