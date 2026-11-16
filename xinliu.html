@@ -215,6 +215,33 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
 #uc{font:400 34px var(--num)!important}
 .toast{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));transform:translate(-50%,-20px);background:var(--ink);color:#fff8ea;padding:11px 20px;border-radius:999px;z-index:60;font-size:14px;font-weight:600;opacity:0;transition:all .35s cubic-bezier(.2,1.2,.4,1);pointer-events:none;max-width:90%;box-shadow:0 12px 30px -10px rgba(0,0,0,.5)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+/* coins / park / shop / heatmap */
+.pill.coin{color:#9a6400}
+#parkBtn{display:none;margin-top:12px;font-size:13px;padding:8px 16px;border-radius:14px}
+body[data-mode=focus] #parkBtn{display:inline-block}
+.pk{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:12px;background:var(--paper);margin-bottom:6px;font-size:14px;line-height:1.5}
+.pk span{flex:1;min-width:0;word-break:break-word}
+.pk .m{flex:none;font-size:11px;color:var(--mute);margin-top:2px}
+.pk .ck{flex:none;width:24px;height:24px;border-radius:8px;border:1.5px solid #d6c9ae;background:#fff;cursor:pointer;color:transparent;font-weight:800;line-height:1;padding:0}
+.pk .ck:hover{color:var(--leaf);border-color:var(--leaf)}
+.shop-top{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,#fff3dc,#ffe0a8);margin-bottom:12px}
+.shop-top svg{width:42px;height:42px;flex:none}
+.coinbig{font:400 34px/1 var(--num);color:#9a6400}
+.shop-top .mute{color:#8a6a3a}
+.rw{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--paper);margin-bottom:8px}
+.rw .rn{flex:1;min-width:0;font-weight:600}
+.rw .buy{padding:7px 12px;font-size:13px;border-radius:12px;box-shadow:0 3px 0 var(--d);white-space:nowrap}
+.rw .buy:active{transform:translateY(3px)}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:18px;padding:0 4px}
+.radd{display:flex;gap:6px;margin-top:4px}.radd input[type=text]{flex:1;min-width:0}.radd input[type=number]{width:84px}
+.heatwrap{overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.hg,.hm{display:flex;gap:3px;width:max-content}
+.hm{margin-bottom:4px}.hm span{width:11px;font-size:10px;color:var(--mute);white-space:nowrap}
+.hc{display:flex;flex-direction:column;gap:3px}
+.hc i{width:11px;height:11px;border-radius:3px;background:#efe6d4}
+.hc i.l1{background:#cdebc2}.hc i.l2{background:#97d388}.hc i.l3{background:#55ad6c}.hc i.l4{background:#2b7148}.hc i.e{visibility:hidden}
+.hleg{display:flex;align-items:center;gap:3px;justify-content:flex-end;font-size:11px;color:var(--mute);margin-top:8px}
+.hleg i{width:11px;height:11px;border-radius:3px;display:inline-block}
 /* responsive */
 @media(max-width:820px){
  .focus-grid,.grid{grid-template-columns:1fr}
@@ -230,7 +257,7 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
  .modal{border-radius:28px 28px 0 0;padding-bottom:calc(24px + env(safe-area-inset-bottom));max-width:none;animation:up .35s cubic-bezier(.2,1,.3,1)}
  @keyframes up{from{transform:translateY(100%)}}
 }
-@media(max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}.stat b{font-size:24px}h1 small{display:none}}
+@media(max-width:420px){h1{font-size:20px;letter-spacing:2px;white-space:nowrap}.brand svg{width:32px;height:32px}.hud{gap:5px}.pill{padding:4px 9px 4px 7px;font-size:12px}.pill svg{width:14px;height:14px}.stats{grid-template-columns:repeat(2,1fr)}.stat b{font-size:24px}h1 small{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -243,6 +270,7 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
   </div>
   <div class="hud">
     <span class="pill fire"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.2-3.8 2.4-5 .2 1.6.9 2.7 2.1 3.2C11 9 10.6 5.4 12 2z" fill="#ff8a3d"/><path d="M12 13c.8 1.6 2.5 2.2 2.5 4.2a2.5 2.5 0 0 1-5 0c0-1.4.9-2.4 2.5-4.2z" fill="#ffd36a"/></svg><span id="streakTxt">连续 0 天</span></span>
+    <span class="pill coin" title="岛币：在「成就」页换奖励"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffc93c"/><circle cx="12" cy="12" r="7" fill="#ffb21f"/><path d="M12 7.5l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z" fill="#fff3c4"/></svg><span id="coinTxt">0</span></span>
     <span class="pill lv" id="lvTag">Lv.1</span>
   </div>
   <div class="xpwrap"><div class="xpbar"><i id="xpFill" style="width:0"></i></div><span class="xptxt" id="xpTxt">0 XP</span></div>
@@ -275,6 +303,7 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
         <button class="btn sun big" id="startBtn">开始专注</button>
         <button class="btn ghost hide" id="giveupBtn">放弃本轮</button>
       </div>
+      <button class="btn ghost" id="parkBtn">冒出个念头？先停这里</button>
       <div class="tree-cap"><span class="tname" id="treeName">种子</span><span class="tsub" id="treeSub">专注和写作都会让它长大</span><span id="leafLoss"></span></div>
     </div>
     <svg class="sea" viewBox="0 0 400 110" preserveAspectRatio="none" aria-hidden="true">
@@ -294,6 +323,10 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
         <div class="stat"><b id="sUrge">0</b><span>扛住冲动</span></div>
         <div class="stat"><b id="sWord">0</b><span>写作字数</span></div>
       </div>
+    </div>
+    <div class="card">
+      <h2>念头停车场<span class="k">专注时冒出的事，结束后再处理</span></h2>
+      <div id="pList"></div>
     </div>
     <div class="card music">
       <h2>学习歌单<span class="k">在页面里播放，不进 B 站首页</span></h2>
@@ -347,7 +380,15 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
 
 <!-- BADGES -->
 <section id="tab-badges" class="hide">
+  <div class="card" style="margin-bottom:16px"><h2>奖励商店<span class="k">用岛币换，换来的不用内疚</span></h2>
+    <div class="shop-top"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffc93c"/><circle cx="12" cy="12" r="7" fill="#ffb21f"/><path d="M12 7.5l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z" fill="#fff3c4"/></svg><div><div class="coinbig" id="coinBig">0</div><div class="mute">岛币 · 每挣 1 XP 得 1 枚，分心扣 XP 也扣岛币</div></div></div>
+    <div id="rList"></div>
+    <div class="radd"><input type="text" id="rName" placeholder="新奖励，比如「再玩一局」"><input type="number" id="rCost" min="1" placeholder="价格"><button class="btn s" id="rAdd">添加</button></div>
+    <p class="mute" id="rLog" style="margin-bottom:0"></p>
+  </div>
   <div class="card"><h2>成就印章<span class="k">BADGES</span></h2><div class="badges" id="bList"></div></div>
+  <div class="card" style="margin-top:16px"><h2>这一年<span class="k" id="heatSum"></span></h2><div class="heatwrap" id="heatWrap"><div id="heat"></div></div>
+    <div class="hleg">少<i style="background:#efe6d4"></i><i style="background:#cdebc2"></i><i style="background:#97d388"></i><i style="background:#55ad6c"></i><i style="background:#2b7148"></i>多</div></div>
   <div class="card" style="margin-top:16px"><h2>近 7 天<span class="k">专注分钟</span></h2><div id="week"></div></div>
 </section>
 
@@ -386,6 +427,11 @@ const blank=()=>({xp:0,days:{},journal:[],badges:{},lostXp:0,settings:{idleMin:2
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))||blank()}catch(e){S=blank()}
 S.settings=Object.assign(blank().settings,S.settings||{});
+// 新字段：旧数据第一次打开时补上（已有的 XP 一次性换成等量岛币）
+if(typeof S.coins!=='number')S.coins=S.xp||0;
+S.parked=S.parked||[];S.purchases=S.purchases||[];
+S.rewards=S.rewards||[{name:'玩一局游戏',cost:80},{name:'刷 15 分钟 X',cost:60},{name:'看一集剧',cost:150},{name:'买杯奶茶',cost:200}];
+const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
 
@@ -410,7 +456,7 @@ window.closeModal=closeModal;
 // ---------- XP & level ----------
 function levelOf(xp){return Math.floor(Math.sqrt(Math.max(0,xp)/40))+1}
 function xpFor(l){return 40*(l-1)*(l-1)}
-function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
+function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);S.coins=Math.max(0,(S.coins||0)+n);if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
 
 // ---------- streak ----------
 function active(d){const x=S.days[d];return x&&(x.min>=15||x.words>=100)}
@@ -463,6 +509,7 @@ function treeSVG(l){
 
 // ---------- render ----------
 function render(){
+  $('coinTxt').textContent=S.coins;renderPark();
   const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
   $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
   $('streakTxt').textContent='连续 '+streak()+' 天';
@@ -489,12 +536,12 @@ function scene(){document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=m
 function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0)finishFocus()}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);resetUI();notify('休息结束','回来开始下一轮吧')}}}
 function flashBusy(){return document.title.startsWith('●')}
 function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;save();const bEnd=focusEnd+5*60000;
-  if(Date.now()>=bEnd){resetUI();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP');return}
-  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP，休息 5 分钟')}
+  if(Date.now()>=bEnd){resetUI();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP');return}
+  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP，休息 5 分钟')}
 function resetUI(){mode='idle';$('startBtn').textContent='开始专注';$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');$('phaseTxt').textContent='准备开始一轮专注';$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer();scene()}
 function breakModal(){const ideas=['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','用一句话说出这轮最大的收获（可以写在「间隙卡」里）','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];modal(`<h3>休息 5 分钟</h3><p>休息的意思是让大脑空下来，信息流会把它塞得更满。试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一轮</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();startFocus()}}
 $('startBtn').onclick=startFocus;
-$('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI()};
+$('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI();parkReview()};
 // 分心检测：记下离开的时刻（也存进 localStorage）。回来时按「离开到本轮结束」之间的时长算，
 // 这样就算本轮在后台已经结束了，离开的那段也照样算分心。
 function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
@@ -581,7 +628,7 @@ const BADGES=[
  ['三','三日连胜','连续 3 天打卡',()=>streak()>=3],['七','一周不断','连续 7 天打卡',()=>streak()>=7],['月','月度心流','连续 30 天打卡',()=>streak()>=30]
 ];
 function checkBadges(){const t=totals();let k=0;BADGES.forEach(b=>{if(!S.badges[b[1]]&&b[3](t)){S.badges[b[1]]=Date.now();save();setTimeout(()=>{beep();toast('解锁成就：'+b[1])},900+2800*k++)}})}
-function renderBadges(){$('bList').innerHTML=BADGES.map(b=>`<div class="badge ${S.badges[b[1]]?'got':''}"><div class="ic">${b[0]}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div></div>`).join('');
+function renderBadges(){renderShop();renderHeat();$('bList').innerHTML=BADGES.map(b=>`<div class="badge ${S.badges[b[1]]?'got':''}"><div class="ic">${b[0]}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div></div>`).join('');
  const days=[];const reasons={};
  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const x=S.days[k]||{};if(x.urgeReasons)for(const r in x.urgeReasons)reasons[r]=(reasons[r]||0)+x.urgeReasons[r];days.push({d,x,today:i===0})}
  const mx=Math.max(25,...days.map(o=>o.x.min||0));const wd='日一二三四五六';
@@ -601,6 +648,30 @@ $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';i
 $('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
 
 showPrompt();render();analyze();restoreTimer();scene();checkAway();
+
+// ---------- 念头停车场 ----------
+function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span>${esc(p.text)}</span><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0">专注时想到「要查个东西」「要回个消息」，点岛上的「先停这里」记一句，不用离开。本轮结束会提醒你。</p>'}
+$('pList').onclick=e=>{const b=e.target.closest('[data-pk]');if(!b)return;const p=S.parked.find(x=>x.at===+b.dataset.pk);if(p){p.done=true;save();renderPark()}};
+$('parkBtn').onclick=()=>{modal(`<h3>先停在这里</h3><p class="mute">写一句就好，本轮结束再处理。你不用离开这一页。</p><input type="text" id="pkIn" placeholder="比如：查一下拉格朗日乘子的条件" maxlength="120"><div class="row center"><button class="btn s" onclick="closeModal()">算了</button><button class="btn p" id="pkOk">停好了</button></div>`);setTimeout(()=>$('pkIn')&&$('pkIn').focus(),50);
+ const ok=()=>{const t=$('pkIn').value.trim();if(!t){closeModal();return}S.parked.unshift({at:Date.now(),text:t,done:false,sess:focusStart});save();closeModal();renderPark();toast('停好了，回到题目')};
+ $('pkOk').onclick=ok;$('pkIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();ok()}}};
+function parkReview(){const l=S.parked.filter(p=>!p.done&&p.sess===focusStart);if(!l.length)return;queueModal(`<h3>这轮停了 ${l.length} 个念头</h3><p class="mute">现在可以去处理了。处理完的在「念头停车场」里打个勾。</p>${l.map(p=>`<div class="pk"><span>${esc(p.text)}</span></div>`).join('')}<div class="row center"><button class="btn p" onclick="closeModal()">知道了</button></div>`)}
+// ---------- 奖励商店 ----------
+function renderShop(){$('coinBig').textContent=S.coins;$('rList').innerHTML=S.rewards.length?S.rewards.map((r,i)=>`<div class="rw"><span class="rn">${esc(r.name)}</span><button class="btn sun buy" data-buy="${i}" ${S.coins<r.cost?'disabled':''}>${r.cost} 岛币</button><button class="x" data-rdel="${i}" title="删除">×</button></div>`).join(''):'<p class="mute">还没有奖励，在下面加一个。</p>';
+ const p=S.purchases.slice(0,6);$('rLog').textContent=p.length?'最近兑换：'+p.map(x=>{const d=new Date(x.at);return(d.getMonth()+1)+'/'+d.getDate()+' '+x.name}).join('、'):''}
+$('rList').onclick=e=>{const del=e.target.closest('[data-rdel]');if(del){const r=S.rewards[+del.dataset.rdel];if(confirm('删除奖励「'+r.name+'」？')){S.rewards.splice(+del.dataset.rdel,1);save();renderShop()}return}
+ const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
+ S.coins-=r.cost;S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
+ modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">说好多久就多久。到点回来，树在等你。</p><div class="row center"><button class="btn p" onclick="closeModal()">好</button></div>`)};
+$('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value);if(!n||!(c>0)){toast('写上奖励名称和价格');return}S.rewards.push({name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
+// ---------- 一年热力图 ----------
+function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
+ let cols='',months='',lastM=-1,activeDays=0,mins=0;
+ while(d<=end){const m=d.getMonth();months+=`<span>${m!==lastM?(m+1)+'月':''}</span>`;lastM=m;let cells='';
+  for(let r=0;r<7;r++){if(d>end){cells+='<i class="e"></i>'}else{const x=S.days[keyOf(d)]||{};const v=(x.min||0)+(x.words||0)/20;const lv=v<=0?0:v<15?1:v<45?2:v<90?3:4;if(v>0){activeDays++;mins+=x.min||0}cells+=`<i class="l${lv}" title="${d.getMonth()+1}/${d.getDate()} · 专注 ${Math.round(x.min||0)} 分钟 · 写 ${x.words||0} 字"></i>`}d.setDate(d.getDate()+1)}
+  cols+=`<div class="hc">${cells}</div>`}
+ $('heat').innerHTML=`<div class="hm">${months}</div><div class="hg">${cols}</div>`;$('heatSum').textContent=`打卡 ${activeDays} 天 · 专注 ${(mins/60).toFixed(1)} 小时`;
+ requestAnimationFrame(()=>{const w=$('heatWrap');w.scrollLeft=w.scrollWidth})}
 
 // ---------- 学习歌单（B 站视频嵌在页面里播放，不跳到 B 站首页和推荐流） ----------
 S.music=S.music||[];let mOn=-1;
