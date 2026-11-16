@@ -1,0 +1,17 @@
+{
+  "name": "心流岛",
+  "short_name": "心流岛",
+  "description": "专注计时、冲动冲浪、写作训练",
+  "lang": "zh-CN",
+  "start_url": "./xinliu.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#3f7d4e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

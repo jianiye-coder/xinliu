@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>心流岛</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3f7d4e">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="心流岛">
+<style>
+:root{color-scheme:light;--bg:#f6f4ee;--card:#fff;--ink:#23211c;--mute:#7a7468;--line:#e6e1d6;--g:#3f7d4e;--g2:#e5f0e3;--o:#d9822b;--o2:#fbeedd;--r:#c0453a;--b:#3b6ea8;--b2:#e3ecf6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+h1{font-size:22px;margin:0;letter-spacing:1px}
+.lv{background:var(--g);color:#fff;border-radius:20px;padding:2px 10px;font-size:13px;font-weight:600}
+.xpbar{flex:1;min-width:140px;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,#6fae6a,#3f7d4e);transition:width .5s}
+.xptxt{font-size:12px;color:var(--mute)}
+nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+nav button{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:20px;cursor:pointer;font-size:14px;color:var(--ink)}
+nav button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{font-size:15px;margin:0 0 10px;color:var(--mute);font-weight:600}
+.timer{font-size:64px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px;margin:6px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.center{justify-content:center}
+.btn{border:none;border-radius:10px;padding:10px 16px;font-size:15px;cursor:pointer;font-weight:600}
+.btn.p{background:var(--g);color:#fff}.btn.o{background:var(--o);color:#fff}.btn.s{background:var(--line);color:var(--ink)}.btn.b{background:var(--b);color:#fff}
+.btn.big{padding:14px 22px;font-size:17px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px}
+.chip.on{border-color:var(--g);background:var(--g2);color:var(--g);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.stat{background:var(--bg);border-radius:10px;padding:8px;text-align:center}
+.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--mute)}
+.urge{width:100%;margin-top:12px;background:var(--o2);color:var(--o);border:1.5px dashed var(--o);border-radius:12px;padding:12px;font-size:15px;font-weight:600;cursor:pointer}
+.tree{display:flex;flex-direction:column;align-items:center}
+.tree svg{width:100%;max-width:280px;height:auto}
+.tname{font-weight:700;margin-top:4px}.tsub{font-size:12px;color:var(--mute)}
+textarea{width:100%;min-height:220px;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:16px;line-height:1.8;font-family:inherit;resize:vertical;background:#fffdf8}
+input[type=text],input[type=number],input[type=time]{border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:14px;font-family:inherit}
+.prompt{background:var(--b2);border-radius:10px;padding:12px;margin-bottom:10px}
+.prompt .tag{display:inline-block;background:var(--b);color:#fff;font-size:12px;border-radius:6px;padding:1px 7px;margin-right:6px}
+.prompt .tip{font-size:13px;color:var(--mute);margin-top:6px}
+.fb{margin-top:10px;font-size:14px}
+.fb .item{padding:6px 10px;border-radius:8px;margin:4px 0;background:var(--bg)}
+.hl{background:#ffe3a3;border-radius:3px;padding:0 2px}
+.preview{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;font-size:14px;line-height:1.9;max-height:160px;overflow:auto;white-space:pre-wrap}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.badge{border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;background:#fff;opacity:.4}
+.badge.got{opacity:1;border-color:var(--g);background:var(--g2)}
+.badge .ic{font-size:22px;font-weight:800;color:var(--g)}
+.badge .n{font-weight:700;font-size:13px}.badge .d{font-size:11px;color:var(--mute)}
+.entry{border-bottom:1px solid var(--line);padding:10px 0}
+.entry .m{font-size:12px;color:var(--mute)}
+.entry .t{white-space:pre-wrap;font-size:14px;margin-top:4px}
+.overlay{position:fixed;inset:0;background:rgba(35,33,28,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.overlay.on{display:flex}
+.modal{background:#fff;border-radius:16px;padding:22px;max-width:460px;width:100%}
+.modal h3{margin:0 0 8px;font-size:18px}
+.breath{width:120px;height:120px;border-radius:50%;background:var(--g2);margin:16px auto;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--g);transition:transform 4s ease-in-out}
+.toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;z-index:60;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%}
+.toast.on{opacity:1}
+.mute{color:var(--mute);font-size:13px}
+.hide{display:none}
+@media(max-width:760px){input[type=text],input[type=number],input[type=time]{font-size:16px}.timer{font-size:54px}}
+@media(max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}}
+label.set{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>心流岛</h1>
+  <span class="lv" id="lvTag">Lv.1</span>
+  <div class="xpbar"><i id="xpFill" style="width:0"></i></div>
+  <span class="xptxt" id="xpTxt">0 XP</span>
+  <span class="xptxt" id="streakTxt">连续 0 天</span>
+</header>
+<nav>
+  <button data-tab="focus" class="on">专注做题</button>
+  <button data-tab="write">写作训练场</button>
+  <button data-tab="journal">我的输出</button>
+  <button data-tab="badges">成就</button>
+  <button data-tab="settings">提醒设置</button>
+</nav>
+
+<!-- FOCUS -->
+<section id="tab-focus">
+<div class="grid">
+  <div class="card">
+    <h2 id="phaseTxt">准备开始一轮专注</h2>
+    <div class="row center" id="durRow">
+      <span class="chip" data-min="15">15 分钟</span>
+      <span class="chip on" data-min="25">25 分钟</span>
+      <span class="chip" data-min="45">45 分钟</span>
+      <span class="chip" data-min="60">60 分钟</span>
+    </div>
+    <div class="timer" id="timer">25:00</div>
+    <div class="row center">
+      <button class="btn p big" id="startBtn">开始专注</button>
+      <button class="btn s hide" id="giveupBtn">放弃本轮</button>
+    </div>
+    <div class="row center" style="margin-top:10px">
+      <button class="btn b" id="doneQBtn">做完一题 +3</button>
+    </div>
+    <button class="urge" id="urgeBtn">我想刷手机了 —— 点这里，别点 App</button>
+    <div class="stats">
+      <div class="stat"><b id="sMin">0</b><span>今日专注分钟</span></div>
+      <div class="stat"><b id="sQ">0</b><span>今日完成题数</span></div>
+      <div class="stat"><b id="sUrge">0</b><span>今日扛住冲动</span></div>
+      <div class="stat"><b id="sWord">0</b><span>今日写作字数</span></div>
+    </div>
+    <p class="mute" style="margin-top:10px">规则：专注中切走页面超过 15 秒会被记一次「分心」并扣 5 XP；每次扛住刷手机的冲动 +5 XP；每做完一题会弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话总结。</p>
+  </div>
+  <div class="card tree">
+    <h2 style="align-self:flex-start">思维之树</h2>
+    <div id="treeBox"></div>
+    <div class="tname" id="treeName">种子</div>
+    <div class="tsub" id="treeSub">专注和写作都会让它长大</div>
+    <div class="tsub" id="leafLoss" style="color:var(--r)"></div>
+  </div>
+</div>
+</section>
+
+<!-- WRITE -->
+<section id="tab-write" class="hide">
+<div class="grid">
+  <div class="card">
+    <div class="prompt" id="promptBox"></div>
+    <div class="row" style="margin-bottom:8px">
+      <button class="chip" id="newPrompt">换一题</button>
+      <span class="chip" data-wm="5">5 分钟</span>
+      <span class="chip on" data-wm="10">10 分钟</span>
+      <span class="chip" data-wm="20">20 分钟</span>
+      <span class="mute" id="wTimer"></span>
+    </div>
+    <textarea id="wText" placeholder="先写，别改。写完再看右边的反馈。"></textarea>
+    <div class="row" style="margin-top:8px;justify-content:space-between">
+      <span class="mute" id="wCount">0 字</span>
+      <div class="row">
+        <button class="btn s" id="wStart">开始计时</button>
+        <button class="btn p" id="wSave">完成并存档</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>实时反馈</h2>
+    <div class="fb" id="fb"><div class="item mute">开始写之后，这里会标出模糊词、检查结构。</div></div>
+    <h2 style="margin-top:14px">模糊词高亮</h2>
+    <div class="preview" id="preview"></div>
+  </div>
+</div>
+</section>
+
+<!-- JOURNAL -->
+<section id="tab-journal" class="hide">
+  <div class="card">
+    <h2>我的输出（写作 + 间隙卡）</h2>
+    <div class="row" style="margin-bottom:6px"><span class="chip on" data-jf="all">全部</span><span class="chip" data-jf="write">写作</span><span class="chip" data-jf="gap">间隙卡</span></div>
+    <div id="jList"></div>
+  </div>
+</section>
+
+<!-- BADGES -->
+<section id="tab-badges" class="hide">
+  <div class="card"><h2>成就徽章</h2><div class="badges" id="bList"></div></div>
+  <div class="card" style="margin-top:14px"><h2>近 7 天</h2><div id="week"></div></div>
+</section>
+
+<!-- SETTINGS -->
+<section id="tab-settings" class="hide">
+  <div class="card">
+    <h2>提醒</h2>
+    <label class="set">系统通知（页面开着时，切到别的窗口也能弹）<button class="btn s" id="notifBtn">开启通知</button></label>
+    <label class="set">空闲多久提醒我开始下一轮（分钟，0=关闭）<input type="number" id="idleMin" min="0" max="120" style="width:80px"></label>
+    <label class="set">每日写作提醒时间<input type="time" id="writeTime"></label>
+    <label class="set">提醒时播放提示音<input type="checkbox" id="sound"></label>
+    <p class="mute">网页里的提醒只在页面开着时有效。Mac 上可以装 <code>mac/</code> 文件夹里的定时弹窗，页面关了也会提醒；手机上用 Safari「分享 → 添加到主屏幕」。</p>
+    <h2 style="margin-top:16px">数据</h2>
+    <div class="row"><button class="btn s" id="exportBtn">导出全部数据</button><button class="btn s" id="importBtn">导入数据</button><input type="file" id="importFile" accept="application/json,.json" class="hide"><button class="btn s" id="resetBtn" style="color:var(--r)">清空重来</button></div>
+    <p class="mute">数据只存在当前这个浏览器里。换设备或换网址打开时，先在旧的地方导出，再到新的地方导入。</p>
+  </div>
+</section>
+</div>
+
+<div class="overlay" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+// ---------- storage ----------
+const KEY='xinliu-v1';
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const blank=()=>({xp:0,days:{},journal:[],badges:{},lostXp:0,settings:{idleMin:20,writeTime:'21:00',sound:true},lastWriteRemind:''});
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))||blank()}catch(e){S=blank()}
+S.settings=Object.assign(blank().settings,S.settings||{});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
+
+// ---------- utils ----------
+const $=id=>document.getElementById(id);
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
+function beep(){if(!S.settings.sound)return;try{const c=new (window.AudioContext||window.webkitAudioContext)();[660,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.15,c.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.18+.3);o.start(c.currentTime+i*.18);o.stop(c.currentTime+i*.18+.32)})}catch(e){}}
+function sysNotify(title,body){if(!('Notification' in window)||Notification.permission!=='granted')return;const opt={body,icon:'icon-192.png',tag:'xinliu'};const plain=()=>{try{new Notification(title,opt)}catch(e){}};
+  // 手机（安卓/iOS 主屏幕）上 new Notification 不可用，要走 service worker
+  if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.ready.then(r=>r.showNotification(title,opt)).catch(plain)}else plain()}
+function notify(title,body){beep();toast(title+' · '+body);if(document.hidden)sysNotify(title,body);flashTitle(title)}
+let flashT=null;function flashTitle(t){clearInterval(flashT);let n=0;flashT=setInterval(()=>{document.title=n++%2?'心流岛':'● '+t;if(n>12){clearInterval(flashT);document.title=baseTitle()}},800)}
+function baseTitle(){return mode==='focus'?fmt(focusEnd-Date.now())+' 专注中':mode==='break'?fmt(focusEnd-Date.now())+' 休息':'心流岛'}
+// 弹窗：带清理函数（关掉时停掉计时器），以及排队（不让升级弹窗盖掉休息弹窗）
+let modalCleanup=null;const modalQ=[];
+function runCleanup(){if(modalCleanup){const f=modalCleanup;modalCleanup=null;try{f()}catch(e){}}}
+function modal(html,cleanup){runCleanup();modalCleanup=cleanup||null;$('modal').innerHTML=html;$('ov').classList.add('on')}
+function closeModal(){runCleanup();$('ov').classList.remove('on');if(modalQ.length){const h=modalQ.shift();setTimeout(()=>{if($('ov').classList.contains('on'))modalQ.unshift(h);else modal(h)},250)}}
+function queueModal(html){if($('ov').classList.contains('on'))modalQ.push(html);else modal(html)}
+window.closeModal=closeModal;
+
+// ---------- XP & level ----------
+function levelOf(xp){return Math.floor(Math.sqrt(Math.max(0,xp)/40))+1}
+function xpFor(l){return 40*(l-1)*(l-1)}
+function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
+
+// ---------- streak ----------
+function active(d){const x=S.days[d];return x&&(x.min>=15||x.words>=100)}
+function streak(){let n=0;const d=new Date();if(!active(today()))d.setDate(d.getDate()-1);for(;;){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(active(k)){n++;d.setDate(d.getDate()-1)}else break}return n}
+
+// ---------- tree ----------
+const STAGES=[[1,'种子','埋在土里，等你第一轮专注'],[2,'嫩芽','破土了'],[3,'幼苗','开始长出叶子'],[5,'小树','有了自己的枝干'],[8,'青年树','枝叶繁茂'],[12,'开花之树','思考开始开花'],[17,'结果之树','输出开始结果'],[23,'森林之心','你已经是一片森林']];
+function stage(l){let s=STAGES[0];for(const x of STAGES)if(l>=x[0])s=x;return{name:s[1],sub:s[2]}}
+function treeSVG(l){
+  const W=260,H=240,gx=130,gy=205;
+  let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><ellipse cx="${gx}" cy="${gy+8}" rx="95" ry="16" fill="#d9cdb3"/><ellipse cx="${gx}" cy="${gy+4}" rx="80" ry="10" fill="#bba67f"/>`;
+  if(l<2){s+=`<ellipse cx="${gx}" cy="${gy}" rx="10" ry="7" fill="#8a5a2b"/></svg>`;return s}
+  const h=Math.min(150,18+l*7), tw=Math.min(14,2+l*.6), top=gy-h;
+  s+=`<path d="M${gx-tw/2} ${gy} Q${gx-tw/3} ${gy-h/2} ${gx-1} ${top} L${gx+1} ${top} Q${gx+tw/3} ${gy-h/2} ${gx+tw/2} ${gy}Z" fill="#7a5230"/>`;
+  const leaves=Math.min(46,l*3), R=Math.min(95,14+l*4.2);
+  let seed=7;const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+  if(l>=5){for(let i=0;i<Math.min(6,l-3);i++){const a=(i%2?1:-1)*(0.5+rnd()*0.6),y=gy-h*(0.45+i*0.08),len=R*0.6;s+=`<line x1="${gx}" y1="${y}" x2="${gx+Math.sin(a)*len}" y2="${y-Math.cos(a)*len*0.6}" stroke="#7a5230" stroke-width="${Math.max(2,tw/3)}" stroke-linecap="round"/>`}}
+  const greens=['#5a9a5e','#3f7d4e','#78b36f','#4f8f56'];
+  for(let i=0;i<leaves;i++){const a=rnd()*Math.PI*2,r=Math.sqrt(rnd())*R*(l<5?0.55:1),x=gx+Math.cos(a)*r,y=top+15+Math.sin(a)*r*0.62,sz=l<5?7:9+rnd()*7;s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${sz.toFixed(1)}" fill="${greens[i%4]}" opacity=".92"/>`}
+  if(l>=12){const n=Math.min(14,(l-11)*2);for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,r=Math.sqrt(rnd())*R*.9;s+=`<circle cx="${gx+Math.cos(a)*r}" cy="${top+15+Math.sin(a)*r*.62}" r="4" fill="#f2a7b8"/>`}}
+  if(l>=17){const n=Math.min(12,(l-16)*2);for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,r=Math.sqrt(rnd())*R*.85;s+=`<circle cx="${gx+Math.cos(a)*r}" cy="${top+18+Math.sin(a)*r*.62}" r="5.5" fill="#d9822b"/>`}}
+  return s+'</svg>';
+}
+
+// ---------- render ----------
+function render(){
+  const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
+  $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
+  $('streakTxt').textContent='连续 '+streak()+' 天';
+  const d=day();$('sMin').textContent=Math.round(d.min);$('sQ').textContent=d.q;$('sUrge').textContent=d.urge;$('sWord').textContent=d.words;
+  $('treeBox').innerHTML=treeSVG(l);const st=stage(l);$('treeName').textContent=st.name+' · Lv.'+l;$('treeSub').textContent=st.sub;
+  $('leafLoss').textContent=d.distract?`今天分心 ${d.distract} 次，树掉了 ${d.distract*5} XP 的叶子`:'';
+}
+
+// ---------- tabs ----------
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));['focus','write','journal','badges','settings'].forEach(t=>$('tab-'+t).classList.toggle('hide',t!==b.dataset.tab));if(b.dataset.tab==='journal')renderJournal();if(b.dataset.tab==='badges')renderBadges()});
+
+// ---------- focus ----------
+let dur=25,focusEnd=0,focusStart=0,tick=null,lastActivity=Date.now(),idleNotified=false,mode='idle';
+function selectDur(m){dur=m;document.querySelectorAll('#durRow .chip').forEach(x=>x.classList.toggle('on',+x.dataset.min===m));$('timer').textContent=String(dur).padStart(2,'0')+':00'}
+document.querySelectorAll('#durRow .chip').forEach(c=>c.onclick=()=>{if(mode!=='idle')return;selectDur(+c.dataset.min)});
+function fmt(ms){const s=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+// 计时状态存进 localStorage：刷新页面、手机把后台页面杀掉，回来都能接着算
+function persistTimer(){S.timer={mode,dur,start:focusStart,end:focusEnd};save()}
+function focusUI(){$('startBtn').classList.add('hide');$('giveupBtn').classList.remove('hide');$('phaseTxt').textContent='专注中 · 手机放远一点'}
+function breakUI(){$('phaseTxt').textContent='休息 5 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始下一轮';$('startBtn').classList.remove('hide')}
+function startFocus(){runCleanupIfBreak();mode='focus';focusStart=Date.now();focusEnd=focusStart+dur*60000;$('startBtn').textContent='开始专注';focusUI();persistTimer();clearInterval(tick);tick=setInterval(loop,500);loop()}
+function runCleanupIfBreak(){if(mode==='break'&&$('mSkip'))closeModal()}
+function loop(){if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0)finishFocus()}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);resetUI();notify('休息结束','回来开始下一轮吧')}}}
+function flashBusy(){return document.title.startsWith('●')}
+function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;save();const bEnd=focusEnd+5*60000;
+  if(Date.now()>=bEnd){resetUI();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP');return}
+  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();addXP(m*2,'完成 '+m+' 分钟专注');notify('专注完成！','+'+m*2+' XP，休息 5 分钟')}
+function resetUI(){mode='idle';$('startBtn').textContent='开始专注';$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');$('phaseTxt').textContent='准备开始一轮专注';$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer()}
+function breakModal(){const ideas=['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','用一句话说出这轮最大的收获（可以写在「间隙卡」里）','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];modal(`<h3>休息 5 分钟</h3><p>休息的意思是让大脑空下来，信息流会把它塞得更满。试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一轮</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();startFocus()}}
+$('startBtn').onclick=startFocus;
+$('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI()};
+// 分心检测：记下离开的时刻（也存进 localStorage）。回来时按「离开到本轮结束」之间的时长算，
+// 这样就算本轮在后台已经结束了，离开的那段也照样算分心。
+function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
+function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle')return;selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;
+  if(t.mode==='focus'){mode='focus';focusUI();tick=setInterval(loop,500);loop()}
+  else if(t.mode==='break'){if(Date.now()<t.end){mode='break';breakUI();tick=setInterval(loop,500);loop()}else{S.timer=null;save()}}}
+
+// urge surfing
+$('urgeBtn').onclick=()=>{let n=60,it=null,bt=null;const reasons=['无聊','卡题了','累了','焦虑','习惯性','想奖励自己'];modal(`<h3>冲动冲浪 · 60 秒</h3><p class="mute">冲动像海浪，会涨也会退。你只要看着它，不用跟它走。</p><div class="breath" id="br">吸气</div><p style="text-align:center;font-size:28px;font-weight:700" id="uc">60</p><p>此刻想刷，是因为：</p><div class="row" id="ur">${reasons.map(r=>`<span class="chip" data-r="${r}">${r}</span>`).join('')}</div><div class="row center" style="margin-top:14px"><button class="btn s" id="uGive">还是去刷了</button><button class="btn p" id="uOk" disabled style="opacity:.5">我扛住了 +5</button></div>`,()=>{clearInterval(it);clearInterval(bt)});let reason='';document.querySelectorAll('#ur .chip').forEach(c=>c.onclick=()=>{reason=c.dataset.r;document.querySelectorAll('#ur .chip').forEach(x=>x.classList.toggle('on',x===c))});let ph=0;const br=$('br');bt=setInterval(()=>{ph=!ph;br.style.transform=ph?'scale(1.35)':'scale(1)';br.textContent=ph?'呼气':'吸气'},4000);br.style.transform='scale(1.35)';it=setInterval(()=>{n--;const uc=$('uc'),ok=$('uOk');if(!uc||!ok){clearInterval(it);return}uc.textContent=n>0?n:'浪退了';if(n<=45){ok.disabled=false;ok.style.opacity=1}if(n<=0)clearInterval(it)},1000);const end=closeModal;$('uOk').onclick=()=>{end();const d=day();d.urge++;d.urgeReasons=d.urgeReasons||{};if(reason)d.urgeReasons[reason]=(d.urgeReasons[reason]||0)+1;save();addXP(5,'扛住了冲动')};$('uGive').onclick=()=>{end();toast('诚实记录也有价值。回来就好。')}};
+
+// gap card
+$('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题');let n=30,it=null;modal(`<h3>间隙卡 · 30 秒</h3><p class="mute">刚做完一题，大脑最想刷信息流的就是这一刻。把它换成一句话：</p><p><b>${['这道题的关键一步是……','我一开始卡在……，后来发现……','如果给同学讲这道题，我会说……','这道题考的本质是……'][Math.floor(Math.random()*4)]}</b></p><input type="text" id="gapIn" style="width:100%" placeholder="一句话就好"><p class="mute" id="gapC" style="text-align:right">30</p><div class="row center"><button class="btn s" id="gapSkip">跳过</button><button class="btn p" id="gapOk">存下 +4</button></div>`,()=>clearInterval(it));setTimeout(()=>$('gapIn')&&$('gapIn').focus(),50);it=setInterval(()=>{n--;if($('gapC'))$('gapC').textContent=n>0?n:'时间到，写完这句就回去做题';if(n<=0)clearInterval(it)},1000);$('gapSkip').onclick=closeModal;$('gapIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('gapOk').click()}};$('gapOk').onclick=()=>{const t=$('gapIn').value.trim();closeModal();if(t.length<4){toast('写得太短了，下次多写几个字');return}S.journal.unshift({type:'gap',at:Date.now(),text:t});d.words+=t.length;save();addXP(4,'间隙卡')}};
+
+// idle reminder + daily write reminder
+['click','keydown','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now();idleNotified=false}));
+setInterval(()=>{const st=S.settings;if(mode==='idle'&&st.idleMin>0&&!idleNotified&&Date.now()-lastActivity>st.idleMin*60000){idleNotified=true;notify('心流岛','已经 '+st.idleMin+' 分钟没开始新一轮了。手机在手上吗？')}const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
+
+// ---------- writing ----------
+const PROMPTS=[
+ ['结论先行','用一句话（30 字以内）说清：今天做的最难的一道题，难在哪？','先写结论，再写原因。删掉所有「我觉得」。'],
+ ['PREP 结构','卸载小红书之后，你的注意力真的变好了吗？','观点 → 理由 → 例子 → 回到观点。四段，每段一两句。'],
+ ['精准定义','不用「很」「感觉」「状态」这几个词，定义一下：对你来说，什么叫「专注」？','好定义 = 它属于哪一类 + 它跟相近东西的区别。'],
+ ['费曼解释','把你最近学的一个概念，讲给一个 12 岁的小孩听。','不能用专业术语；如果必须用，先解释它。'],
+ ['三点说清','今天学到的三件事。每件一句话，按重要性排序。','用「第一、第二、第三」。排序本身就是思考。'],
+ ['反方论证','写一个你相信的观点，然后写出反对它的最强理由。','好的思考者能把对手的观点说得比对手还好。'],
+ ['具体化','描述你此刻的情绪，不许用「烦」「累」「还好」。','用身体感受、具体场景或比喻代替形容词。'],
+ ['比较','比较两种你用过的学习方法，哪个更适合你？为什么？','先说比较的标准，再逐条比较，最后下结论。'],
+ ['因果链','你最近一次拖延，是怎么一步步发生的？','用「因为……所以……于是……」串成一条链，至少 4 环。'],
+ ['一页读书笔记','你最近读/看过的一个内容，它的核心观点是什么？你同意吗？','第一句复述观点，第二部分给你的判断和理由。'],
+ ['问题拆解','你现在最大的一个困扰，把它拆成 3 个更小、可以行动的问题。','每个小问题都要能回答「明天我可以做什么」。'],
+ ['改写练习','写一段话，然后把它压缩到一半字数，意思不变。','先写出来，再删：删重复、删形容词、删「然后」。'],
+ ['类比','用一个生活中的类比，解释你所学专业里的一个难点。','说清类比在哪里成立、在哪里不成立。'],
+ ['复盘','今天哪件事做得好？哪件事下次会换个做法？','事实 → 原因 → 下次怎么做。不写空话。'],
+ ['说服','说服一个朋友每天写 10 分钟东西。','对方会拒绝的理由是什么？先回应它。'],
+ ['观察','描写你此刻所在的空间，让没去过的人能想象出来。','从大到小，从远到近，至少写一个声音或气味。']
+];
+const VAGUE=['非常','特别','十分','很','挺','比较','有点','有些','一些','东西','什么的','之类','感觉','好像','似乎','可能','其实','就是','然后','反正','各种','等等','某种','一定程度','某些','觉得','还行','还好','蛮'];
+const CONNECT={'因果':['因为','所以','因此','导致','于是','由于'],'举例':['比如','例如','举个例子','譬如'],'转折':['但是','但','然而','不过','可是'],'顺序':['首先','其次','第一','第二','最后','然后']};
+let pIdx=Math.floor(Math.random()*PROMPTS.length),wMin=10,wEnd=0,wTick=null;
+function showPrompt(){const p=PROMPTS[pIdx];$('promptBox').innerHTML=`<span class="tag">${p[0]}</span><b>${p[1]}</b><div class="tip">写法提示：${p[2]}</div>`}
+$('newPrompt').onclick=()=>{pIdx=(pIdx+1+Math.floor(Math.random()*(PROMPTS.length-1)))%PROMPTS.length;showPrompt()};
+document.querySelectorAll('[data-wm]').forEach(c=>c.onclick=()=>{wMin=+c.dataset.wm;document.querySelectorAll('[data-wm]').forEach(x=>x.classList.toggle('on',x===c))});
+$('wStart').onclick=()=>{wEnd=Date.now()+wMin*60000;clearInterval(wTick);$('wText').focus();wTick=setInterval(()=>{const l=wEnd-Date.now();$('wTimer').textContent='剩 '+fmt(l)+' · 别停笔，别回头改';if(l<=0){clearInterval(wTick);$('wTimer').textContent='时间到！看看右边的反馈，改一遍再存档';notify('写作时间到','回头读一遍，删掉模糊词')}},500)};
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function countZh(t){return t.replace(/\s/g,'').length}
+function analyze(){
+  const t=$('wText').value,n=countZh(t);$('wCount').textContent=n+' 字';
+  const vr=new RegExp('('+VAGUE.slice().sort((a,b)=>b.length-a.length).join('|')+')','g');
+  const found={};(t.match(vr)||[]).forEach(w=>found[w]=(found[w]||0)+1);
+  const vc=Object.values(found).reduce((a,b)=>a+b,0);
+  $('preview').innerHTML=esc(t).replace(vr,'<span class="hl">$1</span>')||'<span class="mute">（空）</span>';
+  const fb=[];if(n===0){$('fb').innerHTML='<div class="item mute">开始写之后，这里会标出模糊词、检查结构。</div>';return}
+  const sents=t.split(/[。！？!?\n]+/).filter(s=>s.trim().length>0);
+  const avg=sents.length?Math.round(n/sents.length):0;
+  const density=n?vc/n*100:0;
+  fb.push(`<div class="item">模糊词 <b>${vc}</b> 个（每百字 ${density.toFixed(1)} 个）${density>3?' —— 偏多。试着用数字、例子、具体动作替换高亮词。':density>1.5?' —— 还可以更精确。':' —— 很干净。'}</div>`);
+  if(vc)fb.push(`<div class="item mute">${Object.entries(found).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([w,c])=>w+'×'+c).join('　')}</div>`);
+  fb.push(`<div class="item">${sents.length} 句，平均每句 ${avg} 字${avg>45?' —— 句子太长，拆成两句会更清楚。':avg<8&&sents.length>2?' —— 句子很碎，可以把相关的合并。':''}</div>`);
+  const has=Object.entries(CONNECT).filter(([k,ws])=>ws.some(w=>t.includes(w))).map(([k])=>k);
+  const miss=Object.keys(CONNECT).filter(k=>!has.includes(k));
+  fb.push(`<div class="item">逻辑连接：${has.length?'用到了「'+has.join('、')+'」':'还没有逻辑连接词'}${miss.includes('举例')?'。<b>缺少例子</b>——抽象的观点需要一个具体的例子撑住。':''}${miss.includes('因果')?'。没有因果——你的观点「为什么」成立？':''}</div>`);
+  const first=(sents[0]||'').trim();
+  if(first.length>40)fb.push(`<div class="item">第一句有 ${first.length} 字。试着让第一句就是你的结论，读者一眼就知道你要说什么。</div>`);
+  const iThink=(t.match(/我觉得|我认为|我感觉/g)||[]).length;if(iThink>=2)fb.push(`<div class="item">「我觉得/我认为」出现 ${iThink} 次。观点本来就是你的，直接说。</div>`);
+  if(n>=150)fb.push(`<div class="item" style="background:var(--g2);color:var(--g)">已达到 150 字，可以存档拿完成奖励了。</div>`);
+  $('fb').innerHTML=fb.join('');
+}
+$('wText').addEventListener('input',analyze);
+$('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<30){toast('至少写 30 字再存档');return}const vr=new RegExp('('+VAGUE.slice().sort((a,b)=>b.length-a.length).join('|')+')','g');const vc=(t.match(vr)||[]).length;S.journal.unshift({type:'write',at:Date.now(),prompt:PROMPTS[pIdx][1],tag:PROMPTS[pIdx][0],text:t,vague:vc});const d=day();d.words+=n;d.writes++;save();let xp=Math.floor(n/10)+(n>=150?20:0)+(n>=50&&vc/n<0.015?10:0);addXP(xp,'写作 '+n+' 字'+(n>=150?' · 完成奖励':'')+(n>=50&&vc/n<0.015?' · 精准奖励':''));$('wText').value='';analyze();clearInterval(wTick);$('wTimer').textContent='';$('newPrompt').click()};
+
+// ---------- journal ----------
+let jf='all';document.querySelectorAll('[data-jf]').forEach(c=>c.onclick=()=>{jf=c.dataset.jf;document.querySelectorAll('[data-jf]').forEach(x=>x.classList.toggle('on',x===c));renderJournal()});
+function renderJournal(){const list=S.journal.filter(e=>jf==='all'||e.type===jf);$('jList').innerHTML=list.length?list.map(e=>{const d=new Date(e.at);return`<div class="entry"><div class="m">${d.getMonth()+1}月${d.getDate()}日 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} · ${e.type==='gap'?'间隙卡':e.tag+' · '+countZh(e.text)+'字 · 模糊词 '+e.vague}</div>${e.prompt?`<div class="m"><b>${esc(e.prompt)}</b></div>`:''}<div class="t">${esc(e.text)}</div></div>`}).join(''):'<p class="mute">还没有输出。从一张间隙卡开始。</p>'}
+
+// ---------- badges ----------
+function totals(){let t={min:0,q:0,urge:0,words:0,writes:0,sessions:0};Object.values(S.days).forEach(d=>{for(const k in t)t[k]+=d[k]||0});t.gap=S.journal.filter(e=>e.type==='gap').length;t.precise=S.journal.filter(e=>e.type==='write'&&countZh(e.text)>=150&&e.vague/countZh(e.text)<0.01).length;return t}
+const BADGES=[
+ ['初','第一次专注','完成 1 轮专注',t=>t.sessions>=1],['十','专注十轮','完成 10 轮专注',t=>t.sessions>=10],['百','百分钟','累计专注 100 分钟',t=>t.min>=100],['千','千分钟','累计专注 1000 分钟',t=>t.min>=1000],
+ ['浪','冲浪者','扛住 10 次刷手机冲动',t=>t.urge>=10],['海','驯浪师','扛住 50 次冲动',t=>t.urge>=50],
+ ['题','刷题机器','完成 50 道题',t=>t.q>=50],['隙','间隙捕手','写 20 张间隙卡',t=>t.gap>=20],
+ ['笔','提笔','第一次写作存档',t=>t.writes>=1],['文','千字','累计写作 1000 字',t=>t.words>=1000],['书','万字','累计写作 10000 字',t=>t.words>=10000],
+ ['准','精准表达','一篇 150 字以上、模糊词低于 1%',t=>t.precise>=1],
+ ['三','三日连胜','连续 3 天打卡',()=>streak()>=3],['七','一周不断','连续 7 天打卡',()=>streak()>=7],['月','月度心流','连续 30 天打卡',()=>streak()>=30]
+];
+function checkBadges(){const t=totals();let k=0;BADGES.forEach(b=>{if(!S.badges[b[1]]&&b[3](t)){S.badges[b[1]]=Date.now();save();setTimeout(()=>{beep();toast('解锁成就：'+b[1])},900+2800*k++)}})}
+function renderBadges(){$('bList').innerHTML=BADGES.map(b=>`<div class="badge ${S.badges[b[1]]?'got':''}"><div class="ic">${b[0]}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div></div>`).join('');
+ let rows='<table style="width:100%;font-size:13px;border-collapse:collapse"><tr style="color:var(--mute)"><td>日期</td><td>专注分钟</td><td>题数</td><td>扛住冲动</td><td>分心</td><td>写作字数</td></tr>';const reasons={};
+ for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const x=S.days[k]||{};if(x.urgeReasons)for(const r in x.urgeReasons)reasons[r]=(reasons[r]||0)+x.urgeReasons[r];rows+=`<tr style="border-top:1px solid var(--line)"><td>${d.getMonth()+1}/${d.getDate()}</td><td>${Math.round(x.min||0)}</td><td>${x.q||0}</td><td>${x.urge||0}</td><td>${x.distract||0}</td><td>${x.words||0}</td></tr>`}
+ rows+='</table>';const rs=Object.entries(reasons).sort((a,b)=>b[1]-a[1]);rows+=rs.length?`<p class="mute" style="margin-top:10px">这周你想刷手机最常见的原因：<b>${rs.map(([r,c])=>r+' '+c+' 次').join('、')}</b>。${rs[0][0]==='卡题了'?'卡题时试试先把卡点写下来——写出来往往就通了。':rs[0][0]==='累了'?'累的时候需要的是真正的休息（走动、闭眼），信息流不会让你恢复。':rs[0][0]==='无聊'?'无聊说明题目难度不合适，试试换一道更有挑战的。':''}</p>`:'';$('week').innerHTML=rows}
+
+// ---------- settings ----------
+$('idleMin').value=S.settings.idleMin;$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
+$('idleMin').onchange=e=>{S.settings.idleMin=+e.target.value||0;save()};$('writeTime').onchange=e=>{S.settings.writeTime=e.target.value;save()};$('sound').onchange=e=>{S.settings.sound=e.target.checked;save()};
+function notifState(){if(!('Notification' in window)){$('notifBtn').textContent='此环境不支持';$('notifBtn').disabled=true}else if(Notification.permission==='granted'){$('notifBtn').textContent='已开启';$('notifBtn').disabled=true}}
+$('notifBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(e){}notifState();if(!('Notification' in window)||Notification.permission!=='granted')toast('系统通知不可用，会用页面弹窗+提示音提醒你')};notifState();
+$('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='xinliu-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
+$('resetBtn').onclick=()=>{if(confirm('确定清空所有数据？树会回到种子。')){clearInterval(tick);S=blank();save();location.reload()}};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(typeof data!=='object'||!data||typeof data.xp!=='number'||typeof data.days!=='object')throw 0;if(!confirm('用这个文件覆盖当前数据？（当前 '+S.xp+' XP → 文件里 '+data.xp+' XP）'))return;clearInterval(tick);S=Object.assign(blank(),data);S.settings=Object.assign(blank().settings,data.settings||{});save();location.reload()}catch(err){toast('这个文件不是心流岛导出的数据')}};
+$('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
+
+showPrompt();render();analyze();restoreTimer();checkAway();
+const hashTab=()=>{const b=document.querySelector('nav [data-tab="'+location.hash.slice(1)+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
