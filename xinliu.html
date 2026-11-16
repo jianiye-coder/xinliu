@@ -312,9 +312,11 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .wsum{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .wsum div{background:var(--paper);border-radius:14px;padding:10px;text-align:center}.wsum b{display:block;font:400 24px var(--num);color:var(--sea)}.wsum span{font-size:11.5px;color:var(--mute)}
 .wrow{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--line);font-size:13.5px;flex-wrap:wrap}
-.wrow .wd{flex:none;font:12px var(--num);color:var(--mute);width:78px}.wrow .wk{flex:none;color:var(--mute);font-size:12.5px}
-.wrow .ww{flex:1;min-width:140px;font-weight:600}.wrow .ww a{color:var(--sea);text-decoration:none}
-.wrow .ww button{border:1.5px dashed var(--sun-d);background:var(--sun-l);border-radius:10px;padding:3px 10px;font-size:12px;font-weight:700;color:#9a6400;cursor:pointer}
+.wrow .w-d{flex:none;font:12px var(--num);color:var(--mute);width:84px}.wrow .w-k{flex:none;color:var(--mute);font-size:12.5px;white-space:nowrap}
+.wrow .w-w{flex:1;min-width:160px;font-weight:600;line-height:1.5}.wrow .w-w a{color:var(--sea);text-decoration:none}
+.wrow .w-w small{display:block;font-size:11.5px;font-weight:500;color:var(--mute)}.wrow .w-w small.w-hint{color:#b07a1a}
+.wrow .w-fill{border:1.5px dashed var(--sun-d);background:var(--sun-l);border-radius:10px;padding:3px 10px;font-size:12px;font-weight:700;color:#9a6400;cursor:pointer}
+.wrow .w-edit{border:0;background:none;color:var(--mute);cursor:pointer;font-size:13px;padding:0 4px;margin-left:4px}
 /* reward timer */
 .rtbar{display:flex;align-items:center;gap:12px;margin:-6px 0 16px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#fff3dc,#ffe0a8);border:1.5px solid #f3d6a4;font-weight:600;font-size:14px}
 .rtbar span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rtbar b{font:400 22px var(--num);color:#9a6400}
@@ -1314,24 +1316,34 @@ function renderRT(){const b=$('rtBar'),t=S.rt;clearInterval(rtTick);if(!t){b.cla
   b.classList.remove('hide');b.innerHTML=`<span>🎁 奖励时间 · ${esc(t.name)}</span><b>${fmt(left)}</b><button id="rtEnd">提前结束</button>`;
   $('rtEnd').onclick=()=>{const e=S.watch.find(x=>x.id===t.wid);if(e&&t.start)e.used=Math.max(1,Math.round((Date.now()-t.start)/60000));S.rt=null;save();renderRT();toast('提前回来了，很好');askWhat(t.wid,false)}};
  step();rtTick=setInterval(step,1000)}
-function parseWhat(v){const m=v.match(/https?:\/\/\S+/);const link=m?m[0]:'';let what=v.replace(link,'').trim();if(!what&&link){try{what=new URL(link).hostname.replace(/^www\./,'')}catch(e){what=link}}return{what,link}}
+// 解析你填的内容：链接、B 站分享文字里的【标题】、你自己写的名字
+function parseWhat(v){const m=v.match(/https?:\/\/\S+/);const link=m?m[0].replace(/[，。）)】]+$/,''):'';let rest=v.replace(m?m[0]:'','');let title='';const tm=rest.match(/【([^】]+)】/);if(tm){title=tm[1].replace(/[-_]?(哔哩哔哩|bilibili)[^】]*$/i,'').trim();rest=rest.replace(tm[0],'')}
+ let what=rest.trim();if(!what&&!title&&link){try{what=new URL(link).hostname.replace(/^www\./,'')}catch(e){what=link}}return{what,link,title,titleTried:false}}
+const isBili=u=>/bilibili\.com|b23\.tv/i.test(u||'');
+// 自动抓标题：B 站不允许网页直接读取（会被浏览器的 ORB 拦下），所以 B 站靠分享文字里的标题；其他网站用 microlink 读网页标题
+async function fetchTitle(e){if(!e.link||e.title||e.titleTried)return;e.titleTried=true;save();if(isBili(e.link))return;
+ try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),8000);const j=await(await fetch('https://api.microlink.io/?url='+encodeURIComponent(e.link),{signal:ctl.signal})).json();const t=j&&j.status==='success'&&j.data&&j.data.title;
+  if(t&&t!==e.link&&!/^(BV\w+|av\d+)$/i.test(t)){e.title=t.slice(0,120);if(j.data.publisher)e.site=j.data.publisher;save();renderWatch()}}catch(err){}}
 function askWhat(wid,timeUp){const e=S.watch.find(x=>x.id===wid);if(!e)return;const v=verbOf(e.kind),recent=[...new Set(S.watch.filter(x=>x.what&&x.kind===e.kind).map(x=>x.what))].slice(0,4);
  queueModal(`<h3>${timeUp?'奖励时间到 ⏰':'回来了 👍'}</h3><p>${timeUp?`「${esc(e.kind)}」的 ${e.mins} 分钟用完了。`:''}你刚才${v}了什么？</p>
  ${recent.length?`<div class="row" id="wRecent">${recent.map(x=>`<span class="chip" data-w="${esc(x)}">${esc(x)}</span>`).join('')}</div>`:''}
- <input type="text" id="wIn" maxlength="200" placeholder="名字或链接都行，比如：Homeland S1E3 https://…" style="margin-top:8px">
+ <input type="text" id="wIn" maxlength="300" placeholder="名字或链接都行。B 站视频用「分享 → 复制链接」粘贴，会自动带上标题" style="margin-top:8px" value="${esc([e.title?'【'+e.title+'】':'',e.what&&e.what!==e.title?e.what:'',e.link||''].filter(Boolean).join(' '))}">
  <p class="mute" style="margin:6px 0 0">记下来，你就能看到自己的时间都花在了什么上。</p>
  <div class="row center"><button class="btn s" id="wSkip">先不填</button><button class="btn sun" id="wOk">${timeUp?'记下，开始下一个番茄':'记下'}</button></div>`);
  const bind=()=>{if(!$('wOk'))return setTimeout(bind,200);setTimeout(()=>$('wIn')&&$('wIn').focus(),60);
   const rc=$('wRecent');if(rc)rc.onclick=ev=>{const c=ev.target.closest('[data-w]');if(c){$('wIn').value=c.dataset.w+' ';$('wIn').focus()}};
-  const ok=()=>{const v2=$('wIn').value.trim();if(v2){Object.assign(e,parseWhat(v2));save();renderWatch()}closeModal();if(timeUp)startNext()};
+  const ok=()=>{const v2=$('wIn').value.trim();if(v2){Object.assign(e,parseWhat(v2));save();renderWatch();fetchTitle(e)}closeModal();if(timeUp)startNext()};
   $('wOk').onclick=ok;$('wIn').onkeydown=ev=>{if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();ok()}};$('wSkip').onclick=()=>{closeModal();renderWatch()}};bind()}
 // 观看记录
 function renderWatch(){if(!$('wList'))return;const W=S.watch,wk=Date.now()-7*86400000,sum={};W.filter(e=>e.at>=wk).forEach(e=>{const k=/b\s*站|bilibili|刷|(^|\s)X$/i.test(e.kind)?'刷信息流':/看/.test(e.kind)?'看剧':'玩游戏';sum[k]=(sum[k]||0)+(e.used||e.mins||0)});
- const top={};W.filter(e=>e.what).forEach(e=>{const k=e.what.replace(/\s*(S\d+)?\s*E?\d+\s*$/i,'').trim()||e.what;top[k]=(top[k]||0)+(e.used||e.mins||0)});const T=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
+ const top={};W.filter(e=>e.what||e.title).forEach(e=>{const k=(e.title||e.what).replace(/\s*(S\d+)?\s*E?\d+\s*$/i,'').trim()||e.what;top[k]=(top[k]||0)+(e.used||e.mins||0)});const T=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
  $('wSum').innerHTML=Object.keys(sum).length?Object.entries(sum).map(([k,v])=>`<div><b>${v}</b><span>近 7 天${k}（分钟）</span></div>`).join(''):'<p class="mute" style="margin:0">还没有记录。在奖励商店兑换看剧、玩游戏、刷 X / B 站后，这里会记下你看了什么、花了多久。</p>';
  $('wTop').innerHTML=T.length?'最常看 / 玩：'+T.map(([k,v])=>`<b>${esc(k)}</b> ${v} 分钟`).join('、'):'';
- $('wList').innerHTML=W.slice(0,60).map(e=>{const d=new Date(e.at),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-  return`<div class="wrow"><span class="wd">${d.getMonth()+1}/${d.getDate()} ${hm}</span><span class="wk">${esc(e.kind)} · ${e.used?'用了 '+e.used+' / ':''}${e.mins} 分钟</span><span class="ww">${e.what?(e.link?`<a href="${esc(e.link)}" target="_blank" rel="noopener">${esc(e.what)} ↗</a>`:esc(e.what)):`<button data-fill="${e.id}">补填看了什么</button>`}</span></div>`}).join('')}
+ $('wList').innerHTML=W.slice(0,60).map(e=>{const d=new Date(e.at),hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const main=e.title||e.what;
+  const sub=e.title&&e.what&&e.what!==e.title&&!/^[\w.-]+\.\w+$/.test(e.what)?e.what:'';const hint=e.link&&!e.title&&isBili(e.link)?'<small class="w-hint">B 站标题读不到：用「分享 → 复制链接」重新粘贴一次就有了</small>':'';
+  const body=main?`${e.link?`<a href="${esc(e.link)}" target="_blank" rel="noopener">${esc(main)} ↗</a>`:esc(main)}${sub?`<small>${esc(sub)}</small>`:''}${hint}<button class="w-edit" data-fill="${e.id}" title="修改">✎</button>`:`<button class="w-fill" data-fill="${e.id}">补填看了什么</button>`;
+  return`<div class="wrow"><span class="w-d">${d.getMonth()+1}/${d.getDate()} ${hm}</span><span class="w-k">${esc(e.kind)} · ${e.used?'用了 '+e.used+' / ':''}${e.mins} 分钟</span><span class="w-w">${body}</span></div>`}).join('');
+ W.slice(0,20).forEach(e=>{if(e.link&&!e.title&&!e.titleTried)fetchTitle(e)})}
 $('wList').onclick=ev=>{const b=ev.target.closest('[data-fill]');if(b)askWhat(+b.dataset.fill,false)};
 window.startNext=()=>{tabTo('focus');if(mode==='idle')setTimeout(askGoal,250)};
 $('rType').onchange=e=>{$('rCost').placeholder=e.target.value==='rate'?'每分钟':'价格'};
