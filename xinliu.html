@@ -121,7 +121,7 @@ body[data-mode=focus] .timer{text-shadow:0 0 24px rgba(255,215,106,.35)}
 .tname{font:700 15px var(--serif);letter-spacing:1px}.tsub{font-size:12px;opacity:.75}
 #leafLoss{font-size:12px;color:var(--coral);font-weight:600}
 body[data-mode=focus] #leafLoss{color:#ffb4a6}
-.sea{position:absolute;left:0;right:0;bottom:0;height:110px;z-index:-1;pointer-events:none}
+.sea{position:absolute;left:0;right:0;bottom:0;width:100%;height:110px;z-index:-1;pointer-events:none}
 .sea .w{animation:wave 9s linear infinite}.sea .w2{animation-duration:14s;animation-direction:reverse}
 @keyframes wave{to{transform:translateX(-400px)}}
 .sea .w1{fill:#6cb7c8}.sea .w2{fill:#4a9fb4}.sea .w3{fill:#2d87a3}
@@ -279,6 +279,29 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 .pipbtn svg{width:15px;height:15px}.pipbtn:hover{background:rgba(255,255,255,.45)}
 body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
 @media(max-width:820px){.pipbtn{display:none!important}}
+/* goal / review / remedy / report */
+.goalline{margin-top:6px;max-width:92%;text-align:center;font-size:13px;font-weight:600;padding:5px 12px;border-radius:12px;background:rgba(255,255,255,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.goalline span{margin-right:6px}
+body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
+.hookbtn{display:block;width:100%;text-align:left;border:1.5px dashed var(--sun-d);background:var(--sun-l);border-radius:14px;padding:9px 12px;margin:10px 0;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink)}
+.hookbtn span{display:block;font-size:11.5px;color:#9a6400;font-weight:700;margin-bottom:2px}
+.rvgoal{font:700 16px/1.5 var(--serif);background:var(--paper);border-radius:12px;padding:10px 12px;margin:10px 0 0}
+.rvres{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rvres button{border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 4px;font-weight:700;font-size:14px;cursor:pointer;color:var(--ink)}
+.rvres button small{display:block;font-size:11px;color:var(--mute);font-weight:600;margin-top:2px}
+.rvres button.on{border-color:var(--leaf);background:var(--leaf-l);color:var(--leaf-d)}
+.rvres button[data-res=no].on{border-color:#d8cbb1;background:var(--paper);color:var(--ink)}
+.rvq{margin:14px 0 6px;font-weight:700;font-size:14px}
+.urem{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);display:flex;flex-direction:column;gap:8px}
+.urem p{margin:0;font-size:13.5px;line-height:1.6}
+.urem input{background:rgba(255,255,255,.92)!important;color:var(--ink)}
+.urem .btn{align-self:flex-start;padding:8px 14px;font-size:13.5px}
+.rep{width:100%;border-collapse:collapse;font-size:13.5px}
+.rep td{padding:9px 6px;border-top:1px solid var(--line);text-align:center}.rep td:first-child{text-align:left}
+.rep td small{display:block;font-size:11px;color:var(--mute)}
+.rep tr.h td{border-top:0;font-size:12px;color:var(--mute)}
+.rep td.up{color:var(--leaf-d);font-weight:700}.rep td.down{color:var(--coral);font-weight:700}
+.repnote{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--leaf-l);font-size:13.5px}.repnote p{margin:4px 0}
 /* tasks / chests / decos */
 .task{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:12px;background:var(--paper);margin-bottom:6px;font-size:14px}
 .task .tk{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #d6c9ae;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff}
@@ -419,6 +442,7 @@ body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba
       <div class="stage"><div class="halo" id="halo"></div><div id="treeBox"></div></div>
       <div class="pomos" id="pomos"></div>
       <div class="phase" id="phaseTxt">准备开始一轮专注</div>
+      <div class="goalline" id="goalLine"></div>
       <div class="timer" id="timer">25:00</div>
       <div class="row center">
         <button class="btn sun big" id="startBtn">开始专注</button>
@@ -514,6 +538,7 @@ body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba
 
 <!-- BADGES -->
 <section id="tab-badges" class="hide">
+  <div class="card" style="margin-bottom:16px"><h2>能力报告<span class="k">近 7 天 vs 前 7 天 · 看本事的变化，不看分数</span></h2><div id="reportBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>月度赛季<span class="k">靠专注分钟升级，奖励永久保留</span></h2><div id="seasonBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>奖励商店<span class="k">用岛币换，换来的不用内疚</span></h2>
     <div class="shop-top"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffc93c"/><circle cx="12" cy="12" r="7" fill="#ffb21f"/><path d="M12 7.5l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z" fill="#fff3c4"/></svg><div><div class="coinbig" id="coinBig">0</div><div class="mute">岛币 · 每挣 1 XP 得 1 枚，分心扣 XP 也扣岛币</div></div></div>
@@ -545,6 +570,7 @@ body[data-mode=focus] .pipbtn{background:rgba(255,255,255,.08);border-color:rgba
     <label class="set">长休息（分钟）<input type="number" id="pLong" min="5" max="60" style="width:84px"></label>
     <label class="set">每几个番茄后长休息一次<input type="number" id="pEvery" min="2" max="8" style="width:84px"></label>
     <label class="set">休息结束后自动开始下一个番茄<input type="checkbox" id="pAuto"></label>
+    <label class="set" style="flex-wrap:wrap">学习锚点：每天固定的时间和地点<span class="row"><input type="time" id="anchorT"><input type="text" id="anchorP" maxlength="16" placeholder="地点，比如图书馆" style="width:140px"></span></label>
     <label class="set">专注中离开页面算分心吗<select id="awayMode"><option value="phone">只在手机上算（推荐）</option><option value="all">电脑和手机都算</option><option value="off">都不算</option></select></label>
     <p class="mute">番茄时长在专注页的岛上选（默认 25 分钟）。中途放弃的那一轮不算一个番茄。</p>
   </div>
@@ -610,8 +636,11 @@ function xpFor(l){return 40*(l-1)*(l-1)}
 function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);S.coins=Math.max(0,(S.coins||0)+n);if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。${islandTheme(after).id!==islandTheme(before).id?'<br><b>你的岛也进化成了「'+islandTheme(after).name+'」！</b>':''}</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
 
 // ---------- streak ----------
-function active(d){const x=S.days[d];return x&&(x.min>=15||x.words>=100)}
-function streak(){let n=0;const d=new Date();if(!active(today()))d.setDate(d.getDate()-1);for(;;){const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(active(k)){n++;d.setDate(d.getDate()-1)}else break}return n}
+// 打卡：专注满 5 分钟（一次热身就够）或写 100 字。每周有 1 天休息日，漏掉不断连续天数
+function active(d){const x=S.days[d];return !!x&&(x.min>=5||x.words>=100)}
+function streak(){let n=0;const d=new Date();if(!active(today()))d.setDate(d.getDate()-1);const used={};
+ for(let i=0;i<800;i++){const k=keyOf(d);if(active(k))n++;else{const w=weekKey(d),prev=new Date(d);prev.setDate(prev.getDate()-1);if(n===0||used[w]||!active(keyOf(prev)))break;used[w]=true}d.setDate(d.getDate()-1)}return n}
+function restUsedThisWeek(){const wk=weekKey(new Date()),d=new Date();d.setDate(d.getDate()-1);while(weekKey(d)===wk){if(!active(keyOf(d)))return true;d.setDate(d.getDate()-1)}return false}
 
 // ---------- tree ----------
 const STAGES=[[1,'种子','埋在土里，等你第一轮专注'],[2,'嫩芽','破土了'],[3,'幼苗','开始长出叶子'],[5,'小树','有了自己的枝干'],[8,'青年树','枝叶繁茂'],[12,'开花之树','思考开始开花'],[17,'结果之树','输出开始结果'],[23,'森林之心','你已经是一片森林']];
@@ -665,10 +694,10 @@ function render(){
   $('coinTxt').textContent=S.coins;renderPark();if(typeof renderGoal==='function')renderGoal();
   const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
   $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
-  $('streakTxt').textContent='连续 '+streak()+' 天';
+  $('streakTxt').textContent='连续 '+streak()+' 天';$('streakTxt').parentNode.title='专注满 5 分钟或写 100 字就算打卡。每周有 1 天休息日，漏掉不断连续天数。'+(restUsedThisWeek()?'本周休息日已用。':'本周休息日还在。');
   const d=day();$('sMin').textContent=Math.round(d.min);$('sQ').textContent=d.q;$('sUrge').textContent=d.urge;$('sWord').textContent=d.words;
   $('treeBox').innerHTML=treeSVG(l);const st=stage(l);$('treeName').textContent=st.name+' · Lv.'+l+' · '+islandTheme(l).name;$('treeSub').textContent=st.sub;
-  $('leafLoss').textContent=d.distract?`今天分心 ${d.distract} 次，树掉了 ${d.distract*5} XP 的叶子`:'';
+  $('leafLoss').textContent=d.distract?`今天走神 ${d.distract} 次，每次都拉回来了`:'';
 }
 
 // ---------- tabs ----------
@@ -690,33 +719,65 @@ function renderPomos(){const e=P().every,c=pomo().c,pos=c%e,full=mode==='break'&
 function nextLabel(){return '第 '+(pomo().c%P().every+1)+' 个番茄'}
 // 计时状态存进 localStorage：刷新页面、手机把后台页面杀掉，回来都能接着算
 function persistTimer(){S.timer={mode,dur,start:focusStart,end:focusEnd,blen:brkLen,long:brkLong};save()}
-function focusUI(){$('startBtn').classList.add('hide');$('giveupBtn').classList.remove('hide');$('phaseTxt').textContent=dur===5?'热身 5 分钟 · 开始就赢了一半':nextLabel()+' · 手机放远一点';renderPomos()}
-function breakUI(){$('phaseTxt').textContent=(brkLong?'长休息 ':'短休息 ')+brkLen+' 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始'+nextLabel();$('startBtn').classList.remove('hide');renderPomos()}
+function focusUI(){renderGoalLine();$('startBtn').classList.add('hide');$('giveupBtn').classList.remove('hide');$('phaseTxt').textContent=dur===5?'热身 5 分钟 · 开始就赢了一半':nextLabel()+' · 手机放远一点';renderPomos()}
+function breakUI(){renderGoalLine();$('phaseTxt').textContent=(brkLong?'长休息 ':'短休息 ')+brkLen+' 分钟 · 起来走走，别打开信息流';$('giveupBtn').classList.add('hide');$('startBtn').textContent='跳过休息，开始'+nextLabel();$('startBtn').classList.remove('hide');renderPomos()}
 function startFocus(){runCleanupIfBreak();mode='focus';focusStart=Date.now();focusEnd=focusStart+dur*60000;$('startBtn').textContent='开始专注';focusUI();persistTimer();clearInterval(tick);tick=setInterval(loop,500);loop()}
 function runCleanupIfBreak(){if(mode==='break'&&$('mSkip'))closeModal()}
 function scene(){pipUpdate();document.body.dataset.mode=mode;const t=focusEnd-Date.now(),p=mode==='focus'?1-t/(dur*60000):mode==='break'?1-t/(brkLen*60000):0;$('halo').style.setProperty('--p',Math.max(0,Math.min(1,p)).toFixed(4))}
-function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0){if(dur===5)warmDone();else finishFocus()}}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);const wasLong=brkLong;resetUI();if(P().auto&&!document.hidden){notify('休息结束','自动开始'+nextLabel());startFocus()}else notify('休息结束',wasLong?'新一组番茄，从第 1 个开始':'回来开始'+nextLabel())}}}
+function loop(){scene();if(mode==='focus'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 专注中';if(left<=0){if(dur===5)warmDone();else finishFocus()}}else if(mode==='break'){const left=focusEnd-Date.now();$('timer').textContent=fmt(left);if(!flashBusy())document.title=fmt(left)+' 休息';if(left<=0){clearInterval(tick);const wasLong=brkLong;resetUI();if(P().auto&&!document.hidden){notify('休息结束','自动开始'+nextLabel());S.curGoal=S.hook||'';S.hook='';save();startFocus()}else notify('休息结束',wasLong?'新一组番茄，从第 1 个开始':'回来开始'+nextLabel())}}}
 function flashBusy(){return document.title.startsWith('●')}
 function finishFocus(){clearInterval(tick);const m=dur;const d=day();d.min+=m;d.sessions++;const pm=pomo();pm.c++;save();const cfg=P();brkLong=pm.c%cfg.every===0;brkLen=brkLong?cfg.long:cfg.short;const bEnd=focusEnd+brkLen*60000;const chestMsg=chestOnSession(brkLong);setTimeout(()=>toast('🎁 '+chestMsg),3000);
   const msg=brkLong?`完成一组 ${cfg.every} 个番茄！`:`第 ${(pm.c-1)%cfg.every+1} 个番茄完成`;
-  if(Date.now()>=bEnd){resetUI();parkReview();addXP(m*2,'完成 '+m+' 分钟专注');notify(msg,'+'+m*2+' XP');return}
-  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);breakModal();parkReview();addXP(m*2+(brkLong?10:0),'完成 '+m+' 分钟专注'+(brkLong?' · 一组番茄奖励':''));notify(msg,'+'+m*2+' XP，休息 '+brkLen+' 分钟')}
-function resetUI(){mode='idle';brkLong=false;$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');idleText();$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer();scene();renderPomos()}
+  const lg=logSession(m,null);
+  if(Date.now()>=bEnd){resetUI();addXP(m,'完成 '+m+' 分钟专注');reviewModal(lg,msg,false);parkReview();notify(msg,'+'+m+' XP');return}
+  mode='break';focusEnd=bEnd;breakUI();persistTimer();tick=setInterval(loop,500);addXP(m+(brkLong?10:0),'完成 '+m+' 分钟专注'+(brkLong?' · 一组番茄奖励':''));reviewModal(lg,msg,true);parkReview();notify(msg,'+'+m+' XP，休息 '+brkLen+' 分钟')}
+function resetUI(){mode='idle';brkLong=false;$('startBtn').classList.remove('hide');$('giveupBtn').classList.add('hide');idleText();renderGoalLine();$('timer').textContent=String(dur).padStart(2,'0')+':00';document.title='心流岛';lastActivity=Date.now();idleNotified=false;persistTimer();scene();renderPomos()}
 function breakModal(){const ideas=brkLong?['走出去 10 分钟，看看远处','吃点东西，喝杯水','做一组拉伸，从脖子到小腿','闭眼躺 5 分钟，什么都不想']:['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','用一句话说出这轮最大的收获（可以写在「间隙卡」里）','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];
- modal(`<h3>${brkLong?'一组番茄完成 🍅 长休息 '+brkLen+' 分钟':'短休息 '+brkLen+' 分钟'}</h3><p>${brkLong?'连续专注了 '+P().every+' 个番茄，大脑需要真正的恢复。':'休息的意思是让大脑空下来，信息流会把它塞得更满。'}试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一个</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();startFocus()}}
-$('startBtn').onclick=startFocus;
-$('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;save();addXP(Math.floor(done),'部分专注');resetUI();parkReview()};
+ modal(`<h3>${brkLong?'一组番茄完成 🍅 长休息 '+brkLen+' 分钟':'短休息 '+brkLen+' 分钟'}</h3><p>${brkLong?'连续专注了 '+P().every+' 个番茄，大脑需要真正的恢复。':'休息的意思是让大脑空下来，信息流会把它塞得更满。'}试试：</p><p><b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p><div class="row center"><button class="btn p" id="mOk">好</button><button class="btn s" id="mSkip">跳过休息，直接下一个</button></div>`);$('mOk').onclick=closeModal;$('mSkip').onclick=()=>{closeModal();askGoal()}}
+$('startBtn').onclick=()=>askGoal();
+$('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm('放弃本轮？已专注的 '+Math.floor(done)+' 分钟会记一半 XP，不算一个番茄。'))return;clearInterval(tick);S.away=null;const d=day();d.min+=done;logSession(Math.round(done),'quit');if(S.curGoal&&!S.hook)S.hook=S.curGoal;S.curGoal='';save();addXP(Math.floor(done/2),'部分专注');resetUI();parkReview()};
 // 分心检测：记下离开的时刻（也存进 localStorage）。回来时按「离开到本轮结束」之间的时长算，
 // 这样就算本轮在后台已经结束了，离开的那段也照样算分心。
 // 离开页面算不算分心：电脑上常常要切到别的窗口查资料、写代码，所以默认只在手机上算
 const IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent)&&matchMedia('(pointer:coarse)').matches);
 function awayOn(){const m=S.settings.awayMode||'phone';return m==='all'||(m==='phone'&&IS_PHONE)}
-function renderRules(){const on=awayOn();$('rules').textContent='规则：'+(on?'专注中切走页面超过 15 秒记一次「分心」，扣 5 XP；':'这台设备上切走页面不算分心（可在「提醒设置 → 番茄钟」修改）；')+'扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。'}
-function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();if(!awayOn())return;const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;save();addXP(-5,'离开了 '+Math.round(away)+' 秒');const h=`<h3>你离开了 ${Math.round(away)} 秒</h3><p>树掉了一片叶子（-5 XP）。没关系，把注意力拉回来本身就是在练习。</p><p class="mute">如果是去查资料，下次可以先在纸上记下要查什么，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
+function renderRules(){const on=awayOn();$('rules').textContent='规则：'+(on?'专注中切走页面超过 15 秒记一次「分心」，不扣分，每次拉回来 +1；':'这台设备上切走页面不算分心（可在「提醒设置 → 番茄钟」修改）；')+'扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。'}
+function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();if(!awayOn())return;const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;d.back=(d.back||0)+1;save();addXP(1,'拉回来了');const h=`<h3>欢迎回来 👋</h3><p>你离开了 ${Math.round(away)} 秒。把注意力拉回来，本身就是在练习专注（拉回来 +1）。</p><p class="mute">今天已经拉回来 ${d.back} 次。如果是想查资料，下次先在念头停车场记一句，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&awayOn()&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
 function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle'){resetUI();return}selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;brkLen=t.blen||5;brkLong=!!t.long;
   if(t.mode==='focus'){mode='focus';focusUI();tick=setInterval(loop,500);loop()}
   else if(t.mode==='break'){if(Date.now()<t.end){mode='break';breakUI();tick=setInterval(loop,500);loop()}else{S.timer=null;save();resetUI()}}}
+
+// ---------- 每轮的目标 + 结束时留的「钩子」 ----------
+// 专注需要清楚的目标和反馈：开始前写这一轮要做成什么，结束时看有没有做到（XP 主要看这个）。
+// 结束时再写一句「下次从哪一步开始」：没合上的事会把你拉回来——拉回学习本身。
+S.log=S.log||[];
+function logSession(m,res){const e={at:Date.now(),dur:m,goal:S.curGoal||'',res};S.log.unshift(e);if(S.log.length>600)S.log.length=600;save();return e}
+function renderGoalLine(){const g=$('goalLine');if(!g)return;const st=S.settings;let h='';
+ if(mode==='focus'&&S.curGoal)h=`<span>🎯</span>${esc(S.curGoal)}`;
+ else if(mode==='idle'&&S.hook)h=`<span>🪝</span>上次留的钩子：${esc(S.hook)}`;
+ else if(mode==='idle'&&st.anchorTime)h=`<span>📍</span>学习锚点：每天 ${esc(st.anchorTime)}${st.anchorPlace?' · '+esc(st.anchorPlace):''}`;
+ g.innerHTML=h;g.classList.toggle('hide',!h)}
+function askGoal(){const hook=S.hook||'';
+ modal(`<h3>${dur===5?'热身 5 分钟：做点什么？':'这一轮要做成什么？'}</h3><p class="mute">写具体一点：「做完第 3–5 题」比「学数学」好。结束时会问你有没有做到。</p>
+ ${hook?`<button class="hookbtn" id="useHook"><span>🪝 上次留的钩子</span>${esc(hook)}</button>`:''}
+ <input type="text" id="gIn" maxlength="60" placeholder="${dur===5?'比如：先把第 1 题读一遍':'比如：做完习题 3.2 的第 1–4 题'}" value="${esc(S.curGoal||'')}">
+ <div class="row center"><button class="btn s" id="gSkip">不写，直接开始</button><button class="btn sun" id="gGo">开始</button></div>`);
+ setTimeout(()=>$('gIn')&&$('gIn').focus(),60);
+ if(hook)$('useHook').onclick=()=>{$('gIn').value=hook;$('gIn').focus()};
+ const go=g=>{S.curGoal=g.trim();if(S.curGoal&&S.curGoal===S.hook)S.hook='';save();closeModal();startFocus()};
+ $('gGo').onclick=()=>go($('gIn').value);$('gSkip').onclick=()=>go('');$('gIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();go($('gIn').value)}}}
+function reviewModal(lg,msg,isBreak){const m=lg.dur,goal=lg.goal;let res=null;
+ const ideas=brkLong?['走出去 10 分钟，看看远处','吃点东西，喝杯水','做一组拉伸，从脖子到小腿']:['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];
+ const h=`<h3>${msg} 🍅</h3>${goal?`<p class="rvgoal">🎯 ${esc(goal)}</p><p class="mute" style="margin:4px 0 8px">做到了吗？</p><div class="rvres" id="rvRes"><button data-res="done">✓ 做到了<small>+${m} XP</small></button><button data-res="part">做到一部分<small>+${Math.round(m/2)} XP</small></button><button data-res="no">没做到<small>没关系</small></button></div>`:'<p class="mute">这一轮没有写目标。下一轮开始前写一句，做到了能多拿一倍 XP。</p>'}
+ <p class="rvq">下次从哪一步开始？</p><input type="text" id="rvHook" maxlength="60" placeholder="写一句，下次一打开就能接上，比如：从第 5 题的第二问开始" value="${esc(goal&&!S.hook?'':S.hook||'')}">
+ ${isBreak?`<p class="mute" style="margin-top:10px">${brkLong?'长':'短'}休息 ${brkLen} 分钟，试试：<b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p>`:''}
+ <div class="row center"><button class="btn sun" id="rvOk">${isBreak?'记下，去休息':'记下'}</button>${isBreak?'<button class="btn s" id="mSkip">跳过休息，直接下一个</button>':''}</div>`;
+ const bind=()=>{const rr=$('rvRes');if(rr)rr.onclick=e=>{const b=e.target.closest('[data-res]');if(!b)return;res=b.dataset.res;rr.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  const submit=()=>{if(goal&&!res){toast('先选一下：做到了吗？');return false}lg.res=goal?res:'nogoal';const hook=$('rvHook').value.trim();S.hook=hook;S.curGoal='';save();renderGoalLine();
+   const bonus=res==='done'?m:res==='part'?Math.round(m/2):0;if(bonus)addXP(bonus,res==='done'?'目标达成':'目标完成一部分');else if(res==='no')toast('诚实记下来了。下一轮目标定小一点试试');return true};
+  $('rvOk').onclick=()=>{if(submit())closeModal()};const sk=$('mSkip');if(sk)sk.onclick=()=>{if(submit()){closeModal();askGoal()}}};
+ if($('ov').classList.contains('on')){modalQ.unshift(h);const iv=setInterval(()=>{if($('rvOk')){clearInterval(iv);bind()}},200)}else{modal(h);bind()}}
 
 // urge surfing
 // 冲动冲浪：吸 4 秒、呼 6 秒（呼气比吸气长，更容易平静下来），一共 6 次 = 60 秒
@@ -729,9 +790,10 @@ $('urgeBtn').onclick=()=>{const TOTAL=60,IN=4,OUT=6,CYC=IN+OUT;let it=null,reaso
   <div class="breath" id="br"><div class="water" id="bw"><svg class="b" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg><svg class="a" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg></div><div class="blab"><b id="bPh">吸气</b><span id="bSec"></span></div></div></div>
  <div class="bcount" id="bCnt"></div>
  <p class="surf-q">此刻想刷，是因为：</p><div class="row" id="ur">${reasons.map(r=>`<span class="chip" data-r="${r}">${r}</span>`).join('')}</div>
+ <div class="urem hide" id="uRem"></div>
  <div class="row center"><button class="btn s" id="uGive">还是去刷了</button><button class="btn p" id="uOk" disabled>我扛住了 +5</button></div>`,()=>{clearInterval(it);$('modal').classList.remove('surf','done')});
  $('modal').classList.add('surf');
- document.querySelectorAll('#ur .chip').forEach(c=>c.onclick=()=>{reason=c.dataset.r;document.querySelectorAll('#ur .chip').forEach(x=>x.classList.toggle('on',x===c))});
+ document.querySelectorAll('#ur .chip').forEach(c=>c.onclick=()=>{reason=c.dataset.r;document.querySelectorAll('#ur .chip').forEach(x=>x.classList.toggle('on',x===c));showRemedy(reason,()=>{resist()})});
  const br=$('br'),bw=$('bw'),ring=$('uRing');
  const setPhase=(ph,sec)=>{br.style.transitionDuration=bw.style.transitionDuration=sec+'s';br.style.transform=ph==='in'?'scale(1.12)':'scale(.86)';bw.style.transform=ph==='in'?'translateY(18%)':'translateY(70%)';$('bPh').textContent=ph==='in'?'吸气':'呼气';try{navigator.vibrate&&navigator.vibrate(ph==='in'?25:[15,60,15])}catch(e){}};
  const step=()=>{if(!$('uRing'))return clearInterval(it);const t=(Date.now()-t0)/1000,left=Math.max(0,TOTAL-t);
@@ -742,15 +804,36 @@ $('urgeBtn').onclick=()=>{const TOTAL=60,IN=4,OUT=6,CYC=IN+OUT;let it=null,reaso
   if(ph!==lastPh){lastPh=ph;setPhase(ph,ph==='in'?IN:OUT)}
   $('bSec').textContent=rem;$('bCnt').textContent=`第 ${Math.min(6,Math.floor(t/CYC)+1)} 次 · 共 6 次`};
  requestAnimationFrame(()=>requestAnimationFrame(step));it=setInterval(step,200);
- $('uOk').onclick=()=>{closeModal();const d=day();d.urge++;d.urgeReasons=d.urgeReasons||{};if(reason)d.urgeReasons[reason]=(d.urgeReasons[reason]||0)+1;save();addXP(5,'扛住了冲动')};
+ const resist=()=>{closeModal();const d=day();d.urge++;d.urgeReasons=d.urgeReasons||{};if(reason)d.urgeReasons[reason]=(d.urgeReasons[reason]||0)+1;save();addXP(5,'扛住了冲动')};
+ $('uOk').onclick=resist;
  $('uGive').onclick=()=>{closeModal();toast('诚实记录也有价值。回来就好。')}};
+
+// 冲动是一个信号：它告诉你此刻卡在哪种不舒服上。不同的不舒服，解药不一样
+function tabTo(t){document.querySelector('nav [data-tab='+t+']').click();scrollTo({top:0,behavior:'smooth'})}
+function earlyBreak(){if(mode!=='focus')return;const done=(Date.now()-focusStart)/60000;clearInterval(tick);S.away=null;const d=day();d.min+=done;logSession(Math.round(done),'early');if(S.curGoal&&!S.hook)S.hook=S.curGoal;S.curGoal='';
+ mode='break';brkLong=false;brkLen=P().short;focusEnd=Date.now()+brkLen*60000;breakUI();persistTimer();tick=setInterval(loop,500);loop();save();addXP(Math.floor(done/2),'提前休息');toast('去休息吧。没做完的已经留成钩子，下一轮接着做')}
+function showRemedy(r,resist){const box=$('uRem');if(!box)return;const cheap=S.rewards.slice().sort((a,b)=>a.cost-b.cost)[0];
+ const R={
+  '卡题了':{t:'卡住的时候，把卡点写下来，往往写着写着就通了。',input:'我卡在……',btn:'存成间隙卡',act:v=>{S.journal.unshift({type:'gap',at:Date.now(),text:'卡点：'+v});day().words+=countZh(v);save();toast('卡点存好了。回去再看一遍题目')}},
+  '累了':mode==='focus'?{t:'累的时候需要的是真正的休息，信息流只会更累。现在提前休息，不算放弃。',btn:'现在提前休息 '+P().short+' 分钟',act:()=>earlyBreak()}:{t:'站起来，离开桌子走 5 分钟。别带手机。'},
+  '无聊':{t:'无聊说明难度不对。换一道更难的题，或者切去写作训练。',btn:'去写作训练场',act:()=>tabTo('write')},
+  '焦虑':{t:'把担心的事写下来，停进念头停车场。现在先不处理它。',input:'我在担心……',btn:'停进停车场',act:v=>parkAdd(v)},
+  '习惯性':{t:'这是手的习惯，不是你真想要的。把手机放到够不着的地方，再跟着圆圈呼吸一次。'},
+  '想奖励自己':{t:cheap?(S.coins>=cheap.cost?`你有 ${S.coins} 岛币，够换「${cheap.name}」了。挣来的奖励，好好享受。`:`再挣 ${cheap.cost-S.coins} 岛币就能换「${cheap.name}」。完成这一轮再奖励自己。`):'在奖励商店里设一个奖励，用岛币换。',btn:'去奖励商店',act:()=>tabTo('badges')}
+ }[r];if(!R){box.classList.add('hide');return}
+ box.innerHTML=`<p>${R.t}</p>${R.input?`<input type="text" id="uRemIn" maxlength="100" placeholder="${R.input}">`:''}${R.btn?`<button class="btn sun" id="uRemGo">${R.btn}</button>`:''}`;box.classList.remove('hide');
+ if(R.btn)$('uRemGo').onclick=()=>{let v='';if(R.input){v=$('uRemIn').value.trim();if(!v){toast('先写一句');return}}resist();R.act(v)};
+ if(R.input)$('uRemIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('uRemGo').click()}}}
+
+function anchorModal(){queueModal(`<h3>学习时间到${S.settings.anchorPlace?' · '+esc(S.settings.anchorPlace):''} 📍</h3><p>不用想今天要学多久。先做 5 分钟热身，只要开始就好。</p><div class="row center"><button class="btn s" onclick="closeModal()">晚点</button><button class="btn sun" onclick="startWarm()">开始热身</button></div>`)}
+window.startWarm=()=>{closeModal();if(mode!=='idle')return;tabTo('focus');selectDur(5);setTimeout(askGoal,280)};
 
 // gap card
 $('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题');let n=30,it=null;modal(`<h3>间隙卡 · 30 秒</h3><p class="mute">刚做完一题，大脑最想刷信息流的就是这一刻。把它换成一句话：</p><p><b>${['这道题的关键一步是……','我一开始卡在……，后来发现……','如果给同学讲这道题，我会说……','这道题考的本质是……'][Math.floor(Math.random()*4)]}</b></p><input type="text" id="gapIn" style="width:100%" placeholder="一句话就好"><p class="mute" id="gapC" style="text-align:right">30</p><div class="row center"><button class="btn s" id="gapSkip">跳过</button><button class="btn p" id="gapOk">存下 +4</button></div>`,()=>clearInterval(it));setTimeout(()=>$('gapIn')&&$('gapIn').focus(),50);it=setInterval(()=>{n--;if($('gapC'))$('gapC').textContent=n>0?n:'时间到，写完这句就回去做题';if(n<=0)clearInterval(it)},1000);$('gapSkip').onclick=closeModal;$('gapIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('gapOk').click()}};$('gapOk').onclick=()=>{const t=$('gapIn').value.trim();closeModal();if(t.length<4){toast('写得太短了，下次多写几个字');return}S.journal.unshift({type:'gap',at:Date.now(),text:t});d.words+=t.length;save();addXP(4,'间隙卡')}};
 
 // idle reminder + daily write reminder
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now();idleNotified=false}));
-setInterval(()=>{const st=S.settings;if(mode==='idle'&&st.idleMin>0&&!idleNotified&&Date.now()-lastActivity>st.idleMin*60000){idleNotified=true;notify('心流岛','已经 '+st.idleMin+' 分钟没开始新一轮了。手机在手上吗？')}const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
+setInterval(()=>{const st=S.settings;if(mode==='idle'&&st.idleMin>0&&!idleNotified&&Date.now()-lastActivity>st.idleMin*60000){idleNotified=true;notify('心流岛','已经 '+st.idleMin+' 分钟没开始新一轮了。手机在手上吗？')}const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.anchorTime&&hm>=st.anchorTime&&S.lastAnchor!==today()&&mode==='idle'&&day().min<5){S.lastAnchor=today();save();notify('学习时间到'+(st.anchorPlace?' · '+st.anchorPlace:''),'先做 5 分钟热身，只要开始就好');anchorModal()}if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
 
 // ---------- writing ----------
 // 题库：[题型, 小标签, 题目, 写法提示]。题目里的 {课} 会换成你在设置里填的课程。
@@ -931,7 +1014,7 @@ const BADGES=[
  ['三','三日连胜','连续 3 天打卡',()=>streak()>=3],['七','一周不断','连续 7 天打卡',()=>streak()>=7],['月','月度心流','连续 30 天打卡',()=>streak()>=30]
 ];
 function checkBadges(){const t=totals();let k=0;BADGES.forEach(b=>{if(!S.badges[b[1]]&&b[3](t)){S.badges[b[1]]=Date.now();save();setTimeout(()=>{beep();toast('解锁成就：'+b[1])},900+2800*k++)}})}
-function renderBadges(){renderSeason();renderShop();renderHeat();renderDecos();$('bList').innerHTML=BADGES.map(b=>`<div class="badge ${S.badges[b[1]]?'got':''}"><div class="ic">${b[0]}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div></div>`).join('');
+function renderBadges(){renderReport();renderSeason();renderShop();renderHeat();renderDecos();$('bList').innerHTML=BADGES.map(b=>`<div class="badge ${S.badges[b[1]]?'got':''}"><div class="ic">${b[0]}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div></div>`).join('');
  const days=[];const reasons={};
  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const x=S.days[k]||{};if(x.urgeReasons)for(const r in x.urgeReasons)reasons[r]=(reasons[r]||0)+x.urgeReasons[r];days.push({d,x,today:i===0})}
  const mx=Math.max(25,...days.map(o=>o.x.min||0));const wd='日一二三四五六';
@@ -944,6 +1027,7 @@ $('wGoalIn').value=wGoal();$('coursesIn').value=S.settings.courses||'';
 $('wGoalIn').onchange=e=>{S.settings.wordGoal=Math.max(50,+e.target.value||300);e.target.value=S.settings.wordGoal;save();renderGoal()};
 $('coursesIn').onchange=e=>{S.settings.courses=e.target.value.trim();save();if(cur&&!cur.rw&&/\{课\}/.test(cur.tpl)){cur.q=fillCourse(cur.tpl);showPrompt()}};
 [['pShort','shortBreak',5,1,30],['pLong','longBreak',15,5,60],['pEvery','longEvery',4,2,8]].forEach(([id,k,def,lo,hi])=>{$(id).value=S.settings[k]||def;$(id).onchange=e=>{S.settings[k]=Math.min(hi,Math.max(lo,Math.round(+e.target.value)||def));e.target.value=S.settings[k];save();if(mode==='idle')resetUI();else renderPomos()}});
+$('anchorT').value=S.settings.anchorTime||'';$('anchorP').value=S.settings.anchorPlace||'';$('anchorT').onchange=e=>{S.settings.anchorTime=e.target.value;save();renderGoalLine()};$('anchorP').onchange=e=>{S.settings.anchorPlace=e.target.value.trim();save();renderGoalLine()};
 $('awayMode').value=S.settings.awayMode||'phone';$('awayMode').onchange=e=>{S.settings.awayMode=e.target.value;if(!awayOn())S.away=null;save();renderRules();toast(awayOn()?'这台设备上，专注中离开页面会算分心':'这台设备上，离开页面不再算分心')};renderRules();
 $('pAuto').checked=!!S.settings.autoNext;$('pAuto').onchange=e=>{S.settings.autoNext=e.target.checked;save()};
 $('idleMin').value=S.settings.idleMin;$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
@@ -979,7 +1063,7 @@ var pipAct='';
 function pipUpdate(){if(!pipWin)return;const d=pipWin.document,q=id=>d.getElementById(id);if(!q('tt'))return;
  d.body.dataset.mode=mode;const left=focusEnd-Date.now();
  q('tt').textContent=mode==='idle'?String(dur).padStart(2,'0')+':00':fmt(left);
- q('ph').textContent=mode==='focus'?nextLabel():mode==='break'?(brkLong?'长休息':'短休息'):'准备开始'+nextLabel();
+ q('ph').textContent=mode==='focus'?(S.curGoal?'🎯 '+S.curGoal:nextLabel()):mode==='break'?(brkLong?'长休息':'短休息'):'准备开始'+nextLabel();
  q('pm').textContent='🍅 '+pomo().c;
  const p=mode==='focus'?1-left/(dur*60000):mode==='break'?1-left/(brkLen*60000):0;q('pb').style.width=(Math.max(0,Math.min(1,p))*100)+'%';
  if(pipAct!==mode){pipAct=mode;const a=q('act');
@@ -1055,9 +1139,9 @@ function renderTasks(){if(!$('taskList'))return;const st=todayTasks(),d=day();$(
  const n=st.ks.filter(k=>st.done[k]).length;$('taskSum').textContent=st.bonus?'全部完成 🎁':n+'/3 · 全部完成送宝箱'}
 // ---------- 5 分钟热身：拖延的时候，先只做 5 分钟；做完可以直接接成一个完整番茄 ----------
 function warmDone(){clearInterval(tick);$('timer').textContent='00:00';beep();
- modal(`<h3>热身完成 🔥</h3><p>最难的是开始，你已经开始了。</p><p class="mute">接着做，这 5 分钟就算进一个完整的 25 分钟番茄（会得到宝箱）。先到这里，也记 5 分钟和 10 XP。</p><div class="row center"><button class="btn s" id="wmStop">先到这里</button><button class="btn sun" id="wmGo">继续 20 分钟，凑成一个番茄</button></div>`);
+ modal(`<h3>热身完成 🔥</h3><p>最难的是开始，你已经开始了。</p><p class="mute">接着做，这 5 分钟就算进一个完整的 25 分钟番茄（会得到宝箱）。先到这里，也记 5 分钟和 10 XP，<b>今天就算打卡了</b>。</p><div class="row center"><button class="btn s" id="wmStop">先到这里</button><button class="btn sun" id="wmGo">继续 20 分钟，凑成一个番茄</button></div>`);
  $('wmGo').onclick=()=>{closeModal();selectDur(25);focusEnd=Date.now()+20*60000;focusStart=focusEnd-25*60000;persistTimer();focusUI();tick=setInterval(loop,500);loop();toast('好，接着来')};
- $('wmStop').onclick=()=>{closeModal();const d=day();d.min+=5;save();addXP(10,'热身 5 分钟');resetUI();parkReview()}}
+ $('wmStop').onclick=()=>{closeModal();const d=day();d.min+=5;logSession(5,'warm');if(S.curGoal&&!S.hook)S.hook=S.curGoal;S.curGoal='';save();addXP(10,'热身 5 分钟');resetUI();parkReview()}}
 function idleText(){if(mode!=='idle')return;$('startBtn').textContent=dur===5?'开始 5 分钟热身':'开始'+nextLabel();$('phaseTxt').textContent=dur===5?'热身：只做 5 分钟，做完可以接着变成一个番茄':'准备开始'+nextLabel()}
 
 function renderDecos(){const L=levelOf(S.xp),cur=islandTheme(L);$('islandRoad').innerHTML=THEMES.map(t=>`<div class="isle ${t===cur?'cur':''} ${L>=t.lv?'got':''}"><div class="iv">${treeSVG(Math.max(t.lv,L>=t.lv&&t===cur?L:t.lv),[])}</div><b>${t.name}</b><span>${L>=t.lv?(t===cur?'现在在这里':'已解锁'):'Lv.'+t.lv+' 解锁'}</span></div>`).join('');$('decoCount').textContent=S.decos.length+' / '+DECOS.length;$('decoList').innerHTML=[3,2,1,0].map(r=>DECOS.filter(d=>d.r===r)).flat().map(d=>{const own=S.decos.includes(d.id);return`<div class="deco ${own?'own':''}" style="--rc:${RAR[d.r].c}">${decoMini(d,own)}<b>${own?d.name:'？？？'}</b><span>${RAR[d.r].n}</span></div>`}).join('')}
@@ -1081,6 +1165,30 @@ function renderSeason(){if(!$('seasonBox'))return;const d=new Date(),name=SEASON
  <div class="sbar"><i style="width:${tier/SEASON_TIERS*100}%"></i></div><div class="tiers">${cells}</div>
  <p class="mute" style="margin:8px 0 0">${tier>=SEASON_TIERS?'这个赛季的奖励全部拿到了 🎉':`再专注 ${next} 分钟升到第 ${tier+1} 级${nb<=SEASON_TIERS?`；第 ${nb} 级有一个${RAR[tierReward(nb).chest].n}宝箱`:''}`}。每 ${SEASON_MIN} 分钟升一级。下个月重新开始，已经得到的东西都留着。</p>`;
  requestAnimationFrame(()=>{const tr=$('seasonBox').querySelector('.tiers'),on=tr&&tr.querySelectorAll('.tier.on');if(tr&&on.length)tr.scrollLeft=on[on.length-1].offsetLeft-tr.clientWidth/2})}
+
+// ---------- 每周能力报告：看技能变化，不看分数 ----------
+// 滚动的 7 天：「近 7 天」对比「再往前 7 天」，哪天看都有意义
+function weekRange(off){const e0=new Date();e0.setHours(24,0,0,0);e0.setDate(e0.getDate()-7*off);const s0=new Date(e0);s0.setDate(s0.getDate()-7);return[s0.getTime(),e0.getTime()]}
+function weekStats(off){const[a,b]=weekRange(off),inR=t=>t>=a&&t<b;
+ const L=S.log.filter(e=>inR(e.at)),tom=L.filter(e=>e.dur>=15&&!['quit','early','warm'].includes(e.res)).length,G=L.filter(e=>['done','part','no'].includes(e.res));
+ const goal=G.length?Math.round(G.reduce((x,e)=>x+(e.res==='done'?1:e.res==='part'?.5:0),0)/G.length*100):null;
+ const W=S.journal.filter(e=>e.type==='write'&&inR(e.at)&&e.secs>=30&&countZh(e.text)>=30),pause=W.length?+(W.reduce((x,e)=>x+(e.pauses||0)/countZh(e.text)*100,0)/W.length).toFixed(1):null;
+ const RW=S.journal.filter(e=>e.rewriteOf&&inR(e.at)).map(e=>{const o=S.journal.find(x=>x.at===e.rewriteOf);return o?countZh(e.text)/countZh(o.text):null}).filter(x=>x),comp=RW.length?Math.round(RW.reduce((x,y)=>x+y,0)/RW.length*100):null;
+ const reasons={};let back=0,urge=0;for(const k in S.days){const t=new Date(k+'T12:00:00').getTime();if(!inR(t))continue;const d=S.days[k];back+=d.back||0;urge+=d.urge||0;for(const r in d.urgeReasons||{})reasons[r]=(reasons[r]||0)+d.urgeReasons[r]}
+ const tot=Object.values(reasons).reduce((x,y)=>x+y,0),stuck=tot?Math.round((reasons['卡题了']||0)/tot*100):null,top=Object.entries(reasons).sort((x,y)=>y[1]-x[1])[0];
+ return{tom,goal,pause,comp,back,urge,stuck,top:top?top[0]:null}}
+function renderReport(){if(!$('reportBox'))return;const A=weekStats(1),B=weekStats(0);
+ const row=(name,a,b,unit,better,tip)=>{const has=a!==null&&b!==null;const diff=has?+(b-a).toFixed(1):null;const good=has&&diff!==0?(better==='up'?diff>0:diff<0):null;
+  return`<tr><td>${name}<small>${tip}</small></td><td>${a===null?'—':a+unit}</td><td><b>${b===null?'—':b+unit}</b></td><td class="${good===null?'':good?'up':'down'}">${has&&diff!==0?(diff>0?'↑ ':'↓ ')+Math.abs(diff)+unit:'·'}</td></tr>`};
+ const notes=[];if(A.goal!==null&&B.goal!==null){if(B.goal>A.goal)notes.push('目标达成率提高了：你给自己定的目标越来越准，也越来越能做到。');else if(B.goal<A.goal)notes.push('目标达成率下降了：试着把每一轮的目标定小一点、具体一点。')}
+ if(A.pause!==null&&B.pause!==null&&B.pause<A.pause)notes.push('写作时卡住的次数变少了，说明下笔前想得更清楚了。');
+ if(A.comp!==null&&B.comp!==null&&B.comp<A.comp)notes.push('改写能压得更短了：你在学会删掉不需要的东西。');
+ if(A.stuck!==null&&B.stuck!==null&&B.stuck<A.stuck)notes.push('因为「卡题」想刷手机的比例变小了：卡住的时候你更有办法了。');
+ if(B.top)notes.push(`近 7 天想刷手机最常见的原因是「${B.top}」。冲动冲浪里选它，会给你对应的解药。`);
+ if(!notes.length)notes.push('数据还不够多。每轮开始前写一个目标、结束时选做没做到，过几天这里就能看到你的变化。');
+ $('reportBox').innerHTML=`<table class="rep"><tr class="h"><td></td><td>前 7 天</td><td>近 7 天</td><td>变化</td></tr>
+ ${row('完成的番茄',A.tom,B.tom,'','up','不含放弃和提前休息')}${row('目标达成率',A.goal,B.goal,'%','up','做到 = 1，一部分 = 0.5')}${row('写作停顿',A.pause,B.pause,'','down','每 100 字停下超过 10 秒的次数')}${row('改写后篇幅',A.comp,B.comp,'%','down','改写版 ÷ 原文')}${row('「卡题」引起的冲动',A.stuck,B.stuck,'%','down','占所有冲动原因的比例')}${row('走神后拉回来',A.back,B.back,' 次','up','拉回来就是在练专注')}</table>
+ <div class="repnote">${notes.map(n=>'<p>'+n+'</p>').join('')}</div>`}
 
 // ---------- 念头停车场 ----------
 function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span>${esc(p.text)}</span><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
@@ -1131,7 +1239,7 @@ $('urgeUrl').textContent=location.origin+location.pathname.replace(/index\.html$
 $('copyUrge').onclick=async()=>{try{await navigator.clipboard.writeText($('urgeUrl').textContent);toast('已复制')}catch(e){toast('复制失败，长按手动复制')}};
 // 启动：所有模块都定义好之后再渲染
 renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();
-const hashTab=()=>{const h=location.hash.slice(1);if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
+const hashTab=()=>{const h=location.hash.slice(1);if(h==='warm'){history.replaceState(null,'',location.pathname+location.search);window.startWarm();return}if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>

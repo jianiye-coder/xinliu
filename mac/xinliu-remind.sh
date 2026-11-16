@@ -2,6 +2,7 @@
 # 心流岛 · macOS 定时弹窗（由 launchd 调用，页面没开也能提醒）
 #   xinliu-remind.sh checkin   空闲检查：问你要不要开始一轮专注
 #   xinliu-remind.sh write     每日写作提醒
+#   xinliu-remind.sh anchor    学习锚点：到点了，直接开始 5 分钟热身
 # 配置在同目录的 config.sh（install.sh 生成）。
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -78,6 +79,14 @@ case "$MODE" in
 
 花 10 分钟，写一段就好。" "今天写过了" "去写")
     [ "$ans" = "去写" ] && open "$URL#write"
+    ;;
+  anchor)
+    screen_locked && exit 0
+    in_session && exit 0
+    ans=$(ask "心流岛 · 学习时间到" "${ANCHOR_PLACE:+去${ANCHOR_PLACE}，}先做 5 分钟热身。
+
+不用想今天要学多久，只要开始就好。" "晚点" "开始热身")
+    [ "$ans" = "开始热身" ] && open "${URL%#*}#warm"
     ;;
   test)
     echo "URL=$URL  时段=${START_HOUR}-${END_HOUR}点  在专注中=$(in_session && echo 是 || echo 否)  锁屏=$(screen_locked && echo 是 || echo 否)"
