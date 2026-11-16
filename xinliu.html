@@ -1227,6 +1227,14 @@ const REC_MUSIC=[
  ['BV1nTbizxE83','莫奈与古典音乐歌单','古典','44:28'],['BV11waPzJE7T','轻鼓点专注lofi','lofi','3:30:42'],['BV17u4y1V7ub','吉卜力钢琴合集','吉卜力钢琴','46:00']];
 S.music=S.music||[];let mOn=-1;
 if((S.musicSeed||0)<1){REC_MUSIC.forEach(([bv,title,kind,len])=>{if(!S.music.some(t=>t.bv===bv))S.music.push({bv,p:1,title,kind,len})});S.musicSeed=1;save()}
+// 第二批（2026-11）：有歌词的爵士 / R&B / Soul，方大同、Hayd 和相近的歌手。放在歌单最前面
+const REC_VOCAL=[
+ ['BV139pxeGENb','方大同 华语R&B合集','方大同','8:55:23'],['BV1tUXXYvELx','方大同歌曲合集·特别的人','方大同','35:51'],['BV1UJDsBVEcR','如果你也喜欢方大同','方大同','1:21:36'],
+ ['BV1N9sJzLE4K','方大同 字幕版R&B精选','方大同','57:45'],['BV1rK98YfEVh','方大同100首 Hi-Res','方大同','6:36:13'],['BV1aL68Y1EhP','Hayd 深夜治愈歌单','Hayd','35:33'],
+ ['BV1ez4y1F7er','Hayd Playlist','Hayd','50:31'],['BV1zphwzPEbj','Hayd《Love Me》官方MV','Hayd','2:47'],['BV1amxrzXEnk','陶喆 字幕版R&B精选','陶喆 · R&B','1:53:22'],
+ ['BV1NQ4y1f7Bc','陶喆 录音室作品合集','陶喆 · R&B','9:20:16'],['BV1knz5BkEkn','华语R&B 100首 陶王周方','R&B','7:10:54'],['BV1DSvyB8EVz','中文R&B歌单','R&B','1:39:05'],
+ ['BV1upLV6fE8g','Daniel Caesar R&B Soul歌单','R&B · Soul','33:46'],['BV1Q11FY3Exr','Neo Soul 精选歌单','Soul','56:19'],['BV1W54y1W7Yn','Norah Jones 爵士现场2018','爵士','1:30:10']];
+if((S.musicSeed||0)<2){const add=REC_VOCAL.filter(([bv])=>!S.music.some(t=>t.bv===bv)).map(([bv,title,kind,len])=>({bv,p:1,title,kind,len}));S.music=add.concat(S.music);S.musicSeed=2;save()}
 function bvOf(u){const m=String(u).match(/BV[0-9A-Za-z]{10}/);return m?m[0]:''}
 function renderMusic(){$('mList').innerHTML=S.music.length?S.music.map((t,i)=>`<div class="track ${i===mOn?'on':''}" data-i="${i}"><span class="play">${i===mOn?'❚❚':'▶'}</span><span class="t">${esc(t.title||t.bv)}${t.kind?`<small>${esc(t.kind)} · ${esc(t.len||'')}</small>`:''}</span><button class="x" data-del="${i}" title="删除">×</button></div>`).join(''):'<p class="mute" style="margin:0">还没有歌单。在 B 站找到喜欢的学习歌单，复制视频链接粘贴到下面。</p>'}
 $('mList').onclick=e=>{const del=e.target.closest('[data-del]');if(del){const i=+del.dataset.del;S.music.splice(i,1);if(i===mOn){mOn=-1;$('mNow').innerHTML='';$('mNow').classList.add('hide')}else if(i<mOn)mOn--;save();renderMusic();return}
