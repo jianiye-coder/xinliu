@@ -458,7 +458,7 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
     </svg>
   </div>
   <div class="side">
-    <button class="act q" id="doneQBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span><b>做完一题 +3</b><span>趁想刷手机之前，写一句「间隙卡」</span></span></button>
+    <button class="act q" id="doneQBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span><b>做完一题 +3</b><span>记一下进度 · 每个番茄结束时写间隙卡</span></span></button>
     <button class="act urge" id="urgeBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M7 10c0-3 2-6 6-6 2 0 3.5 1 4 2.5-2-.5-4 .5-4 3"/></svg></span><span><b>我想刷手机了</b><span>点这里，别点 App · 60 秒冲个浪</span></span></button>
     <div class="card">
       <h2>今日任务<span class="k" id="taskSum"></span></h2>
@@ -741,7 +741,7 @@ $('giveupBtn').onclick=()=>{const done=(Date.now()-focusStart)/60000;if(!confirm
 // 离开页面算不算分心：电脑上常常要切到别的窗口查资料、写代码，所以默认只在手机上算
 const IS_PHONE=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent)&&matchMedia('(pointer:coarse)').matches);
 function awayOn(){const m=S.settings.awayMode||'phone';return m==='all'||(m==='phone'&&IS_PHONE)}
-function renderRules(){const on=awayOn();$('rules').textContent='规则：'+(on?'专注中切走页面超过 15 秒记一次「分心」，不扣分，每次拉回来 +1；':'这台设备上切走页面不算分心（可在「提醒设置 → 番茄钟」修改）；')+'扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。'}
+function renderRules(){const on=awayOn();$('rules').textContent='规则：'+(on?'专注中切走页面超过 15 秒记一次「分心」，不扣分，每次拉回来 +1；':'这台设备上切走页面不算分心（可在「提醒设置 → 番茄钟」修改）；')+'扛住一次刷手机的冲动 +5 XP；每个番茄结束时写一句「间隙卡」，把想刷信息流的那一刻换成一句话。'}
 function checkAway(){const a=S.away;if(!a||!a.at)return;S.away=null;save();if(!awayOn())return;const away=(Math.min(Date.now(),a.end)-a.at)/1000;if(away<=15)return;const d=day();d.distract++;d.back=(d.back||0)+1;save();addXP(1,'拉回来了');const h=`<h3>欢迎回来 👋</h3><p>你离开了 ${Math.round(away)} 秒。把注意力拉回来，本身就是在练习专注（拉回来 +1）。</p><p class="mute">今天已经拉回来 ${d.back} 次。如果是想查资料，下次先在念头停车场记一句，本轮结束再查。</p><div class="row center"><button class="btn p" onclick="closeModal()">${mode==='focus'?'回到题目':'知道了'}</button></div>`;if(mode==='focus')modal(h);else queueModal(h)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(mode==='focus'&&awayOn()&&!(S.away&&S.away.at)){S.away={at:Date.now(),end:focusEnd};save()}}else{loop();checkAway()}});
 function restoreTimer(){const t=S.timer;if(!t||!t.mode||t.mode==='idle'){resetUI();return}selectDur(t.dur||25);focusStart=t.start;focusEnd=t.end;brkLen=t.blen||5;brkLong=!!t.long;
@@ -767,14 +767,16 @@ function askGoal(){const hook=S.hook||'';
  if(hook)$('useHook').onclick=()=>{$('gIn').value=hook;$('gIn').focus()};
  const go=g=>{S.curGoal=g.trim();if(S.curGoal&&S.curGoal===S.hook)S.hook='';save();closeModal();startFocus()};
  $('gGo').onclick=()=>go($('gIn').value);$('gSkip').onclick=()=>go('');$('gIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();go($('gIn').value)}}}
+const GAP_PROMPTS=['这一轮的关键一步是……','我一开始卡在……，后来发现……','如果讲给同学听，我会说……','这一轮学到的本质是……','这一轮最大的收获是……'];
 function reviewModal(lg,msg,isBreak){const m=lg.dur,goal=lg.goal;let res=null;
  const ideas=brkLong?['走出去 10 分钟，看看远处','吃点东西，喝杯水','做一组拉伸，从脖子到小腿']:['站起来接杯水，看窗外 20 秒','闭眼做 5 次深呼吸','伸展脖子和肩膀','在纸上画出刚才那道题的思路图'];
  const h=`<h3>${msg} 🍅</h3>${goal?`<p class="rvgoal">🎯 ${esc(goal)}</p><p class="mute" style="margin:4px 0 8px">做到了吗？</p><div class="rvres" id="rvRes"><button data-res="done">✓ 做到了<small>+${m} XP</small></button><button data-res="part">做到一部分<small>+${Math.round(m/2)} XP</small></button><button data-res="no">没做到<small>没关系</small></button></div>`:'<p class="mute">这一轮没有写目标。下一轮开始前写一句，做到了能多拿一倍 XP。</p>'}
+ <p class="rvq">间隙卡：用一句话总结这一轮 <span class="mute" style="font-weight:500">+4 XP</span></p><input type="text" id="rvGap" maxlength="120" placeholder="${GAP_PROMPTS[Math.floor(Math.random()*GAP_PROMPTS.length)]}">
  <p class="rvq">下次从哪一步开始？</p><input type="text" id="rvHook" maxlength="60" placeholder="写一句，下次一打开就能接上，比如：从第 5 题的第二问开始" value="${esc(goal&&!S.hook?'':S.hook||'')}">
  ${isBreak?`<p class="mute" style="margin-top:10px">${brkLong?'长':'短'}休息 ${brkLen} 分钟，试试：<b>${ideas[Math.floor(Math.random()*ideas.length)]}</b></p>`:''}
  <div class="row center"><button class="btn sun" id="rvOk">${isBreak?'记下，去休息':'记下'}</button>${isBreak?'<button class="btn s" id="mSkip">跳过休息，直接下一个</button>':''}</div>`;
  const bind=()=>{const rr=$('rvRes');if(rr)rr.onclick=e=>{const b=e.target.closest('[data-res]');if(!b)return;res=b.dataset.res;rr.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
-  const submit=()=>{if(goal&&!res){toast('先选一下：做到了吗？');return false}lg.res=goal?res:'nogoal';const hook=$('rvHook').value.trim();S.hook=hook;S.curGoal='';save();renderGoalLine();
+  const submit=()=>{if(goal&&!res){toast('先选一下：做到了吗？');return false}lg.res=goal?res:'nogoal';const gap=$('rvGap').value.trim();if(gap.length>=4){S.journal.unshift({type:'gap',at:Date.now(),text:gap});day().words+=countZh(gap);lg.gap=true;setTimeout(()=>addXP(4,'间隙卡'),1200)}const hook=$('rvHook').value.trim();S.hook=hook;S.curGoal='';save();renderGoalLine();
    const bonus=res==='done'?m:res==='part'?Math.round(m/2):0;if(bonus)addXP(bonus,res==='done'?'目标达成':'目标完成一部分');else if(res==='no')toast('诚实记下来了。下一轮目标定小一点试试');return true};
   $('rvOk').onclick=()=>{if(submit())closeModal()};const sk=$('mSkip');if(sk)sk.onclick=()=>{if(submit()){closeModal();askGoal()}}};
  if($('ov').classList.contains('on')){modalQ.unshift(h);const iv=setInterval(()=>{if($('rvOk')){clearInterval(iv);bind()}},200)}else{modal(h);bind()}}
@@ -829,7 +831,7 @@ function anchorModal(){queueModal(`<h3>学习时间到${S.settings.anchorPlace?'
 window.startWarm=()=>{closeModal();if(mode!=='idle')return;tabTo('focus');selectDur(5);setTimeout(askGoal,280)};
 
 // gap card
-$('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题');let n=30,it=null;modal(`<h3>间隙卡 · 30 秒</h3><p class="mute">刚做完一题，大脑最想刷信息流的就是这一刻。把它换成一句话：</p><p><b>${['这道题的关键一步是……','我一开始卡在……，后来发现……','如果给同学讲这道题，我会说……','这道题考的本质是……'][Math.floor(Math.random()*4)]}</b></p><input type="text" id="gapIn" style="width:100%" placeholder="一句话就好"><p class="mute" id="gapC" style="text-align:right">30</p><div class="row center"><button class="btn s" id="gapSkip">跳过</button><button class="btn p" id="gapOk">存下 +4</button></div>`,()=>clearInterval(it));setTimeout(()=>$('gapIn')&&$('gapIn').focus(),50);it=setInterval(()=>{n--;if($('gapC'))$('gapC').textContent=n>0?n:'时间到，写完这句就回去做题';if(n<=0)clearInterval(it)},1000);$('gapSkip').onclick=closeModal;$('gapIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('gapOk').click()}};$('gapOk').onclick=()=>{const t=$('gapIn').value.trim();closeModal();if(t.length<4){toast('写得太短了，下次多写几个字');return}S.journal.unshift({type:'gap',at:Date.now(),text:t});d.words+=t.length;save();addXP(4,'间隙卡')}};
+$('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题 · 今天第 '+d.q+' 题')};
 
 // idle reminder + daily write reminder
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now();idleNotified=false}));
