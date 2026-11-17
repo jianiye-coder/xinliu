@@ -319,6 +319,22 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .rep tr.h td{border-top:0;font-size:12px;color:var(--mute)}
 .rep td.up{color:var(--leaf-d);font-weight:700}.rep td.down{color:var(--coral);font-weight:700}
 .repnote{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--leaf-l);font-size:13.5px}.repnote p{margin:4px 0}
+/* ledger */
+.lgsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lgsum div,.lgtime>div:not(.vs){border-radius:14px;padding:10px;text-align:center;background:var(--paper)}
+.lgsum b{display:block;font:400 26px/1.2 var(--num)}.lgsum span,.lgtime span{font-size:11.5px;color:var(--mute)}
+.lgsum .in b{color:var(--leaf-d)}.lgsum .out b{color:var(--coral)}.lgsum .net b{color:#9a6400}
+.lgtime{display:grid;grid-template-columns:1fr auto 1fr 1fr;gap:8px;align-items:center;margin-top:8px}
+.lgtime b{display:block;font:400 22px/1.2 var(--num);color:var(--sea)}.lgtime .vs{font-size:18px;color:var(--mute)}.lgtime .r b{color:var(--ink)}
+.lgcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+h4{margin:0 0 6px;font:700 13.5px var(--serif)}
+.lgbar{display:grid;grid-template-columns:76px 1fr auto;gap:8px;align-items:center;font-size:12.5px;margin:5px 0}
+.lgbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lgbar i{height:8px;border-radius:9px;display:block;min-width:4px}
+.lgbar.in i{background:linear-gradient(90deg,#9fd38f,#3f9a62)}.lgbar.out i{background:linear-gradient(90deg,#f4b0a2,#e9634e)}.lgbar b{font:12px var(--num)}
+.lgday{margin-top:6px}.lgd{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mute);padding:6px 2px;border-bottom:1px solid var(--line)}
+.lgrow{display:grid;grid-template-columns:44px 1fr auto;gap:8px;padding:6px 2px;font-size:13px;border-bottom:1px dashed var(--line)}
+.lgrow .lt{font:12px var(--num);color:var(--mute)}.lgrow b{font:13px var(--num)}.lgrow.pos b{color:var(--leaf-d)}.lgrow.neg b{color:var(--coral)}.lgrow.reset{opacity:.5}
+@media(max-width:520px){.lgsum{grid-template-columns:1fr 1fr}.lgsum .net{grid-column:1/-1}.lgtime{grid-template-columns:1fr auto 1fr}.lgtime .r{grid-column:1/-1}.lgcols{grid-template-columns:1fr}}
 /* watch list */
 .wsum{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
 .wsum div{background:var(--paper);border-radius:14px;padding:10px;text-align:center}.wsum b{display:block;font:400 24px var(--num);color:var(--sea)}.wsum span{font-size:11.5px;color:var(--mute)}
@@ -496,7 +512,6 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
     </svg>
   </div>
   <div class="side">
-    <button class="act q" id="doneQBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span><b>做完一题 +3</b><span>记一下进度 · 每个番茄结束时写间隙卡</span></span></button>
     <button class="act urge" id="urgeBtn"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M7 10c0-3 2-6 6-6 2 0 3.5 1 4 2.5-2-.5-4 .5-4 3"/></svg></span><span><b>我想刷手机了</b><span>点这里，别点 App · 60 秒冲个浪</span></span></button>
     <div class="card">
       <h2>今日任务<span class="k" id="taskSum"></span></h2>
@@ -518,7 +533,7 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
       <h2>今天<span class="k">TODAY</span></h2>
       <div class="stats">
         <div class="stat"><b id="sMin">0</b><span>专注分钟</span></div>
-        <div class="stat"><b id="sQ">0</b><span>完成题数</span></div>
+        <div class="stat"><b id="sQ">0</b><span>完成番茄</span></div>
         <div class="stat"><b id="sUrge">0</b><span>扛住冲动</span></div>
         <div class="stat"><b id="sWord">0</b><span>写作字数</span></div>
       </div>
@@ -534,7 +549,7 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
       <div class="tracks" id="mList"></div>
       <div class="addrow"><input type="text" id="mUrl" placeholder="粘贴 B 站视频链接（含 BV 号）"><button class="btn b" id="mAdd">添加</button></div>
     </div>
-    <p class="rules" id="rules">规则：专注中切走页面超过 15 秒记一次「分心」，扣 5 XP；扛住一次刷手机的冲动 +5 XP；做完一题弹出 30 秒「间隙卡」，把想刷信息流的那一刻换成一句话。</p>
+    <p class="rules" id="rules">规则：扛住一次刷手机的冲动 +5 XP；每个番茄结束时写一句「间隙卡」。</p>
   </div>
 </div>
 </section>
@@ -591,6 +606,10 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
     <div id="rList"></div>
     <div class="radd"><input type="text" id="rName" placeholder="新奖励，比如「再玩一局」"><select id="rType"><option value="fixed">固定价格</option><option value="rate">按分钟</option></select><input type="number" id="rCost" min="1" placeholder="价格"><button class="btn s" id="rAdd">添加</button></div>
     <p class="mute" id="rLog" style="margin-bottom:0"></p>
+  </div>
+  <div class="card" style="margin-bottom:16px"><h2>🧾 账本<span class="k">挣了多少、花了多少 · 时间进出</span></h2>
+    <div class="row" id="lgRange" style="margin-bottom:10px"><span class="chip on" data-lr="1">今天</span><span class="chip" data-lr="7">近 7 天</span><span class="chip" data-lr="30">近 30 天</span></div>
+    <div id="lgBox"></div>
   </div>
   <div class="card" style="margin-bottom:16px"><h2>岛屿进化<span class="k">升级解锁新的岛</span></h2><div class="road" id="islandRoad"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>岛屿收藏册<span class="k" id="decoCount"></span></h2><div class="decos" id="decoList"></div><p class="mute" style="margin:10px 0 0">装饰从专注宝箱里开出来，开到就会出现在你的岛上。</p></div>
@@ -681,6 +700,8 @@ if((S.priceSeed||0)<5){S.rewards=S.rewards.filter(r=>r.name!=='买杯奶茶');S.
 // 已经按分钟计费了，名字里不用再写「20分钟」：看b站20分钟 → 看 B 站
 if((S.priceSeed||0)<6){const fix=n=>/^看\s*b\s*站/i.test(n)?'看 B 站':n;S.rewards.forEach(r=>{const n=fix(r.name);if(n!==r.name){r.name=n;r.rate=r.rate||9;r.mins=r.mins||20;delete r.cost;r.link=r.link||'https://www.bilibili.com';r.linkLabel=r.linkLabel||'打开 B 站'}});S.purchases.forEach(x=>x.name=fix(x.name));S.watch.forEach(x=>x.kind=fix(x.kind));S.priceSeed=6}
 const keyOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+// 账本：岛币的每一笔进出都记下来（清零不算收支）
+function coinLog(n,why,kind){n=Math.round(n);if(!n)return;const before=S.coins||0;S.coins=Math.max(0,before+n);const real=S.coins-before;if(!real)return;S.ledger=S.ledger||[];S.ledger.unshift({at:Date.now(),n:real,why:String(why||'').slice(0,60),k:kind||''});if(S.ledger.length>1500)S.ledger.length=1500}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function day(k){k=k||today();if(!S.days[k])S.days[k]={min:0,q:0,urge:0,words:0,distract:0,sessions:0,writes:0};return S.days[k]}
 
@@ -705,7 +726,7 @@ window.closeModal=closeModal;
 // ---------- XP & level ----------
 function levelOf(xp){return Math.floor(Math.sqrt(Math.max(0,xp)/40))+1}
 function xpFor(l){return 40*(l-1)*(l-1)}
-function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);S.coins=Math.max(0,(S.coins||0)+n);if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。${islandTheme(after).id!==islandTheme(before).id?'<br><b>你的岛也进化成了「'+islandTheme(after).name+'」！</b>':''}</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
+function addXP(n,why){const before=levelOf(S.xp);S.xp=Math.max(0,S.xp+n);coinLog(n,why||'XP');if(n<0)S.lostXp+=-n;save();render();if(why)toast((n>0?'+':'')+n+' XP · '+why);const after=levelOf(S.xp);if(after>before){beep();setTimeout(()=>queueModal(`<h3>升级了！Lv.${after}</h3><p>你的思维之树长成了「${stage(after).name}」。${islandTheme(after).id!==islandTheme(before).id?'<br><b>你的岛也进化成了「'+islandTheme(after).name+'」！</b>':''}</p><div style="text-align:center">${treeSVG(after)}</div><div class="row center"><button class="btn p" onclick="closeModal()">继续</button></div>`),400)}checkBadges()}
 
 // ---------- streak ----------
 // 打卡：专注满 5 分钟（一次热身就够）或写 100 字。每周有 1 天休息日，漏掉不断连续天数
@@ -763,11 +784,12 @@ function treeBase(l){
 // ---------- render ----------
 function render(){
   if(typeof checkTasks==='function'){checkSeason();checkTasks();renderTasks();renderChests();renderSeason()}
+  if(typeof renderLedger==='function'&&!$('tab-badges').classList.contains('hide'))renderLedger();
   $('coinTxt').textContent=S.coins;renderPark();if(typeof renderGoal==='function')renderGoal();
   const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
   $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
   $('streakTxt').textContent='连续 '+streak()+' 天';$('streakTxt').parentNode.title='专注满 5 分钟或写 100 字就算打卡。每周有 1 天休息日，漏掉不断连续天数。'+(restUsedThisWeek()?'本周休息日已用。':'本周休息日还在。');
-  const d=day();$('sMin').textContent=Math.round(d.min);$('sQ').textContent=d.q;$('sUrge').textContent=d.urge;$('sWord').textContent=d.words;
+  const d=day();$('sMin').textContent=Math.round(d.min);$('sQ').textContent=pomo().c;$('sUrge').textContent=d.urge;$('sWord').textContent=d.words;
   $('treeBox').innerHTML=treeSVG(l);const st=stage(l);$('treeName').textContent=st.name+' · Lv.'+l+' · '+islandTheme(l).name;$('treeSub').textContent=st.sub;
   $('leafLoss').textContent=d.distract?`今天走神 ${d.distract} 次，每次都拉回来了`:'';
 }
@@ -932,7 +954,6 @@ function anchorModal(){queueModal(`<h3>学习时间到${S.settings.anchorPlace?'
 window.startWarm=()=>{closeModal();if(mode!=='idle')return;tabTo('focus');selectDur(5);setTimeout(askGoal,280)};
 
 // gap card
-$('doneQBtn').onclick=()=>{const d=day();d.q++;save();addXP(3,'完成一题 · 今天第 '+d.q+' 题')};
 
 // idle reminder + daily write reminder
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now();idleNotified=false}));
@@ -1114,12 +1135,12 @@ function totals(){let t={min:0,q:0,urge:0,words:0,writes:0,sessions:0};Object.va
 const BADGES=[
  ['初','第一次专注','完成 1 轮专注',t=>t.sessions>=1],['十','专注十轮','完成 10 轮专注',t=>t.sessions>=10],['百','百分钟','累计专注 100 分钟',t=>t.min>=100],['千','千分钟','累计专注 1000 分钟',t=>t.min>=1000],
  ['浪','冲浪者','扛住 10 次刷手机冲动',t=>t.urge>=10],['海','驯浪师','扛住 50 次冲动',t=>t.urge>=50],
- ['题','刷题机器','完成 50 道题',t=>t.q>=50],['隙','间隙捕手','写 20 张间隙卡',t=>t.gap>=20],
+ ['茄','五十番茄','完成 50 个番茄',t=>t.sessions>=50],['隙','间隙捕手','写 20 张间隙卡',t=>t.gap>=20],
  ['笔','提笔','第一次写作存档',t=>t.writes>=1],['文','千字','累计写作 1000 字',t=>t.words>=1000],['书','万字','累计写作 10000 字',t=>t.words>=10000],
  ['准','精准表达','一篇 150 字以上、模糊词低于 1%',t=>t.precise>=1],
  ['三','三日连胜','连续 3 天打卡',()=>streak()>=3],['七','一周不断','连续 7 天打卡',()=>streak()>=7],['月','月度心流','连续 30 天打卡',()=>streak()>=30]
 ];
-const BADGE_PROG=[t=>[t.sessions,1],t=>[t.sessions,10],t=>[t.min,100],t=>[t.min,1000],t=>[t.urge,10],t=>[t.urge,50],t=>[t.q,50],t=>[t.gap,20],t=>[t.writes,1],t=>[t.words,1000],t=>[t.words,10000],t=>[t.precise,1],()=>[streak(),3],()=>[streak(),7],()=>[streak(),30]];
+const BADGE_PROG=[t=>[t.sessions,1],t=>[t.sessions,10],t=>[t.min,100],t=>[t.min,1000],t=>[t.urge,10],t=>[t.urge,50],t=>[t.sessions,50],t=>[t.gap,20],t=>[t.writes,1],t=>[t.words,1000],t=>[t.words,10000],t=>[t.precise,1],()=>[streak(),3],()=>[streak(),7],()=>[streak(),30]];
 // 印章：每枚形状、朱文/白文、盖章角度都不同；用 SVG 滤镜做出印泥的晕开和斑驳
 function sealSVG(ch,i,got){const shape=i%4,white=i%2===0,R='#c4392b',P='#fbf3e6',fid='ink'+i;
  const outer=shape===1?`<circle cx="40" cy="40" r="34"/>`:shape===2?`<ellipse cx="40" cy="40" rx="28" ry="35"/>`:`<rect x="7" y="7" width="66" height="66" rx="${shape===3?3:7}"/>`;
@@ -1134,7 +1155,7 @@ function sealSVG(ch,i,got){const shape=i%4,white=i%2===0,R='#c4392b',P='#fbf3e6'
   :`<g fill="none" stroke="${R}" stroke-width="4.5">${outer}</g>${shape!==0?`<g fill="none" stroke="${R}" stroke-width="1.3">${inner}</g>`:''}<text x="40" y="41" text-anchor="middle" dominant-baseline="central" font-size="${fs}" ${font} fill="${R}">${ch}</text>`;
  return`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs>${filt}</defs><g filter="url(#${fid})">${body}</g></svg>`}
 function checkBadges(){const t=totals();let k=0;BADGES.forEach(b=>{if(!S.badges[b[1]]&&b[3](t)){S.badges[b[1]]=Date.now();save();setTimeout(()=>{beep();toast('解锁成就：'+b[1])},900+2800*k++)}})}
-function renderBadges(){renderReport();renderSeason();renderShop();renderHeat();renderDecos();const T=totals();let n=0;
+function renderBadges(){renderReport();renderSeason();renderShop();renderLedger();renderHeat();renderDecos();const T=totals();let n=0;
  $('bList').innerHTML=BADGES.map((b,i)=>{const at=S.badges[b[1]],got=!!at;if(got)n++;const [c,need]=BADGE_PROG[i](T),pct=Math.min(100,Math.round(Math.max(0,c)/need*100)),rot=((i*37)%13)-6;let meta;
   if(got){const d=new Date(at);meta=`<div class="sdate">${d.getMonth()+1}月${d.getDate()}日 盖章</div>`}else meta=`<div class="sprog"><i style="width:${pct}%"></i></div><div class="snum">${Math.min(Math.round(c),need)} / ${need}</div>`;
   return`<div class="seal ${got?'got':''}" style="--rot:${rot}deg" title="${b[2]}"><div class="sv">${sealSVG(b[0],i,got)}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div>${meta}</div>`}).join('');
@@ -1143,7 +1164,7 @@ function renderBadges(){renderReport();renderSeason();renderShop();renderHeat();
  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');const x=S.days[k]||{};if(x.urgeReasons)for(const r in x.urgeReasons)reasons[r]=(reasons[r]||0)+x.urgeReasons[r];days.push({d,x,today:i===0})}
  const mx=Math.max(25,...days.map(o=>o.x.min||0));const wd='日一二三四五六';
  let rows='<div class="bars">'+days.map(o=>{const m=Math.round(o.x.min||0);return`<div class="bar ${o.today?'today':''}"><span>${m||''}</span><i style="height:${(m/mx*100).toFixed(1)}%"></i></div>`}).join('')+'</div><div class="barlab">'+days.map(o=>`<span>${o.today?'今天':'周'+wd[o.d.getDay()]}</span>`).join('')+'</div>';
- rows+='<table class="wk"><tr><td>日期</td><td>题数</td><td>扛住冲动</td><td>分心</td><td>写作字数</td></tr>'+days.map(o=>`<tr><td>${o.d.getMonth()+1}/${o.d.getDate()}</td><td>${o.x.q||0}</td><td>${o.x.urge||0}</td><td>${o.x.distract||0}</td><td>${o.x.words||0}</td></tr>`).join('')+'</table>';
+ rows+='<table class="wk"><tr><td>日期</td><td>扛住冲动</td><td>分心</td><td>写作字数</td></tr>'+days.map(o=>`<tr><td>${o.d.getMonth()+1}/${o.d.getDate()}</td><td>${o.x.urge||0}</td><td>${o.x.distract||0}</td><td>${o.x.words||0}</td></tr>`).join('')+'</table>';
  const rs=Object.entries(reasons).sort((a,b)=>b[1]-a[1]);rows+=rs.length?`<p class="mute" style="margin-top:12px">这周你想刷手机最常见的原因：<b>${rs.map(([r,c])=>r+' '+c+' 次').join('、')}</b>。${rs[0][0]==='卡题了'?'卡题时试试先把卡点写下来——写出来往往就通了。':rs[0][0]==='累了'?'累的时候需要的是真正的休息（走动、闭眼），信息流不会让你恢复。':rs[0][0]==='无聊'?'无聊说明题目难度不合适，试试换一道更有挑战的。':''}</p>`:'';$('week').innerHTML=rows}
 
 // ---------- settings ----------
@@ -1160,7 +1181,7 @@ function notifState(){if(!('Notification' in window)){$('notifBtn').textContent=
 $('notifBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(e){}notifState();if(!('Notification' in window)||Notification.permission!=='granted')toast('系统通知不可用，会用页面弹窗+提示音提醒你')};notifState();
 $('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='xinliu-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
 $('resetBtn').onclick=()=>{if(confirm('确定清空所有数据？树会回到种子。')){clearInterval(tick);S=blank();save();location.reload()}};
-$('resetXpBtn').onclick=()=>{if(!confirm('把 XP、等级、赛季等级和岛币都清零？树会回到种子，岛回到小海岛，这个月的赛季从 0 级重新算。\n\n写作、间隙卡、成就印章、打卡记录、宝箱和装饰都保留。'))return;S.xp=0;S.coins=0;S.lostXp=0;S.season={m:monthKey(),got:0,base:monthMinutesRaw()};save();render();if(!$('tab-badges').classList.contains('hide'))renderBadges();toast('XP、等级和岛币已清零，从种子重新开始')};
+$('resetXpBtn').onclick=()=>{if(!confirm('把 XP、等级、赛季等级和岛币都清零？树会回到种子，岛回到小海岛，这个月的赛季从 0 级重新算。\n\n写作、间隙卡、成就印章、打卡记录、宝箱和装饰都保留。'))return;S.xp=0;coinLog(-(S.coins||0),'XP、等级和岛币清零','reset');S.lostXp=0;S.season={m:monthKey(),got:0,base:monthMinutesRaw()};save();render();if(!$('tab-badges').classList.contains('hide'))renderBadges();toast('XP、等级和岛币已清零，从种子重新开始')};
 $('importBtn').onclick=()=>$('importFile').click();
 $('importFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const data=JSON.parse(await f.text());if(typeof data!=='object'||!data||typeof data.xp!=='number'||typeof data.days!=='object')throw 0;if(!confirm('用这个文件覆盖当前数据？（当前 '+S.xp+' XP → 文件里 '+data.xp+' XP）'))return;clearInterval(tick);S=Object.assign(blank(),data);S.settings=Object.assign(blank().settings,data.settings||{});save();location.reload()}catch(err){toast('这个文件不是心流岛导出的数据')}};
 $('ov').onclick=e=>{if(e.target.id==='ov'&&mode!=='focus')closeModal()};
@@ -1246,7 +1267,7 @@ $('chestRow').onclick=e=>{const b=e.target.closest('[data-chest]');if(!b)return;
 function openChest(c){S.chests=S.chests.filter(x=>x!==c);const r=c.r,base=[12,30,60,150][r],coins=base+Math.floor(Math.random()*base*.5);const lines=[];let got=null,dupCoins=0;
  if(Math.random()<[.35,.65,1,1][r]){const dr=Math.random()<.6?r:Math.floor(Math.random()*(r+1));const pool=DECOS.filter(d=>d.r===dr);const d=pool[Math.floor(Math.random()*pool.length)];
   if(d&&!S.decos.includes(d.id)){S.decos.push(d.id);got=d}else if(d){dupCoins=[10,20,40,80][d.r]}}
- S.coins+=coins+dupCoins;save();render();
+ coinLog(coins+dupCoins,RAR[r].n+'宝箱'+(got?' · 开出'+got.name:''));save();render();
  lines.push(`<div class="loot"><b>+${coins}</b> 岛币</div>`);if(got)lines.push(`<div class="loot new" style="--rc:${RAR[got.r].c}">${decoMini(got,true)}<div><b>新装饰：${got.name}</b><span>${RAR[got.r].n} · 已经放到你的岛上了</span></div></div>`);if(dupCoins)lines.push(`<div class="loot"><b>+${dupCoins}</b> 岛币（开到了已有的装饰）</div>`);if(!got&&!dupCoins)lines.push(`<p class="mute" style="margin:2px 0 0">这次没开出装饰。${RAR[r].n}宝箱有 ${['35%','65%','100%','100%'][r]} 的机会开出装饰。</p>`);
  modal(`<div class="chestopen" id="chestOpen" style="--rc:${RAR[r].c}"><div class="cbox" id="cbox">${chestSVG(r,false)}</div><h3>${RAR[r].n}宝箱 · 你开到了</h3><div class="loots">${lines.join('')}</div>${got?`<div class="cprev">${treeSVG(levelOf(S.xp))}</div>`:''}<div class="row center"><button class="btn p" onclick="closeModal()">收下</button></div></div>`);
  setTimeout(()=>{const b=$('cbox'),w=$('chestOpen');if(!b||!w)return;b.innerHTML=chestOpenSVG(r);w.classList.add('revealed');beep()},620)}
@@ -1254,16 +1275,16 @@ function openChest(c){S.chests=S.chests.filter(x=>x!==c);const r=c.r,base=[12,30
 const TASKS=[
  {k:'p2',g:0,t:'完成 2 个番茄',need:2,v:()=>pomo().c},{k:'p3',g:0,t:'完成 3 个番茄',need:3,v:()=>pomo().c},
  {k:'w150',g:1,t:'写满 150 字',need:150,v:d=>d.words||0},{k:'w1',g:1,t:'完成 1 篇写作训练',need:1,v:d=>d.writes||0},{k:'gap2',g:1,t:'写 2 张间隙卡',need:2,v:()=>S.journal.filter(e=>e.type==='gap'&&keyOf(new Date(e.at))===today()).length},
- {k:'u1',g:2,t:'扛住 1 次刷手机的冲动',need:1,v:d=>d.urge||0},{k:'q3',g:2,t:'做完 3 道题',need:3,v:d=>d.q||0},{k:'clean',g:2,t:'完成 1 个番茄，且今天没有分心',need:1,v:d=>(pomo().c>=1&&!d.distract)?1:0},{k:'park',g:2,t:'用念头停车场停下 1 个念头',need:1,v:()=>S.parked.filter(p=>keyOf(new Date(p.at))===today()).length+S.journal.filter(e=>e.type==='idea'&&keyOf(new Date(e.at))===today()).length}
+ {k:'u1',g:2,t:'扛住 1 次刷手机的冲动',need:1,v:d=>d.urge||0},{k:'clean',g:2,t:'完成 1 个番茄，且今天没有分心',need:1,v:d=>(pomo().c>=1&&!d.distract)?1:0},{k:'park',g:2,t:'用念头停车场停下 1 个念头',need:1,v:()=>S.parked.filter(p=>keyOf(new Date(p.at))===today()).length+S.journal.filter(e=>e.type==='idea'&&keyOf(new Date(e.at))===today()).length}
 ];
 function todayTasks(){const t=today();if(!S.tasks||S.tasks.date!==t){let h=0;for(const ch of t)h=(h*31+ch.charCodeAt(0))>>>0;const ks=[0,1,2].map(g=>{const p=TASKS.filter(x=>x.g===g);return p[(h>>>(g*4))%p.length].k});S.tasks={date:t,ks,done:{},bonus:false};save()}return S.tasks}
 let taskMsgs=[];
-function checkTasks(){const st=todayTasks(),d=day();let changed=false;st.ks.forEach(k=>{const T=TASKS.find(x=>x.k===k);if(!T||st.done[k])return;if(T.v(d)>=T.need){st.done[k]=true;S.coins+=10;changed=true;taskMsgs.push('每日任务完成：'+T.t+' · +10 岛币')}});
- if(!st.bonus&&st.ks.every(k=>st.done[k])){st.bonus=true;changed=true;if(S.chests.length<4){S.chests.push({id:Date.now()+1,r:rollRarity(1),ready:true});taskMsgs.push('今天 3 个任务全部完成！送你一个宝箱，已经可以打开')}else{S.coins+=40;taskMsgs.push('今天 3 个任务全部完成！宝箱槽满了，换成 40 岛币')}}
+function checkTasks(){const st=todayTasks(),d=day();let changed=false;st.ks.forEach(k=>{const T=TASKS.find(x=>x.k===k);if(!T||st.done[k])return;if(T.v(d)>=T.need){st.done[k]=true;coinLog(10,'每日任务：'+T.t);changed=true;taskMsgs.push('每日任务完成：'+T.t+' · +10 岛币')}});
+ if(!st.bonus&&st.ks.every(k=>st.done[k])){st.bonus=true;changed=true;if(S.chests.length<4){S.chests.push({id:Date.now()+1,r:rollRarity(1),ready:true});taskMsgs.push('今天 3 个任务全部完成！送你一个宝箱，已经可以打开')}else{coinLog(40,'3 个每日任务全部完成');taskMsgs.push('今天 3 个任务全部完成！宝箱槽满了，换成 40 岛币')}}
  if(changed)save();if(taskMsgs.length){const m=taskMsgs.slice();taskMsgs=[];m.forEach((x,i)=>setTimeout(()=>{beep();toast(x)},2800*(i+1)))}}
 $('myTaskList').onclick=e=>{const del=e.target.closest('[data-mtdel]');if(del){const t=S.myTasks.find(x=>x.id===+del.dataset.mtdel);if(t&&confirm('删除每天的任务「'+t.t+'」？')){S.myTasks=S.myTasks.filter(x=>x!==t);save();renderTasks()}return}
  if(e.target.closest('a'))return;const row=e.target.closest('[data-mt]');if(!row)return;const st=todayTasks();st.mine=st.mine||{};const id=+row.dataset.mt;
- if(st.mine[id]){delete st.mine[id];S.coins=Math.max(0,S.coins-15)}else{st.mine[id]=true;S.coins+=15;beep();toast('完成：'+(S.myTasks.find(x=>x.id===id)||{}).t+' · +15 岛币')}save();render()};
+ const tn=(S.myTasks.find(x=>x.id===id)||{}).t||'';if(st.mine[id]){delete st.mine[id];coinLog(-15,'取消打勾：'+tn,'undo')}else{st.mine[id]=true;coinLog(15,'我的任务：'+tn);beep();toast('完成：'+(S.myTasks.find(x=>x.id===id)||{}).t+' · +15 岛币')}save();render()};
 $('mtAdd').onclick=()=>{const t=$('mtIn').value.trim();if(!t)return;S.myTasks.push({id:Date.now(),t});save();$('mtIn').value='';renderTasks()};
 $('mtIn').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('mtAdd').click()}};
 function renderTasks(){if(!$('taskList'))return;const st=todayTasks(),d=day();st.mine=st.mine||{};$('myTaskList').innerHTML=S.myTasks.map(t=>{const ok=!!st.mine[t.id];return`<div class="task mine ${ok?'ok':''}" data-mt="${t.id}"><span class="tk">${ok?'✓':''}</span><span class="tt">${esc(t.t)}</span>${t.link?`<a class="tl" href="${esc(t.link)}" target="_blank" rel="noopener" title="打开">↗</a>`:''}<span class="tp">${ok?'+15':'点一下打勾'}</span><button class="x" data-mtdel="${t.id}" title="删除">×</button></div>`}).join('');$('taskList').innerHTML=st.ks.map(k=>{const T=TASKS.find(x=>x.k===k);if(!T)return'';const v=Math.min(T.need,T.v(d)),ok=!!st.done[k];return`<div class="task ${ok?'ok':''}"><span class="tk">${ok?'✓':''}</span><span class="tt">${T.t}</span><span class="tp">${ok?'+10':v+'/'+T.need}</span></div>`}).join('');
@@ -1287,7 +1308,7 @@ function tierReward(t){return t===30?{chest:3}:t===20?{chest:2}:t===10?{chest:1}
 function checkSeason(){const mk=monthKey();if(!S.season||S.season.m!==mk)S.season={m:mk,got:0};const tier=Math.min(SEASON_TIERS,Math.floor(monthMinutes()/SEASON_MIN));if(S.season.got>=tier)return;
  let coins=0,chests=0;while(S.season.got<tier){const t=++S.season.got,rw=tierReward(t);
   if(rw.chest!==undefined){if(S.chests.length<4){S.chests.push({id:Date.now()+t,r:rollRarity(rw.chest),ready:true});chests++}else coins+=[40,80,150,300][rw.chest]}else coins+=rw.coins}
- S.coins+=coins;save();taskMsgs.push(`赛季升到第 ${tier} 级 · `+[coins?'+'+coins+' 岛币':'',chests?chests+' 个宝箱可以打开':''].filter(Boolean).join('，'))}
+ coinLog(coins,'赛季升到第 '+tier+' 级');save();taskMsgs.push(`赛季升到第 ${tier} 级 · `+[coins?'+'+coins+' 岛币':'',chests?chests+' 个宝箱可以打开':''].filter(Boolean).join('，'))}
 function renderSeason(){if(!$('seasonBox'))return;const d=new Date(),name=SEASONS[d.getMonth()],m=Math.round(monthMinutes()),tier=Math.min(SEASON_TIERS,Math.floor(m/SEASON_MIN));
  const end=new Date(d.getFullYear(),d.getMonth()+1,1),left=Math.ceil((end-d)/86400000);
  let cells='';for(let t=1;t<=SEASON_TIERS;t++){const rw=tierReward(t),on=t<=tier;cells+=`<div class="tier ${on?'on':''} ${rw.chest!==undefined?'big':''}" title="第 ${t} 级：${rw.chest!==undefined?RAR[rw.chest].n+'及以上宝箱':rw.coins+' 岛币'}" style="${rw.chest!==undefined?'--rc:'+RAR[rw.chest].c:''}">${rw.chest!==undefined?chestSVG(rw.chest,!on):''}<span>${t}</span></div>`}
@@ -1345,7 +1366,7 @@ const linkBtn=r=>r.link?`<a class="btn b" href="${esc(r.link)}" target="_blank" 
 $('rList').onclick=e=>{const del=e.target.closest('[data-rdel]');if(del){const r=S.rewards[+del.dataset.rdel];if(confirm('删除奖励「'+r.name+'」？')){S.rewards.splice(+del.dataset.rdel,1);save();renderShop()}return}
  const b=e.target.closest('[data-buy]');if(!b||b.disabled)return;const r=S.rewards[+b.dataset.buy];if(r.rate){buyTimed(r);return}
  if(S.coins<r.cost)return;if(!confirm('花 '+r.cost+' 岛币换「'+r.name+'」？'))return;
- S.coins-=r.cost;S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
+ coinLog(-r.cost,r.name,'spend');S.purchases.unshift({at:Date.now(),name:r.name,cost:r.cost});save();render();renderShop();beep();
  modal(`<h3>兑换成功：${esc(r.name)}</h3><p>这是你挣来的，好好享受，不用内疚。</p><div class="row center">${linkBtn(r)}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)};
 function verbOf(n){return /看/.test(n)?'看':/刷/.test(n)?'刷':'玩'}
 function buyTimed(r){if(S.rt&&S.rt.end>Date.now()){toast('「'+S.rt.name+'」的奖励时间还没用完');return}const def=r.mins||15,verb=/看/.test(r.name)?'看':/刷/.test(r.name)?'刷':'玩';
@@ -1356,7 +1377,7 @@ function buyTimed(r){if(S.rt&&S.rt.end>Date.now()){toast('「'+S.rt.name+'」的
  const mins=()=>Math.min(240,Math.max(1,Math.round(+$('tmIn').value||0)));
  const upd=()=>{const m=mins(),c=m*r.rate,ok=S.coins>=c;$('tmCost').textContent=c+' 岛币';$('tmHave').textContent=ok?`你有 ${S.coins} 岛币，换完还剩 ${S.coins-c}`:`你有 ${S.coins} 岛币，还差 ${c-S.coins}。现在最多能换 ${Math.floor(S.coins/r.rate)} 分钟`;$('tmGo').disabled=!ok;$('tmGo').textContent=ok?`开始（花 ${c} 岛币）`:'岛币不够';document.querySelectorAll('#tmChips .chip').forEach(x=>x.classList.toggle('on',+x.dataset.m===m))};
  $('tmIn').oninput=upd;$('tmChips').onclick=e=>{const c=e.target.closest('[data-m]');if(c){$('tmIn').value=c.dataset.m;upd()}};upd();setTimeout(()=>$('tmIn')&&$('tmIn').select(),60);
- $('tmGo').onclick=()=>{const m=mins(),c=m*r.rate;if(S.coins<c)return;S.coins-=c;const now=Date.now();S.purchases.unshift({at:now,name:r.name,cost:c,mins:m});S.watch.unshift({id:now,at:now,kind:r.name,mins:m,what:''});S.rt={name:r.name,start:now,end:now+m*60000,mins:m,wid:now};save();render();renderShop();renderRT();beep();
+ $('tmGo').onclick=()=>{const m=mins(),c=m*r.rate;if(S.coins<c)return;coinLog(-c,r.name+' '+m+' 分钟','spend');const now=Date.now();S.purchases.unshift({at:now,name:r.name,cost:c,mins:m});S.watch.unshift({id:now,at:now,kind:r.name,mins:m,what:''});S.rt={name:r.name,start:now,end:now+m*60000,mins:m,wid:now};save();render();renderShop();renderRT();beep();
   modal(`<h3>开始：${esc(r.name)} · ${m} 分钟</h3><p>这是你挣来的，好好享受，不用内疚。</p><p class="mute">倒计时在页面最上面，到点会提醒你回来，再问你${verbOf(r.name)}了什么。</p><div class="row center">${linkBtn(r)}<button class="btn ${r.link?'s':'p'}" onclick="closeModal()">好</button></div>`)}}
 // 奖励倒计时：到点提醒回来，并问你刚才看了 / 玩了 / 刷了什么（记进观看记录）
 let rtTick=null;
@@ -1397,6 +1418,26 @@ $('wList').onclick=ev=>{const b=ev.target.closest('[data-fill]');if(b)askWhat(+b
 window.startNext=()=>{tabTo('focus');if(mode==='idle')setTimeout(askGoal,250)};
 $('rType').onchange=e=>{$('rCost').placeholder=e.target.value==='rate'?'每分钟':'价格'};
 $('rAdd').onclick=()=>{const n=$('rName').value.trim(),c=Math.round(+$('rCost').value),rate=$('rType').value==='rate';if(!n||!(c>0)){toast('写上奖励名称和'+(rate?'每分钟的价格':'价格'));return}S.rewards.push(rate?{name:n.slice(0,30),rate:c,mins:15}:{name:n.slice(0,30),cost:c});save();$('rName').value='';$('rCost').value='';renderShop()};
+// ---------- 🧾 账本：岛币和时间的进出 ----------
+S.ledger=S.ledger||[];
+if(!S.ledgerSeed){const have=new Set(S.ledger.map(e=>e.at));S.purchases.forEach(x=>{if(!have.has(x.at)&&x.cost)S.ledger.push({at:x.at,n:-x.cost,why:x.name+(x.mins?' '+x.mins+' 分钟':''),k:'spend'})});S.ledger.sort((a,b)=>b.at-a.at);S.ledgerSeed=Date.now();save()}
+let lgDays=1;
+$('lgRange').onclick=e=>{const c=e.target.closest('[data-lr]');if(!c)return;lgDays=+c.dataset.lr;document.querySelectorAll('#lgRange .chip').forEach(x=>x.classList.toggle('on',x===c));renderLedger()};
+function lgCat(e){const w=e.why;if(e.k==='spend')return'花';if(/宝箱/.test(w))return'宝箱';if(/赛季/.test(w))return'赛季';if(/任务/.test(w))return'任务';if(/冲动|拉回来/.test(w))return'扛住冲动';if(/写作|改写|间隙卡|一题/.test(w))return'写作和做题';if(/专注|番茄|目标|热身|休息/.test(w))return'专注';return'其他'}
+function renderLedger(){if(!$('lgBox'))return;const from=new Date();from.setHours(0,0,0,0);from.setDate(from.getDate()-(lgDays-1));const t0=from.getTime();
+ const L=S.ledger.filter(e=>e.at>=t0&&e.k!=='reset');const earn=L.filter(e=>e.k!=='spend').reduce((a,e)=>a+e.n,0),spend=-L.filter(e=>e.k==='spend').reduce((a,e)=>a+e.n,0);
+ let focus=0;for(const k in S.days){if(new Date(k+'T12:00:00').getTime()>=t0)focus+=S.days[k].min||0}focus=Math.round(focus);
+ const fun=S.watch.filter(e=>e.at>=t0).reduce((a,e)=>a+(e.used||e.mins||0),0);
+ const src={};L.filter(e=>e.k!=='spend').forEach(e=>{const c=lgCat(e);src[c]=(src[c]||0)+e.n});const outs={};L.filter(e=>e.k==='spend').forEach(e=>{const c=e.why.replace(/\s*\d+\s*分钟$/,'');outs[c]=(outs[c]||0)-e.n});
+ const bars=(o,cls)=>{const E=Object.entries(o).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]),mx=Math.max(1,...E.map(x=>x[1]));return E.length?E.map(([k,v])=>`<div class="lgbar ${cls}"><span>${esc(k)}</span><i style="width:${v/mx*100}%"></i><b>${v}</b></div>`).join(''):'<p class="mute" style="margin:4px 0">还没有</p>'};
+ const ratio=fun?(focus/fun).toFixed(1)+' : 1':focus?'只专注，没娱乐':'—';const rng=lgDays===1?'今天':'近 '+lgDays+' 天';
+ const groups={};S.ledger.filter(e=>e.at>=t0).slice(0,120).forEach(e=>{const d=new Date(e.at),k=(d.getMonth()+1)+'月'+d.getDate()+'日';(groups[k]=groups[k]||[]).push(e)});
+ $('lgBox').innerHTML=`<div class="lgsum"><div class="in"><b>+${earn}</b><span>${rng}挣到的岛币</span></div><div class="out"><b>−${spend}</b><span>${rng}花掉的岛币</span></div><div class="net"><b>${earn-spend>=0?'+':'−'}${Math.abs(earn-spend)}</b><span>净收入 · 现在余额 ${S.coins}</span></div></div>
+ <div class="lgtime"><div><b>${focus}</b><span>专注分钟</span></div><div class="vs">⇄</div><div><b>${fun}</b><span>娱乐分钟（看剧、游戏、刷 X / B 站）</span></div><div class="r"><b>${ratio}</b><span>专注 : 娱乐</span></div></div>
+ <div class="lgcols"><div><h4>钱从哪来</h4>${bars(src,'in')}</div><div><h4>花在哪了</h4>${bars(outs,'out')}</div></div>
+ <h4 style="margin:14px 0 4px">明细</h4>${Object.keys(groups).length?Object.entries(groups).map(([d,es])=>`<div class="lgday"><div class="lgd">${d}<span>${(v=>v>=0?'+'+v:'−'+(-v))(es.filter(e=>e.k!=='reset').reduce((a,e)=>a+e.n,0))}</span></div>${es.map(e=>{const t=new Date(e.at);return`<div class="lgrow ${e.k==='reset'?'reset':e.n<0?'neg':'pos'}"><span class="lt">${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}</span><span class="lw">${esc(e.why||'')}</span><b>${e.n>0?'+':'−'}${Math.abs(e.n)}</b></div>`}).join('')}</div>`).join(''):'<p class="mute">这段时间还没有岛币进出。</p>'}
+ ${S.ledgerSeed&&S.ledgerSeed>t0?'':`<p class="mute" style="margin-top:8px">「挣」的明细从 ${new Date(S.ledgerSeed).getMonth()+1} 月 ${new Date(S.ledgerSeed).getDate()} 日开始记；更早的只有兑换记录。</p>`}`}
+
 // ---------- 一年热力图 ----------
 function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
  let cols='',months='',lastM=-1,activeDays=0,mins=0;
@@ -1436,7 +1477,8 @@ $('urgeUrl').textContent=location.origin+location.pathname.replace(/index\.html$
 $('copyUrge').onclick=async()=>{try{await navigator.clipboard.writeText($('urgeUrl').textContent);toast('已复制')}catch(e){toast('复制失败，长按手动复制')}};
 // 启动：所有模块都定义好之后再渲染
 renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();renderRT();renderWatch();
-const hashTab=()=>{const h=location.hash.slice(1);if(h==='warm'){history.replaceState(null,'',location.pathname+location.search);window.startWarm();return}if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
+// 「存一个想法」链接：…/xinliu.html#idea=想法内容。# 后面的内容不会发到服务器，只存在你自己的浏览器里
+const hashTab=()=>{const h=location.hash.slice(1);if(h.startsWith('idea=')){let t='';try{t=decodeURIComponent(h.slice(5)).trim()}catch(e){}history.replaceState(null,'',location.pathname+location.search);if(t){const dup=S.journal.some(e=>e.type==='idea'&&e.text===t);if(!dup)parkAdd(t,'idea');document.querySelector('nav [data-tab=journal]').click();const c=document.querySelector('[data-jf=idea]');if(c)c.click();toast(dup?'这个想法已经存过了':'💡 存进「想法」了')}return}if(h==='warm'){history.replaceState(null,'',location.pathname+location.search);window.startWarm();return}if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>
