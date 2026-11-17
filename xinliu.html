@@ -1250,7 +1250,7 @@ function pipUpdate(){if(!pipWin)return;const d=pipWin.document,q=id=>d.getElemen
  q('ph').textContent=mode==='focus'?(S.curGoal?'🎯 '+S.curGoal:nextLabel()):mode==='break'?(brkLong?'长休息':'短休息'):'准备开始'+nextLabel();
  q('pm').textContent='🍅 '+pomo().c;
  const p=mode==='focus'?1-left/(dur*60000):mode==='break'?1-left/(brkLen*60000):0;q('pb').style.width=(Math.max(0,Math.min(1,p))*100)+'%';
- if(pipAct!==mode){pipAct=mode;const a=q('act');
+ if(pipAct!==mode){pipAct=mode;const a=q('act'),dr=q('pk');if(dr&&dr.value.trim()){const k=parkAdd(dr.value);if(k)toast(k==='idea'?'💡 小窗里没回车的那句也存成想法了':'☐ 小窗里没回车的那句也停进念头停车场了')}
   if(mode==='focus'){a.innerHTML='<input id="pk" placeholder="冒出个念头？写下，回车" maxlength="120">';const i=q('pk');i.onkeydown=e=>{let k;if(e.key==='Enter'&&!e.isComposing&&(k=parkAdd(i.value))){i.value='';i.placeholder=k==='idea'?'💡 存成想法了':'☐ 待办停好了，回到题目';setTimeout(()=>{if(i.isConnected)i.placeholder='冒出个念头？写下，回车'},2500)}}}
   else{a.innerHTML=`<button class="go" id="go">${mode==='break'?'跳过休息，开始下一个':'开始专注'}</button>`;q('go').onclick=()=>{closeModal();startFocus()}}}}
 if('documentPictureInPicture' in window){$('pipBtn').classList.remove('hide');$('pipBtn').onclick=openPip}
