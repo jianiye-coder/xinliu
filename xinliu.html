@@ -273,6 +273,8 @@ body[data-mode=focus] #parkBtn{display:inline-block}
 .pk span{flex:1;min-width:0;word-break:break-word}
 .pk .pt{cursor:text;border-radius:6px;padding:0 2px}.pk .pt:hover{background:rgba(45,135,163,.08)}
 .pk .pkb{flex:none;border:0;background:none;cursor:pointer;color:var(--mute);font-size:14px;padding:0 3px;opacity:.75}.pk .pkb:hover{opacity:1}
+.pkfoot{display:flex;flex-wrap:wrap;gap:6px 12px;margin:2px 0 6px}.pklink{border:0;background:none;color:var(--sea);font-weight:700;font-size:12.5px;cursor:pointer;padding:2px 0}
+.pkdone{width:100%}.pk.done{opacity:.65}.pk.done span{text-decoration:line-through;text-decoration-color:rgba(0,0,0,.25)}
 .pkedit{width:100%;font-size:14px;padding:4px 8px;border:1.5px solid var(--sea);border-radius:8px;font-family:inherit;background:#fff}
 .pk .m{flex:none;font-size:11px;color:var(--mute);margin-top:2px}
 .pk .ck{flex:none;width:24px;height:24px;border-radius:8px;border:1.5px solid #d6c9ae;background:#fff;cursor:pointer;color:transparent;font-weight:800;line-height:1;padding:0}
@@ -569,7 +571,8 @@ h4{margin:0 0 6px;font:700 13.5px var(--serif)}
     <div class="card">
       <h2>念头停车场<span class="k">要做的事停在这里 · 冒出的想法存进写作</span></h2>
       <div id="pList"></div>
-      <div class="addrow"><input type="text" id="pkAdd" maxlength="200" placeholder="写一句。回车会自动判断是待办还是想法"><button class="btn s" id="pkAddBtn" title="要去做的事">☐ 待办</button><button class="btn s" id="pkIdeaBtn" title="一个想法，以后可以写成一篇">💡 想法</button></div>
+      <div class="pkfoot" id="pFoot"></div>
+      <div class="addrow"><input type="text" id="pkAdd" maxlength="200" placeholder="写一句。回车默认存成待办，像想法的会存进「想法」"><button class="btn s" id="pkAddBtn" title="要去做的事">☐ 待办</button><button class="btn s" id="pkIdeaBtn" title="一个想法，以后可以写成一篇">💡 想法</button></div>
     </div>
     <div class="card music">
       <h2>学习歌单<span class="k">在页面里播放，不进 B 站首页 · 每 3 天自动加新歌</span></h2>
@@ -1162,9 +1165,9 @@ let jf='all';document.querySelectorAll('[data-jf]').forEach(c=>c.onclick=()=>{jf
 function renderJournal(){const list=S.journal.filter(e=>jf==='all'||e.type===jf);const rewritten=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
  $('jList').innerHTML=list.length?list.map(e=>{const d=new Date(e.at);const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');const n=countZh(e.text);
   const meta=e.type==='idea'?'💡 想法':e.type==='gap'?'间隙卡':esc(e.tag||'写作')+' · '+n+'字 · 模糊词 '+e.vague+(e.secs?' · 用时 '+mmss(e.secs)+' · 停顿 '+(e.pauses||0)+' 次':'');
-  let acts='';if(e.type==='idea'){const w=S.journal.find(x=>x.ideaOf===e.at);acts=w?'<span class="mute">已经写成一篇了</span>':`<button data-idea="${e.at}">✍️ 写成一篇</button><button data-essay="${e.at}">📄 存成随笔</button>`}else if(e.type==='write'){if(e.rewriteOf){const o=S.journal.find(x=>x.at===e.rewriteOf);if(o)acts=`<button data-cmp="${e.at}">对比改写前后</button>`}else if(n>=40)acts=rewritten.has(e.at)?'<span class="mute">已改写</span>':`<button data-rw="${e.at}">改写成一半</button>`}
+  let acts='';if(e.type==='idea'){const w=S.journal.find(x=>x.ideaOf===e.at);acts=w?'<span class="mute">已经写成一篇了</span>':`<button data-idea="${e.at}">✍️ 写成一篇</button><button data-essay="${e.at}">📄 存成随笔</button><button data-totodo="${e.at}">☐ 改回待办</button>`}else if(e.type==='write'){if(e.rewriteOf){const o=S.journal.find(x=>x.at===e.rewriteOf);if(o)acts=`<button data-cmp="${e.at}">对比改写前后</button>`}else if(n>=40)acts=rewritten.has(e.at)?'<span class="mute">已改写</span>':`<button data-rw="${e.at}">改写成一半</button>`}
   return`<div class="entry"><div class="m">${d.getMonth()+1}月${d.getDate()}日 ${hm} · ${meta}</div>${e.prompt?`<div class="m"><b>${esc(e.prompt)}</b></div>`:''}<div class="t">${esc(e.text)}</div>${acts?`<div class="acts">${acts}</div>`:''}</div>`}).join(''):'<p class="mute">还没有输出。从一张间隙卡开始。</p>'}
-$('jList').onclick=e=>{const eb=e.target.closest('[data-essay]');if(eb){const o=S.journal.find(x=>x.at===+eb.dataset.essay);if(o&&saveEssay(o.text,o.at)){renderJournal();toast('📄 存进写作了（随笔），从想法里移走了')}return}const ib=e.target.closest('[data-idea]');if(ib){startIdeaWrite(+ib.dataset.idea);return}const r=e.target.closest('[data-rw]');if(r){startRewrite(+r.dataset.rw);return}const c=e.target.closest('[data-cmp]');if(c){const n=S.journal.find(x=>x.at===+c.dataset.cmp),o=n&&S.journal.find(x=>x.at===n.rewriteOf);if(o)showCompare(o,n)}};
+$('jList').onclick=e=>{const tt=e.target.closest('[data-totodo]');if(tt){const o=S.journal.find(x=>x.at===+tt.dataset.totodo);if(o){S.journal=S.journal.filter(x=>x!==o);S.parked.unshift({at:o.at,text:o.text,done:false,sess:0});save();renderJournal();renderPark();toast('☐ 改回待办了，在专注页的「念头停车场」')}return}const eb=e.target.closest('[data-essay]');if(eb){const o=S.journal.find(x=>x.at===+eb.dataset.essay);if(o&&saveEssay(o.text,o.at)){renderJournal();toast('📄 存进写作了（随笔），从想法里移走了')}return}const ib=e.target.closest('[data-idea]');if(ib){startIdeaWrite(+ib.dataset.idea);return}const r=e.target.closest('[data-rw]');if(r){startRewrite(+r.dataset.rw);return}const c=e.target.closest('[data-cmp]');if(c){const n=S.journal.find(x=>x.at===+c.dataset.cmp),o=n&&S.journal.find(x=>x.at===n.rewriteOf);if(o)showCompare(o,n)}};
 
 // ---------- badges ----------
 function totals(){let t={min:0,q:0,urge:0,words:0,writes:0,sessions:0};Object.values(S.days).forEach(d=>{for(const k in t)t[k]+=d[k]||0});t.gap=S.journal.filter(e=>e.type==='gap').length;t.precise=S.journal.filter(e=>e.type==='write'&&countZh(e.text)>=150&&e.vague/countZh(e.text)<0.01).length;return t}
@@ -1379,15 +1382,23 @@ function renderReport(){if(!$('reportBox'))return;const A=weekStats(1),B=weekSta
  <div class="repnote">${notes.map(n=>'<p>'+n+'</p>').join('')}</div>`}
 
 // ---------- 念头停车场 ----------
-function renderPark(){const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk" data-row="${p.at}"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span class="pt" data-pe="${p.at}" title="点一下修改">${esc(p.text)}</span><button class="pkb" data-pe="${p.at}" title="修改">✎</button><button class="pkb" data-pmv="${p.at}" title="其实是个想法：移到「想法」">💡</button><button class="pkb" data-pwr="${p.at}" title="存成随笔：移到「输出 → 写作」">✍️</button><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
+let pkShowDone=false;
+function renderParkFoot(){const f=$('pFoot');if(!f)return;const D=S.parked.filter(p=>p.done).sort((a,b)=>(b.doneAt||b.at)-(a.doneAt||a.at)),I=S.journal.filter(e=>e.type==='idea').length;
+ f.innerHTML=(D.length?`<button class="pklink" id="pkDoneT">${pkShowDone?'收起':'已完成 '+D.length+' 条'}</button>`:'')+(I?`<button class="pklink" id="pkIdeasT">存成想法的 ${I} 条 →</button>`:'')+
+  (pkShowDone&&D.length?`<div class="pkdone">${D.slice(0,40).map(p=>`<div class="pk done"><span>✓ ${esc(p.text)}</span><button class="pkb" data-pkre="${p.at}" title="恢复成待办">↩︎ 恢复</button></div>`).join('')}</div>`:'');
+ const a=$('pkDoneT');if(a)a.onclick=()=>{pkShowDone=!pkShowDone;renderParkFoot()};const b=$('pkIdeasT');if(b)b.onclick=()=>{document.querySelector('nav [data-tab=journal]').click();const c=document.querySelector('[data-jf=idea]');if(c)c.click();scrollTo({top:0,behavior:'smooth'})};
+ f.querySelectorAll('[data-pkre]').forEach(x=>x.onclick=()=>{const p=S.parked.find(y=>y.at===+x.dataset.pkre);if(p){p.done=false;delete p.doneAt;save();renderPark();toast('恢复了')}})}
+function renderPark(){setTimeout(renderParkFoot,0);const l=S.parked.filter(p=>!p.done);$('pList').innerHTML=l.length?l.map(p=>{const d=new Date(p.at);return`<div class="pk" data-row="${p.at}"><button class="ck" data-pk="${p.at}" title="处理完了">✓</button><span class="pt" data-pe="${p.at}" title="点一下修改">${esc(p.text)}</span><button class="pkb" data-pe="${p.at}" title="修改">✎</button><button class="pkb" data-pmv="${p.at}" title="其实是个想法：移到「想法」">💡</button><button class="pkb" data-pwr="${p.at}" title="存成随笔：移到「输出 → 写作」">✍️</button><span class="m">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<p class="mute" style="margin:0 0 4px">想到「要查个东西」「要回个消息」？在下面写一句，先别去做。专注中也可以点岛上的「先停这里」，本轮结束会提醒你。</p>'}
 $('pList').onclick=e=>{if(e.target.closest('.pkedit'))return;const wr=e.target.closest('[data-pwr]');if(wr){const p=S.parked.find(x=>x.at===+wr.dataset.pwr);if(p&&saveEssay(p.text)){renderPark();toast('✍️ 存进「输出 → 写作」了（随笔）')}else if(p)toast('太短了，至少写 4 个字');return}const mv=e.target.closest('[data-pmv]');if(mv){const p=S.parked.find(x=>x.at===+mv.dataset.pmv);if(p){S.parked=S.parked.filter(x=>x!==p);S.journal.unshift({type:'idea',at:p.at,text:p.text,sess:p.sess});save();renderPark();toast('💡 移到「想法」了')}return}
- const ed=e.target.closest('[data-pe]');if(ed){editPark(+ed.dataset.pe);return}const b=e.target.closest('[data-pk]');if(!b)return;const p=S.parked.find(x=>x.at===+b.dataset.pk);if(p){p.done=true;save();renderPark()}};
+ const ed=e.target.closest('[data-pe]');if(ed){editPark(+ed.dataset.pe);return}const b=e.target.closest('[data-pk]');if(!b)return;const p=S.parked.find(x=>x.at===+b.dataset.pk);if(p){p.done=true;p.doneAt=Date.now();save();renderPark();toast('✓ 完成了。点下面「已完成」可以恢复')}};
 // 念头停车场里的每一条都可以改：点文字或 ✎，回车保存，Esc 取消
 function editPark(at){const p=S.parked.find(x=>x.at===at),row=document.querySelector(`#pList .pk[data-row="${at}"]`);if(!p||!row)return;const span=row.querySelector('.pt');span.innerHTML=`<input class="pkedit" maxlength="200">`;const i=span.querySelector('input');i.value=p.text;i.focus();i.select();let fin=false;
  const done=ok=>{if(fin)return;fin=true;if(ok){const v=i.value.trim();if(v&&v!==p.text){p.text=v;save();toast('改好了')}}renderPark()};
  i.onkeydown=ev=>{if(ev.key==='Enter'&&!ev.isComposing){ev.preventDefault();done(true)}else if(ev.key==='Escape'){ev.preventDefault();done(false)}};i.onblur=()=>done(true)}
 // 待办 vs 想法：动词开头、带截止时间的是「要做的事」；其余算「想法」，存进写作，以后可以写成一篇
-function guessKind(t){return /^(去|要|得|记得|别忘|查|回|买|交|发|约|问|打|联系|预约|下载|提交|订|报名|付|还|取|改|做|打印|复习|整理|准备|看一下|看看|找|带|拿|寄|充|续|申请|填|签|洗|收拾|订正)|ddl|deadline|截止|明天|今晚|今天|下周|周[一二三四五六日天]|\d+\s*[点号]/i.test(t.trim())?'todo':'idea'}
+function guessKind(t){t=t.trim();const reflect=/我觉得|我认为|其实|为什么|也许|是不是|原来|发现|感觉|意识到|想到|体会|本质|如果.*就|反思|道理|人生|成熟|意义/.test(t)||countZh(t)>60;
+ const todo=/^(去|要|得|记得|别忘|查|回|买|交|发|约|问|打|联系|预约|下载|提交|订|报名|付|还|取|改|做|打印|复习|整理|准备|看一下|看看|找|带|拿|寄|充|续|申请|填|签|洗|收拾|订正|读|写|背|练)|去.{0,6}问|问.{0,8}(老师|教授|助教|同学)|\b(OH|office hour|TA|due|deadline|ddl|email|hw|pset|quiz|exam|midterm|final)\b|作业|考试|截止|明天|今晚|今天|下周|周[一二三四五六日天]|\d+\s*[点号]/i.test(t);
+ return reflect&&!todo?'idea':'todo'}
 function parkAdd(t,kind){t=t.trim();if(!t)return false;kind=kind||guessKind(t);let now=Date.now();while(S.journal.some(e=>e.at===now)||S.parked.some(p=>p.at===now))now++;const sess=mode==='focus'?focusStart:0;
  if(kind==='idea')S.journal.unshift({type:'idea',at:now,text:t,sess});else S.parked.unshift({at:now,text:t,done:false,sess});
  save();renderPark();checkTasks();renderTasks();return kind}
