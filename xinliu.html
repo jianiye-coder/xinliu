@@ -155,6 +155,7 @@ body[data-mode=break] .sea .w1{fill:#f6b38a}body[data-mode=break] .sea .w2{fill:
 .track:hover{border-color:var(--line)}.track.on{border-color:var(--sea);background:var(--sea-l)}
 .track .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
 .track .t small{display:block;font-size:11px;font-weight:500;color:var(--mute)}
+.newtag{font-style:normal;font-size:10px;font-weight:800;color:#fff;background:var(--coral);border-radius:6px;padding:0 5px;margin-right:5px;vertical-align:1px}
 .tracks{max-height:320px;overflow-y:auto;padding-right:2px}
 .track .x{border:0;background:none;color:var(--mute);cursor:pointer;font-size:16px;padding:0 4px}
 .track .play{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--sea);color:#fff;font-size:10px}
@@ -571,7 +572,7 @@ h4{margin:0 0 6px;font:700 13.5px var(--serif)}
       <div class="addrow"><input type="text" id="pkAdd" maxlength="200" placeholder="写一句。回车会自动判断是待办还是想法"><button class="btn s" id="pkAddBtn" title="要去做的事">☐ 待办</button><button class="btn s" id="pkIdeaBtn" title="一个想法，以后可以写成一篇">💡 想法</button></div>
     </div>
     <div class="card music">
-      <h2>学习歌单<span class="k">在页面里播放，不进 B 站首页</span></h2>
+      <h2>学习歌单<span class="k">在页面里播放，不进 B 站首页 · 每 3 天自动加新歌</span></h2>
       <div class="now hide" id="mNow"></div>
       <div class="tracks" id="mList"></div>
       <div class="addrow"><input type="text" id="mUrl" placeholder="粘贴 B 站视频链接（含 BV 号）"><button class="btn b" id="mAdd">添加</button></div>
@@ -1543,12 +1544,16 @@ const REC_VOCAL=[
  ['BV1upLV6fE8g','Daniel Caesar R&B Soul歌单','R&B · Soul','33:46'],['BV1Q11FY3Exr','Neo Soul 精选歌单','Soul','56:19'],['BV1W54y1W7Yn','Norah Jones 爵士现场2018','爵士','1:30:10']];
 if((S.musicSeed||0)<2){const add=REC_VOCAL.filter(([bv])=>!S.music.some(t=>t.bv===bv)).map(([bv,title,kind,len])=>({bv,p:1,title,kind,len}));S.music=add.concat(S.music);S.musicSeed=2;save()}
 function bvOf(u){const m=String(u).match(/BV[0-9A-Za-z]{10}/);return m?m[0]:''}
-function renderMusic(){$('mList').innerHTML=S.music.length?S.music.map((t,i)=>`<div class="track ${i===mOn?'on':''}" data-i="${i}"><span class="play">${i===mOn?'❚❚':'▶'}</span><span class="t">${esc(t.title||t.bv)}${t.kind?`<small>${esc(t.kind)} · ${esc(t.len||'')}</small>`:''}</span><button class="x" data-del="${i}" title="删除">×</button></div>`).join(''):'<p class="mute" style="margin:0">还没有歌单。在 B 站找到喜欢的学习歌单，复制视频链接粘贴到下面。</p>'}
-$('mList').onclick=e=>{const del=e.target.closest('[data-del]');if(del){const i=+del.dataset.del;S.music.splice(i,1);if(i===mOn){mOn=-1;$('mNow').innerHTML='';$('mNow').classList.add('hide')}else if(i<mOn)mOn--;save();renderMusic();return}
+function renderMusic(){$('mList').innerHTML=S.music.length?S.music.map((t,i)=>`<div class="track ${i===mOn?'on':''}" data-i="${i}"><span class="play">${i===mOn?'❚❚':'▶'}</span><span class="t">${t.added&&Date.now()-new Date(t.added+'T00:00:00').getTime()<3*86400000?'<em class="newtag">新</em>':''}${esc(t.title||t.bv)}${t.kind?`<small>${esc(t.kind)} · ${esc(t.len||'')}</small>`:''}</span><button class="x" data-del="${i}" title="删除">×</button></div>`).join(''):'<p class="mute" style="margin:0">还没有歌单。在 B 站找到喜欢的学习歌单，复制视频链接粘贴到下面。</p>'}
+$('mList').onclick=e=>{const del=e.target.closest('[data-del]');if(del){const i=+del.dataset.del;S.musicRemoved=S.musicRemoved||[];if(S.music[i]&&!S.musicRemoved.includes(S.music[i].bv))S.musicRemoved.push(S.music[i].bv);S.music.splice(i,1);if(i===mOn){mOn=-1;$('mNow').innerHTML='';$('mNow').classList.add('hide')}else if(i<mOn)mOn--;save();renderMusic();return}
  const tr=e.target.closest('.track');if(!tr)return;const i=+tr.dataset.i;if(i===mOn){mOn=-1;$('mNow').innerHTML='';$('mNow').classList.add('hide')}else{mOn=i;const t=S.music[i];$('mNow').innerHTML=`<iframe src="https://player.bilibili.com/player.html?bvid=${t.bv}&p=${t.p||1}&autoplay=1&danmaku=0&high_quality=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;$('mNow').classList.remove('hide')}renderMusic()};
 $('mAdd').onclick=()=>{const u=$('mUrl').value.trim();if(!u)return;if(/b23\.tv/.test(u)&&!bvOf(u)){toast('短链接解析不了：先在浏览器打开它，再复制地址栏里带 BV 的链接');return}const bv=bvOf(u);if(!bv){toast('没找到 BV 号，复制视频页地址栏的链接');return}const pm=u.match(/[?&]p=(\d+)/);const title=(u.replace(/https?:\/\/\S+/g,'').replace(/[【】\[\]]/g,' ').trim()).slice(0,40)||prompt('给它起个名字（比如「钢琴 · 读书用」）',bv)||bv;S.music.push({bv,p:pm?+pm[1]:1,title});save();$('mUrl').value='';renderMusic()};
 $('mUrl').onkeydown=e=>{if(e.key==='Enter'&&!e.isComposing)$('mAdd').click()};
-renderMusic();
+// 自动更新的歌单：每次打开都读一下 playlist.json（定时任务每 3 天往里加新歌），把没听过的新歌放到最前面
+async function syncPlaylist(){if(!location.protocol.startsWith('http'))return;try{const r=await fetch('playlist.json?'+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();const rm=new Set(S.musicRemoved||[]),have=new Set(S.music.map(t=>t.bv));
+ const add=(j.items||[]).filter(t=>/^BV[0-9A-Za-z]{10}$/.test(t.bv)&&!have.has(t.bv)&&!rm.has(t.bv)).map(t=>({bv:t.bv,p:t.p||1,title:String(t.title||t.bv).slice(0,40),kind:t.kind||'',len:t.len||'',added:t.added||''}));
+ if(add.length){add.sort((a,b)=>(b.added||'').localeCompare(a.added||''));S.music=add.concat(S.music);save();renderMusic();const fresh=add.filter(t=>t.added&&Date.now()-new Date(t.added+'T00:00:00').getTime()<3*86400000).length;if(fresh)toast('🎵 学习歌单更新了 '+fresh+' 首')}}catch(e){}}
+renderMusic();syncPlaylist();
 // 手机拦截：快捷指令打开 …/xinliu.html#urge，直接进入冲动冲浪
 $('urgeUrl').textContent=location.origin+location.pathname.replace(/index\.html$/,'xinliu.html').replace(/\/$/,'/xinliu.html')+'#urge';
 $('copyUrge').onclick=async()=>{try{await navigator.clipboard.writeText($('urgeUrl').textContent);toast('已复制')}catch(e){toast('复制失败，长按手动复制')}};

@@ -1,0 +1,246 @@
+{
+ "updated": "2026-11-16",
+ "note": "心流岛学习歌单。每 3 天由定时任务自动加入新的 B 站视频（核对过 BV 号）。网页打开时会把这里的新歌并进你的歌单，你删掉的不会再加回来。",
+ "items": [
+  {
+   "bv": "BV139pxeGENb",
+   "title": "方大同 华语R&B合集",
+   "kind": "方大同",
+   "len": "8:55:23",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1tUXXYvELx",
+   "title": "方大同歌曲合集·特别的人",
+   "kind": "方大同",
+   "len": "35:51",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1UJDsBVEcR",
+   "title": "如果你也喜欢方大同",
+   "kind": "方大同",
+   "len": "1:21:36",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1N9sJzLE4K",
+   "title": "方大同 字幕版R&B精选",
+   "kind": "方大同",
+   "len": "57:45",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1rK98YfEVh",
+   "title": "方大同100首 Hi-Res",
+   "kind": "方大同",
+   "len": "6:36:13",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1aL68Y1EhP",
+   "title": "Hayd 深夜治愈歌单",
+   "kind": "Hayd",
+   "len": "35:33",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1ez4y1F7er",
+   "title": "Hayd Playlist",
+   "kind": "Hayd",
+   "len": "50:31",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1zphwzPEbj",
+   "title": "Hayd《Love Me》官方MV",
+   "kind": "Hayd",
+   "len": "2:47",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1amxrzXEnk",
+   "title": "陶喆 字幕版R&B精选",
+   "kind": "陶喆 · R&B",
+   "len": "1:53:22",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1NQ4y1f7Bc",
+   "title": "陶喆 录音室作品合集",
+   "kind": "陶喆 · R&B",
+   "len": "9:20:16",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1knz5BkEkn",
+   "title": "华语R&B 100首 陶王周方",
+   "kind": "R&B",
+   "len": "7:10:54",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1DSvyB8EVz",
+   "title": "中文R&B歌单",
+   "kind": "R&B",
+   "len": "1:39:05",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1upLV6fE8g",
+   "title": "Daniel Caesar R&B Soul歌单",
+   "kind": "R&B · Soul",
+   "len": "33:46",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1Q11FY3Exr",
+   "title": "Neo Soul 精选歌单",
+   "kind": "Soul",
+   "len": "56:19",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1W54y1W7Yn",
+   "title": "Norah Jones 爵士现场2018",
+   "kind": "爵士",
+   "len": "1:30:10",
+   "vocal": true,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1x32sYvEwk",
+   "title": "静谧松雨·专注古典乐",
+   "kind": "古典",
+   "len": "46:07",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1Zs411A717",
+   "title": "2小时静心学习lofi",
+   "kind": "lofi",
+   "len": "2:02:39",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1a7411T7W4",
+   "title": "四小时巴赫学习音乐",
+   "kind": "古典",
+   "len": "4:41:33",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV11C4y1Z72y",
+   "title": "一小时抗浮躁晚间学习音乐",
+   "kind": "纯音乐",
+   "len": "1:00:08",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1FEQuBXEn1",
+   "title": "6小时100首纯音乐合集",
+   "kind": "轻音乐",
+   "len": "6:44:13",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV16J41117f8",
+   "title": "深秋自习室lofi",
+   "kind": "lofi",
+   "len": "12:13:07",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1gB7m6eEHm",
+   "title": "纯音乐雨声·青春盛夏",
+   "kind": "雨声+音乐",
+   "len": "1:39:52",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1iE411N7Kv",
+   "title": "六小时莫扎特自习室",
+   "kind": "古典",
+   "len": "6:04:16",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1RZ4y1v7Ze",
+   "title": "提神醒脑学习BGM",
+   "kind": "纯音乐",
+   "len": "57:04",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1w3AwzvEJy",
+   "title": "适合学习的顶级纯音乐",
+   "kind": "纯音乐",
+   "len": "36:28",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1LNdYBsET3",
+   "title": "集中注意力纯音乐歌单",
+   "kind": "纯音乐",
+   "len": "48:33",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1Cp4y1X7eN",
+   "title": "3小时钢琴曲和雨声",
+   "kind": "雨声+钢琴",
+   "len": "3:02:34",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1nTbizxE83",
+   "title": "莫奈与古典音乐歌单",
+   "kind": "古典",
+   "len": "44:28",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV11waPzJE7T",
+   "title": "轻鼓点专注lofi",
+   "kind": "lofi",
+   "len": "3:30:42",
+   "vocal": false,
+   "added": "2026-11-01"
+  },
+  {
+   "bv": "BV17u4y1V7ub",
+   "title": "吉卜力钢琴合集",
+   "kind": "吉卜力钢琴",
+   "len": "46:00",
+   "vocal": false,
+   "added": "2026-11-01"
+  }
+ ]
+}
