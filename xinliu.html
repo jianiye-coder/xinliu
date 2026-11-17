@@ -322,6 +322,29 @@ body[data-mode=focus] .goalline{background:rgba(255,255,255,.1)}
 .rep tr.h td{border-top:0;font-size:12px;color:var(--mute)}
 .rep td.up{color:var(--leaf-d);font-weight:700}.rep td.down{color:var(--coral);font-weight:700}
 .repnote{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--leaf-l);font-size:13.5px}.repnote p{margin:4px 0}
+/* habit strength */
+.pill.strp{color:var(--leaf-d)}.pill.strp svg{width:16px;height:16px}
+.strwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.strring{position:relative;width:120px;height:120px;flex:none}.strring svg{width:100%;height:100%}
+.strring>div{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.strring b{font:400 28px/1 var(--num);color:var(--leaf-d)}.strring span{font-size:12px;color:var(--mute);margin-top:4px;font-weight:700}
+.strinfo{flex:1;min-width:220px}.strinfo .spark{width:100%;height:56px;display:block;background:var(--paper);border-radius:10px}
+.sparklab{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mute);margin-top:3px}
+.strinfo p{font-size:13.5px;line-height:1.7;margin:8px 0 0}
+@media(max-width:420px){.pill.strp{display:none}}
+/* rhythm */
+.rhyhead b{display:block;font:400 26px/1.2 var(--num);color:var(--sea)}.rhyhead span{font-size:12.5px;color:var(--mute)}
+.rhbars{display:flex;align-items:flex-end;gap:3px;height:90px;margin-top:12px;padding-bottom:16px;border-bottom:1.5px solid var(--line)}
+.rh{position:relative;flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end}
+.rh i{display:block;background:#bfe0c2;border-radius:4px 4px 0 0;min-height:0}.rh.best i{background:linear-gradient(180deg,#5bb072,#2b7148)}
+.rh em{display:block;background:#f6c6bc;border-radius:2px}
+.rh span{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font:10px var(--num);color:var(--mute)}
+.rwk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:6px}
+.rwk div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:78px;gap:2px;font-size:11px;color:var(--mute)}
+.rwk i{display:block;width:70%;max-width:30px;background:#d9e8ee;border-radius:6px 6px 2px 2px;min-height:3px}
+.rwk .top i{background:linear-gradient(180deg,#7fd0dd,#2d87a3)}.rwk .low i{background:#f6c6bc}.rwk b{font:11px var(--num)}
+.rhytip{font-size:13.5px;line-height:1.7;margin:10px 0 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.rhytip.ok{color:var(--leaf-d)}
+.rhytip .btn{padding:6px 12px;font-size:13px}
 /* ledger */
 .lgsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .lgsum div,.lgtime>div:not(.vs){border-radius:14px;padding:10px;text-align:center;background:var(--paper)}
@@ -467,6 +490,7 @@ h4{margin:0 0 6px;font:700 13.5px var(--serif)}
   </div>
   <div class="hud">
     <span class="pill fire"><svg viewBox="0 0 24 24"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.2-3.8 2.4-5 .2 1.6.9 2.7 2.1 3.2C11 9 10.6 5.4 12 2z" fill="#ff8a3d"/><path d="M12 13c.8 1.6 2.5 2.2 2.5 4.2a2.5 2.5 0 0 1-5 0c0-1.4.9-2.4 2.5-4.2z" fill="#ffd36a"/></svg><span id="streakTxt">连续 0 天</span></span>
+    <span class="pill strp" id="strPill" title="习惯强度：一次漏打卡只会降一点，坚持会慢慢涨"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="#e3dccd" stroke-width="3"/><circle id="strArc" cx="10" cy="10" r="7.5" fill="none" stroke="#3f9a62" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 10 10)"/></svg><span id="strTxt">0%</span></span>
     <span class="pill coin" title="岛币：在「成就」页换奖励"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#ffc93c"/><circle cx="12" cy="12" r="7" fill="#ffb21f"/><path d="M12 7.5l1.3 2.8 3 .3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3-.3z" fill="#fff3c4"/></svg><span id="coinTxt">0</span></span>
     <span class="pill lv" id="lvTag">Lv.1</span>
   </div>
@@ -602,6 +626,8 @@ h4{margin:0 0 6px;font:700 13.5px var(--serif)}
 
 <!-- BADGES -->
 <section id="tab-badges" class="hide">
+  <div class="card" style="margin-bottom:16px"><h2>习惯强度<span class="k">一次漏打卡只降一点 · 坚持会慢慢涨</span></h2><div id="strBox"></div></div>
+  <div class="card" style="margin-bottom:16px"><h2>最稳定的学习时段<span class="k">近 30 天的番茄记录</span></h2><div id="rhyBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>能力报告<span class="k">近 7 天 vs 前 7 天 · 看本事的变化，不看分数</span></h2><div id="reportBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>月度赛季<span class="k">靠专注分钟升级，奖励永久保留</span></h2><div id="seasonBox"></div></div>
   <div class="card" style="margin-bottom:16px"><h2>奖励商店<span class="k">看剧、玩游戏 6 岛币/分钟，刷信息流 9 岛币/分钟</span></h2>
@@ -788,6 +814,7 @@ function treeBase(l){
 function render(){
   if(typeof checkTasks==='function'){checkSeason();checkTasks();renderTasks();renderChests();renderSeason()}
   if(typeof renderLedger==='function'&&!$('tab-badges').classList.contains('hide'))renderLedger();
+  if(typeof renderStrength==='function')renderStrength();
   $('coinTxt').textContent=S.coins;renderPark();if(typeof renderGoal==='function')renderGoal();
   const l=levelOf(S.xp),lo=xpFor(l),hi=xpFor(l+1);
   $('lvTag').textContent='Lv.'+l;$('xpFill').style.width=((S.xp-lo)/(hi-lo)*100)+'%';$('xpTxt').textContent=S.xp+' / '+hi+' XP';
@@ -1163,7 +1190,7 @@ function sealSVG(ch,i,got){const shape=i%4,white=i%2===0,R='#c4392b',P='#fbf3e6'
   :`<g fill="none" stroke="${R}" stroke-width="4.5">${outer}</g>${shape!==0?`<g fill="none" stroke="${R}" stroke-width="1.3">${inner}</g>`:''}<text x="40" y="41" text-anchor="middle" dominant-baseline="central" font-size="${fs}" ${font} fill="${R}">${ch}</text>`;
  return`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><defs>${filt}</defs><g filter="url(#${fid})">${body}</g></svg>`}
 function checkBadges(){const t=totals();let k=0;BADGES.forEach(b=>{if(!S.badges[b[1]]&&b[3](t)){S.badges[b[1]]=Date.now();save();setTimeout(()=>{beep();toast('解锁成就：'+b[1])},900+2800*k++)}})}
-function renderBadges(){renderReport();renderSeason();renderShop();renderLedger();renderHeat();renderDecos();const T=totals();let n=0;
+function renderBadges(){renderStrength();renderRhythm();renderReport();renderSeason();renderShop();renderLedger();renderHeat();renderDecos();const T=totals();let n=0;
  $('bList').innerHTML=BADGES.map((b,i)=>{const at=S.badges[b[1]],got=!!at;if(got)n++;const [c,need]=BADGE_PROG[i](T),pct=Math.min(100,Math.round(Math.max(0,c)/need*100)),rot=((i*37)%13)-6;let meta;
   if(got){const d=new Date(at);meta=`<div class="sdate">${d.getMonth()+1}月${d.getDate()}日 盖章</div>`}else meta=`<div class="sprog"><i style="width:${pct}%"></i></div><div class="snum">${Math.min(Math.round(c),need)} / ${need}</div>`;
   return`<div class="seal ${got?'got':''}" style="--rot:${rot}deg" title="${b[2]}"><div class="sv">${sealSVG(b[0],i,got)}</div><div class="n">${b[1]}</div><div class="d">${b[2]}</div>${meta}</div>`}).join('');
@@ -1450,6 +1477,43 @@ function renderLedger(){if(!$('lgBox'))return;const from=new Date();from.setHour
  <div class="lgcols"><div><h4>钱从哪来</h4>${bars(src,'in')}</div><div><h4>花在哪了</h4>${bars(outs,'out')}</div></div>
  <h4 style="margin:14px 0 4px">明细</h4>${Object.keys(groups).length?Object.entries(groups).map(([d,es])=>`<div class="lgday"><div class="lgd">${d}<span>${(v=>v>=0?'+'+v:'−'+(-v))(es.filter(e=>e.k!=='reset').reduce((a,e)=>a+e.n,0))}</span></div>${es.map(e=>{const t=new Date(e.at);return`<div class="lgrow ${e.k==='reset'?'reset':e.n<0?'neg':'pos'}"><span class="lt">${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}</span><span class="lw">${esc(e.why||'')}</span><b>${e.n>0?'+':'−'}${Math.abs(e.n)}</b></div>`}).join('')}</div>`).join(''):'<p class="mute">这段时间还没有岛币进出。</p>'}
  ${S.ledgerSeed&&S.ledgerSeed>t0?'':`<p class="mute" style="margin-top:8px">「挣」的明细从 ${new Date(S.ledgerSeed).getMonth()+1} 月 ${new Date(S.ledgerSeed).getDate()} 日开始记；更早的只有兑换记录。</p>`}`}
+
+// ---------- 习惯强度（参考 Loop Habit Tracker）：每天 强度 = 昨天 × 0.948 + 今天打卡 × 0.052，半衰期 13 天 ----------
+// 今天打卡按做了多少算：专注 25 分钟（或等量写作）算满分，5 分钟热身算一半；每周第一次漏打卡算休息日，不扣
+const STR_M=Math.pow(.5,1/13);
+function dayCredit(k){const x=S.days[k];if(!active(k))return 0;const v=(x.min||0)+(x.words||0)/20;return Math.max(.5,Math.min(1,v/25))}
+function strengthSeries(){const ks=Object.keys(S.days).filter(k=>active(k)).sort();if(!ks.length)return[];const end=new Date();end.setHours(12,0,0,0);let s=0;const out=[],used={};
+ for(const d=new Date(ks[0]+'T12:00:00');d<=end;d.setDate(d.getDate()+1)){const k=keyOf(d);if(k===today()&&!active(k)){out.push({k,s,pending:true});continue}
+  let c=null,rest=false;if(active(k))c=dayCredit(k);else{const w=weekKey(d);if(!used[w]){used[w]=true;rest=true}else c=0}
+  if(c!==null)s=s*STR_M+c*(1-STR_M);out.push({k,s,c,rest})}return out}
+function strNow(){const a=strengthSeries();return a.length?a[a.length-1]:null}
+function strStage(p){return p<20?'刚发芽':p<40?'在扎根':p<60?'越来越稳':p<80?'快成习惯了':'已经是习惯了'}
+function renderStrength(){const a=strengthSeries(),last=a[a.length-1],p=last?Math.round(last.s*100):0;
+ if($('strTxt')){$('strTxt').textContent=p+'%';$('strArc').setAttribute('stroke-dasharray',p+' 100')}
+ if(!$('strBox'))return;if(!last){$('strBox').innerHTML='<p class="mute" style="margin:0">专注满 5 分钟或写满 100 字，就会开始计算习惯强度。</p>';return}
+ const s=last.s,miss=Math.round(s*STR_M*100),base=last.pending?s:s;let w7=base;for(let i=0;i<7;i++)w7=w7*STR_M+(1-STR_M);w7=Math.round(w7*100);
+ const recent=a.slice(-30),W=280,H=56,xs=i=>recent.length>1?i/(recent.length-1)*W:W/2,ys=v=>H-4-v*(H-8);
+ const pts=recent.map((e,i)=>xs(i).toFixed(1)+','+ys(e.s).toFixed(1)).join(' ');const r=34,C=2*Math.PI*r;
+ $('strBox').innerHTML=`<div class="strwrap"><div class="strring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="${r}" fill="none" stroke="#ebe2d0" stroke-width="9"/><circle cx="42" cy="42" r="${r}" fill="none" stroke="url(#strg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(C*s).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 42 42)"/><defs><linearGradient id="strg"><stop offset="0" stop-color="#9fd38f"/><stop offset="1" stop-color="#2b7148"/></linearGradient></defs></svg><div><b>${p}%</b><span>${strStage(p)}</span></div></div>
+ <div class="strinfo"><svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="#3f9a62" stroke-width="2.2" stroke-linejoin="round"/>${recent.map((e,i)=>e.c===0?`<circle cx="${xs(i).toFixed(1)}" cy="${ys(e.s).toFixed(1)}" r="2.6" fill="#e9634e"/>`:e.rest?`<circle cx="${xs(i).toFixed(1)}" cy="${ys(e.s).toFixed(1)}" r="2.4" fill="#ffb547"/>`:'').join('')}</svg><div class="sparklab"><span>${recent.length} 天前</span><span>红点 = 漏打卡 · 黄点 = 休息日</span><span>今天</span></div>
+ <p>${last.pending?`今天还没打卡。<b>今天打卡</b>就能继续涨；如果今天漏掉，会从 ${p}% 降到 <b>${miss}%</b>。`:`今天已经打卡。明天如果漏掉，只会从 ${p}% 降到 <b>${miss}%</b>。`} 接下来 7 天都打卡，会到 <b>${w7}%</b>。</p></div></div>`}
+
+// ---------- 最稳定的学习时段：按开始时间看近 30 天完成了多少番茄、目标达成率；按星期看打卡 ----------
+function renderRhythm(){if(!$('rhyBox'))return;const t0=Date.now()-30*86400000;const L=S.log.filter(e=>e.at>=t0&&e.dur>=15);
+ const done=L.filter(e=>!['quit','early','warm'].includes(e.res));if(done.length<3){$('rhyBox').innerHTML=`<p class="mute" style="margin:0">再完成 ${3-done.length} 个番茄就能看出你最稳定的时段。</p>`;return}
+ const H=Array.from({length:24},()=>({n:0,g:0,gn:0,q:0}));L.forEach(e=>{const h=new Date(e.at-e.dur*60000).getHours();if(['quit','early'].includes(e.res))H[h].q++;else if(e.res!=='warm'){H[h].n++;if(['done','part','no'].includes(e.res)){H[h].gn++;H[h].g+=e.res==='done'?1:e.res==='part'?.5:0}}});
+ let best=0,bi=0;for(let h=0;h<24;h++){const v=H[h].n+H[(h+1)%24].n;if(v>best){best=v;bi=h}}const b2=(bi+1)%24,gN=H[bi].gn+H[b2].gn,gR=gN?Math.round((H[bi].g+H[b2].g)/gN*100):null;
+ const lo=Math.min(...H.map((x,i)=>x.n||x.q?i:24)),hi=Math.max(...H.map((x,i)=>x.n||x.q?i:-1)),from=Math.min(lo,7),to=Math.max(hi,22),mx=Math.max(1,...H.map(x=>x.n));
+ let bars='';for(let h=from;h<=to;h++){const x=H[h],inB=h===bi||h===b2;bars+=`<div class="rh ${inB?'best':''}" title="${h}:00–${h+1}:00 · 完成 ${x.n} 个${x.q?'，放弃或提前休息 '+x.q+' 个':''}"><i style="height:${x.n/mx*100}%"></i>${x.q?`<em style="height:${Math.min(100,x.q/mx*100)}%"></em>`:''}<span>${h%3===0?h:''}</span></div>`}
+ const wd='日一二三四五六',WD=Array.from({length:7},()=>({a:0,t:0}));for(let i=1;i<=28;i++){const d=new Date();d.setDate(d.getDate()-i);const w=d.getDay();WD[w].t++;if(active(keyOf(d)))WD[w].a++}
+ const wr=WD.map((x,i)=>({i,r:x.t?x.a/x.t:0}));const top=wr.slice().sort((a,b)=>b.r-a.r)[0],low=wr.slice().sort((a,b)=>a.r-b.r)[0];
+ const anc=S.settings.anchorTime,ah=anc?+anc.split(':')[0]:null,sug=String(bi).padStart(2,'0')+':00',inBest=ah===bi||ah===b2;
+ $('rhyBox').innerHTML=`<div class="rhyhead"><div><b>${bi}:00–${(bi+2)%24}:00</b><span>你最稳定的时段 · 近 30 天完成 ${best} 个番茄${gR!==null?' · 目标达成 '+gR+'%':''}</span></div></div>
+ <div class="rhbars">${bars}</div><p class="mute" style="margin:2px 0 10px;font-size:11.5px">按开始时间统计；绿色 = 完成的番茄，浅红 = 放弃或提前休息</p>
+ <div class="rwk">${wr.map(x=>`<div class="${x.i===top.i?'top':x.i===low.i&&low.r<top.r?'low':''}"><i style="height:${Math.round(x.r*100)}%"></i><span>周${wd[x.i]}</span><b>${Math.round(x.r*100)}%</b></div>`).join('')}</div>
+ <p class="rhytip">近 4 周，<b>周${wd[top.i]}</b>最稳定（${Math.round(top.r*100)}% 的周${wd[top.i]}打了卡）${low.r<top.r?`，<b>周${wd[low.i]}</b>最容易断（${Math.round(low.r*100)}%）。周${wd[low.i]}可以把目标定小一点：一个 5 分钟热身也算`:''}。</p>
+ ${inBest?`<p class="rhytip ok">你的学习锚点 ${anc} 正好在最稳定的时段里，保持住。</p>`:`<div class="rhytip"><span>${anc?`你的学习锚点是 ${anc}，不在最稳定的时段。`:'你还没有设学习锚点。'}要把锚点设成 <b>${sug}</b> 吗？</span><button class="btn s" id="rhySet">设成 ${sug}</button></div>`}`;
+ const bt=$('rhySet');if(bt)bt.onclick=()=>{S.settings.anchorTime=sug;save();if($('anchorT'))$('anchorT').value=sug;renderGoalLine();renderRhythm();toast('学习锚点改成每天 '+sug+'。Mac 弹窗要重新装一次才会跟着改')}}
 
 // ---------- 一年热力图 ----------
 function renderHeat(){const end=new Date();end.setHours(0,0,0,0);const d=new Date(end);d.setDate(d.getDate()-7*52-end.getDay());
