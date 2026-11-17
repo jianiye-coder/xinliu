@@ -224,6 +224,17 @@ code{background:var(--paper);padding:1px 6px;border-radius:6px;font-size:12.5px}
 .modal.surf h3{color:#fff;margin:0}
 .surf-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
 #uc{font:400 20px var(--num);color:rgba(230,244,243,.7);font-variant-numeric:tabular-nums}
+.surf-h{flex-wrap:wrap}.uswap{margin-left:auto;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#e6f4f3;border-radius:10px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer}
+.ustage{min-height:200px;display:flex;flex-direction:column;justify-content:center}
+.mirror{position:relative;margin:14px auto 4px;width:min(300px,100%);aspect-ratio:4/3;border-radius:22px;overflow:hidden;background:#0b2230;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.25)}
+.mirror video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+.mtxt{position:absolute;inset:auto 0 0 0;padding:14px 10px 12px;text-align:center;font:600 14px/1.5 var(--serif);color:#fff;background:linear-gradient(transparent,rgba(5,20,30,.75))}.mtxt b{font:400 30px var(--num)}
+.chat{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px;max-height:280px;overflow-y:auto;padding:2px}
+.bub{align-self:flex-start;max-width:85%;background:rgba(255,255,255,.12);border-radius:16px 16px 16px 4px;padding:9px 13px;font-size:14px;line-height:1.55}
+.bub.me{align-self:flex-end;background:#ffd76a;color:#3b2a05;border-radius:16px 16px 4px 16px;font-weight:600}
+.chat .opts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.typeit{margin:12px 0 4px}.tphrase{font:700 19px/1.6 var(--serif);text-align:center;letter-spacing:2px;margin:8px 0 12px;user-select:none;-webkit-user-select:none}
+.typeit input{width:100%;font-size:16px;padding:11px 13px;background:rgba(255,255,255,.92)!important;color:var(--ink)}.tmsg{text-align:center;font-size:13px;color:rgba(230,244,243,.75);min-height:20px;margin:6px 0 0}
 .surf-sub{color:rgba(230,244,243,.72);font-size:13px;margin:6px 0 0}
 .bwrap{position:relative;width:228px;height:228px;margin:16px auto 4px;display:grid;place-items:center}
 .bring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
@@ -843,33 +854,62 @@ function reviewModal(lg,msg,isBreak){const m=lg.dur,goal=lg.goal;let res=null;
  if($('ov').classList.contains('on')){modalQ.unshift(h);const iv=setInterval(()=>{if($('rvOk')){clearInterval(iv);bind()}},200)}else{modal(h);bind()}}
 
 // urge surfing
-// 冲动冲浪：吸 4 秒、呼 6 秒（呼气比吸气长，更容易平静下来），一共 6 次 = 60 秒
-$('urgeBtn').onclick=()=>{const TOTAL=60,IN=4,OUT=6,CYC=IN+OUT;let it=null,reason='',lastPh='',t0=Date.now();
- const reasons=['无聊','卡题了','累了','焦虑','习惯性','想奖励自己'];
- modal(`<div class="surf-h"><h3>冲动冲浪</h3><span id="uc">01:00</span></div>
- <p class="surf-sub">冲动像海浪，会涨也会退。跟着圆圈呼吸，看着它，不用跟它走。</p>
- <div class="bwrap"><svg class="bring" viewBox="0 0 228 228"><circle class="trk" cx="114" cy="114" r="110"/><circle class="prg" id="uRing" cx="114" cy="114" r="110" pathLength="1"/></svg>
-  <div class="ripple"></div><div class="ripple r2"></div><div class="ripple r3"></div>
-  <div class="breath" id="br"><div class="water" id="bw"><svg class="b" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg><svg class="a" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg></div><div class="blab"><b id="bPh">吸气</b><span id="bSec"></span></div></div></div>
- <div class="bcount" id="bCnt"></div>
+// 冲动冲浪：每次换一种打断方式（像 one sec），用久了也不会麻木
+// 呼吸 4/6 · 4-7-8 呼吸 · 照镜子 · 问问自己 · 打一句话。下面的原因和解药不变
+const ORB='<div class="bwrap"><svg class="bring" viewBox="0 0 228 228"><circle class="trk" cx="114" cy="114" r="110"/><circle class="prg" id="uRing" cx="114" cy="114" r="110" pathLength="1"/></svg><div class="ripple"></div><div class="ripple r2"></div><div class="ripple r3"></div><div class="breath" id="br"><div class="water" id="bw"><svg class="b" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg><svg class="a" viewBox="0 0 200 10" preserveAspectRatio="none"><path d="M0 5 Q12.5 0 25 5 T50 5 T75 5 T100 5 T125 5 T150 5 T175 5 T200 5 V10 H0Z" fill="#86dbe6"/></svg></div><div class="blab"><b id="bPh">吸气</b><span id="bSec"></span></div></div></div><div class="bcount" id="bCnt"></div>';
+function breathMode(pattern,rounds,unlockAt,label){return(stage,unlock,api)=>{const CYC=pattern.reduce((a,p)=>a+p[1],0),TOTAL=CYC*rounds,t0=Date.now();let last=-1;stage.innerHTML=ORB;api.timer(true);
+ const br=$('br'),bw=$('bw'),ring=$('uRing'),PH={in:'吸气',hold:'屏住',out:'呼气'};
+ const set=(ph,sec)=>{br.style.transitionDuration=bw.style.transitionDuration=sec+'s';if(ph==='in'){br.style.transform='scale(1.12)';bw.style.transform='translateY(18%)'}else if(ph==='out'){br.style.transform='scale(.86)';bw.style.transform='translateY(70%)'}$('bPh').textContent=PH[ph];try{navigator.vibrate&&navigator.vibrate(ph==='in'?25:ph==='hold'?10:[15,60,15])}catch(e){}};
+ const step=()=>{if(!$('uRing'))return;const t=(Date.now()-t0)/1000,left=Math.max(0,TOTAL-t);ring.style.strokeDashoffset=(1-Math.min(1,t/TOTAL)).toFixed(4);api.time(left);if(t>=unlockAt)unlock();
+  if(left<=0){clearInterval(it);$('modal').classList.add('done');$('bPh').textContent='浪退了';$('bSec').textContent='';$('bCnt').textContent='你刚刚看着一波冲动来了又走';bw.style.transitionDuration='3s';bw.style.transform='translateY(45%)';return}
+  let c=t%CYC,i=0;while(c>=pattern[i][1]){c-=pattern[i][1];i++}if(i!==last){last=i;set(pattern[i][0],pattern[i][1])}
+  $('bSec').textContent=Math.ceil(pattern[i][1]-c);$('bCnt').textContent=`${label} · 第 ${Math.min(rounds,Math.floor(t/CYC)+1)} / ${rounds} 轮`};
+ requestAnimationFrame(()=>requestAnimationFrame(step));const it=setInterval(step,200);return()=>clearInterval(it)}}
+const URGE_MODES=[
+ {id:'breath',name:'跟着呼吸',sub:'冲动像海浪，会涨也会退。跟着圆圈呼吸，看着它，不用跟它走。',run:breathMode([['in',4],['out',6]],6,15,'吸 4 呼 6')},
+ {id:'478',name:'4-7-8 呼吸',sub:'吸气 4 秒，屏住 7 秒，慢慢呼气 8 秒。屏住的那几秒，冲动会自己变弱。',run:breathMode([['in',4],['hold',7],['out',8]],3,19,'4-7-8')},
+ {id:'mirror',name:'照镜子',sub:'看着屏幕里自己的眼睛 20 秒。画面只在你的屏幕上，不录、不上传。',run:(stage,unlock,api)=>{api.timer(false);stage.innerHTML='<div class="mirror"><video id="mv" autoplay playsinline muted></video><div class="mtxt" id="mtxt">打开摄像头中…</div></div>';let stream=null,it=null,dead=false;
+  const start=()=>{const t0=Date.now();it=setInterval(()=>{const left=Math.max(0,20-(Date.now()-t0)/1000);const m=$('mtxt');if(!m)return;m.innerHTML=left>0?`看着自己的眼睛<br><b>${Math.ceil(left)}</b><br>你现在真的想刷吗？`:'好。现在决定：回到题目，还是去刷？';if(left<=0){clearInterval(it);unlock()}},250)};
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){S.noCam=Date.now();save();api.next('这台设备不能用摄像头，换一种');return()=>{}}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false}).then(s=>{if(dead){s.getTracks().forEach(t=>t.stop());return}stream=s;const v=$('mv');if(v){v.srcObject=s;start()}}).catch(()=>{S.noCam=Date.now();save();if(!dead)api.next('没有打开摄像头，换一种')});
+  return()=>{dead=true;clearInterval(it);if(stream)stream.getTracks().forEach(t=>t.stop())}}},
+ {id:'ask',name:'问问自己',sub:'三个问题，诚实回答就好。',run:(stage,unlock,api)=>{api.timer(false);
+  const Q=[['你想打开什么？',['小红书','B 站','抖音','X','微信','游戏','其他']],['打开以后，你希望得到什么？',['放松一下','逃开卡住的题','看看有没有新消息','打发无聊','奖励自己','说不清']]];
+  const MAP={'放松一下':'累了','逃开卡住的题':'卡题了','看看有没有新消息':'习惯性','打发无聊':'无聊','奖励自己':'想奖励自己','说不清':'习惯性'};
+  const SUG={'放松一下':'真正的放松是离开屏幕：站起来，走两分钟，看远处。','逃开卡住的题':'卡住的那种难受，刷手机只会推迟它。把卡点写下来，往往写着写着就通了。','看看有没有新消息':'真有急事的人会打电话。这一轮结束再统一看，一次看完。','打发无聊':'无聊说明难度不对。换一道更难的题，或者切到写作。','奖励自己':'想奖励自己没问题——去奖励商店，用挣来的岛币换，说好多久就多久。','说不清':'说不清，通常就是手的习惯。把手机放到够不着的地方。'};
+  stage.innerHTML='<div class="chat" id="chat"></div>';const chat=$('chat');let ans=[];
+  const say=(t,me)=>{chat.insertAdjacentHTML('beforeend',`<div class="bub ${me?'me':''}">${t}</div>`);chat.scrollTop=chat.scrollHeight};
+  const ask=i=>{if(i<2){say(Q[i][0]);chat.insertAdjacentHTML('beforeend',`<div class="opts">${Q[i][1].map(o=>`<span class="chip" data-o="${o}">${o}</span>`).join('')}</div>`)}
+   else{say(esc(SUG[ans[1]]||''));say('现在，你还想打开它吗？');chat.insertAdjacentHTML('beforeend','<div class="opts"><span class="chip" data-o="不想了">不想了</span><span class="chip" data-o="还是想">还是想</span></div>')}};
+  chat.onclick=e=>{const c=e.target.closest('[data-o]');if(!c)return;const o=c.dataset.o;c.parentNode.remove();say(esc(o),true);
+   if(ans.length<2){ans.push(o);if(ans.length===1)api.app(o);if(ans.length===2){const r=MAP[o];if(r)api.reason(r)}setTimeout(()=>ask(ans.length),350)}
+   else{unlock();say(o==='不想了'?'好。那就回到题目，这一下你已经赢了。':'诚实很好。想去的话，先去奖励商店用岛币换，定好时间。')}};
+  ask(0);return()=>{}}},
+ {id:'type',name:'打一句话',sub:'把下面这句话一字不差地打出来（不能粘贴）。打完再决定。',run:(stage,unlock,api)=>{api.timer(false);
+  const P=['我现在选择回到题目，而不是打开手机','冲动会过去，我的时间不会回来','刷完不会更开心，做完这题会','我想要的是休息，不是信息流','先做完这一小步，再决定要不要刷'];const p=P[Math.floor(Math.random()*P.length)];
+  stage.innerHTML=`<div class="typeit"><p class="tphrase">${p}</p><input type="text" id="tIn" autocomplete="off" placeholder="在这里打出上面那句话"><p class="tmsg" id="tMsg"></p></div>`;const inp=$('tIn'),norm=s=>s.replace(/[\s，。,.!！]/g,'');
+  inp.onpaste=e=>{e.preventDefault();$('tMsg').textContent='不能粘贴，一个字一个字打出来'};inp.oninput=()=>{const a=norm(inp.value),b=norm(p);if(a===b){inp.disabled=true;$('tMsg').textContent='打完了。现在你还想刷吗？';unlock()}else $('tMsg').textContent=b.startsWith(a)?`${a.length} / ${b.length}`:'有一个字不一样，再看看'};setTimeout(()=>inp.focus(),100);return()=>{}}}
+];
+// 摄像头打不开或被拒绝时，7 天内跳过「照镜子」
+function nextUrgeMode(from){const noCam=S.noCam&&Date.now()-S.noCam<7*86400000;const ok=URGE_MODES.map((m,i)=>i).filter(i=>!(URGE_MODES[i].id==='mirror'&&noCam));const i=from===undefined?(S.urgeLast===undefined?-1:S.urgeLast):from;return ok.find(k=>k>i)??ok[0]}
+$('urgeBtn').onclick=()=>openUrge();
+function openUrge(force){let reason='',cleanup=null,mi=force!==undefined?force:nextUrgeMode();S.urgeLast=mi;save();
+ const reasons=['无聊','卡题了','累了','焦虑','习惯性','想奖励自己'];let app='';
+ modal(`<div class="surf-h"><h3 id="uTitle">冲动冲浪</h3><span id="uc"></span><button class="uswap" id="uSwap" title="换一种方式">换一种 ↻</button></div>
+ <p class="surf-sub" id="uSub"></p><div class="ustage" id="uStage"></div>
  <p class="surf-q">此刻想刷，是因为：</p><div class="row" id="ur">${reasons.map(r=>`<span class="chip" data-r="${r}">${r}</span>`).join('')}</div>
  <div class="urem hide" id="uRem"></div>
- <div class="row center"><button class="btn s" id="uGive">还是去刷了</button><button class="btn p" id="uOk" disabled>我扛住了 +5</button></div>`,()=>{clearInterval(it);$('modal').classList.remove('surf','done')});
+ <div class="row center"><button class="btn s" id="uGive">还是去刷了</button><button class="btn p" id="uOk" disabled>我扛住了 +5</button></div>`,()=>{if(cleanup)cleanup();$('modal').classList.remove('surf','done')});
  $('modal').classList.add('surf');
- document.querySelectorAll('#ur .chip').forEach(c=>c.onclick=()=>{reason=c.dataset.r;document.querySelectorAll('#ur .chip').forEach(x=>x.classList.toggle('on',x===c));showRemedy(reason,()=>{resist()})});
- const br=$('br'),bw=$('bw'),ring=$('uRing');
- const setPhase=(ph,sec)=>{br.style.transitionDuration=bw.style.transitionDuration=sec+'s';br.style.transform=ph==='in'?'scale(1.12)':'scale(.86)';bw.style.transform=ph==='in'?'translateY(18%)':'translateY(70%)';$('bPh').textContent=ph==='in'?'吸气':'呼气';try{navigator.vibrate&&navigator.vibrate(ph==='in'?25:[15,60,15])}catch(e){}};
- const step=()=>{if(!$('uRing'))return clearInterval(it);const t=(Date.now()-t0)/1000,left=Math.max(0,TOTAL-t);
-  ring.style.strokeDashoffset=(1-Math.min(1,t/TOTAL)).toFixed(4);$('uc').textContent=fmt(left*1000);
-  if(t>=15){$('uOk').disabled=false}
-  if(left<=0){clearInterval(it);$('modal').classList.add('done');$('bPh').textContent='浪退了';$('bSec').textContent='';$('bCnt').textContent='你刚刚看着一波冲动来了又走';bw.style.transitionDuration='3s';bw.style.transform='translateY(45%)';return}
-  const c=t%CYC,ph=c<IN?'in':'out',rem=Math.ceil(ph==='in'?IN-c:CYC-c);
-  if(ph!==lastPh){lastPh=ph;setPhase(ph,ph==='in'?IN:OUT)}
-  $('bSec').textContent=rem;$('bCnt').textContent=`第 ${Math.min(6,Math.floor(t/CYC)+1)} 次 · 共 6 次`};
- requestAnimationFrame(()=>requestAnimationFrame(step));it=setInterval(step,200);
- const resist=()=>{closeModal();const d=day();d.urge++;d.urgeReasons=d.urgeReasons||{};if(reason)d.urgeReasons[reason]=(d.urgeReasons[reason]||0)+1;save();addXP(5,'扛住了冲动')};
+ const pick=r=>{reason=r;document.querySelectorAll('#ur .chip').forEach(x=>x.classList.toggle('on',x.dataset.r===r));showRemedy(r,resist)};
+ document.querySelectorAll('#ur .chip').forEach(c=>c.onclick=()=>pick(c.dataset.r));
+ const unlock=()=>{const b=$('uOk');if(b)b.disabled=false};
+ const api={timer:on=>{$('uc').classList.toggle('hide',!on)},time:s=>{const u=$('uc');if(u)u.textContent=fmt(s*1000)},reason:pick,app:a=>{app=a},next:msg=>{if(msg)toast(msg);run(nextUrgeMode(mi))}};
+ const run=i=>{if(cleanup){cleanup();cleanup=null}mi=i;S.urgeLast=i;save();const m=URGE_MODES[i];$('modal').classList.remove('done');$('uTitle').textContent='冲动冲浪 · '+m.name;$('uSub').textContent=m.sub;$('uOk').disabled=true;cleanup=m.run($('uStage'),unlock,api)};
+ $('uSwap').onclick=()=>run(nextUrgeMode(mi));run(mi);
+ const resist=()=>{closeModal();const d=day();d.urge++;d.urgeReasons=d.urgeReasons||{};if(reason)d.urgeReasons[reason]=(d.urgeReasons[reason]||0)+1;if(app){d.urgeApps=d.urgeApps||{};d.urgeApps[app]=(d.urgeApps[app]||0)+1}save();addXP(5,'扛住了冲动')};
  $('uOk').onclick=resist;
- $('uGive').onclick=()=>{closeModal();toast('诚实记录也有价值。回来就好。')}};
+ $('uGive').onclick=()=>{closeModal();toast('诚实记录也有价值。回来就好。')}}
 
 // 冲动是一个信号：它告诉你此刻卡在哪种不舒服上。不同的不舒服，解药不一样
 function tabTo(t){document.querySelector('nav [data-tab='+t+']').click();scrollTo({top:0,behavior:'smooth'})}
