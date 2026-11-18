@@ -1114,7 +1114,10 @@ function analyze(){
   if(n>=150&&!(cur&&cur.rw))fb.push(`<div class="item" style="background:var(--leaf-l);color:var(--leaf-d)">已达到 150 字，可以存档拿完成奖励了。</div>`);
   $('fb').innerHTML=fb.join('');
 }
-$('wText').addEventListener('input',()=>{trackTyping();analyze()});
+// 写作草稿：每打一个字都存一份（单独的 key），页面被刷新、关掉、被 Chrome 休眠也不会丢
+const DK='xinliu-draft';function wDraft(){const t=$('wText').value;try{t.trim()?localStorage.setItem(DK,JSON.stringify({t,at:Date.now(),q:cur&&cur.q})):localStorage.removeItem(DK)}catch(e){}}
+function restoreDraft(){try{const d=JSON.parse(localStorage.getItem(DK)||'null');if(d&&d.t&&d.t.trim()&&!$('wText').value.trim()){$('wText').value=d.t;analyze();renderGoal();const w=new Date(d.at);toast('📝 恢复了 '+(w.getMonth()+1)+'/'+w.getDate()+' 没存档的草稿（'+countZh(d.t)+' 字），在「输出 → 写作」')}}catch(e){}}
+$('wText').addEventListener('input',()=>{trackTyping();analyze();wDraft()});
 $('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<(cur&&cur.rw?15:30)){toast('至少写 '+(cur&&cur.rw?15:30)+' 字再存档');return}
  const st=textStats(t),secs=ws.first?Math.max(1,(ws.last-ws.first)/1000):0,before=day().words||0;
  const e={type:'write',at:Date.now(),text:t,vague:st.v,secs:Math.round(secs),pauses:ws.pauses,pauseSecs:Math.round(ws.pauseMs/1000)};
@@ -1126,7 +1129,7 @@ $('wSave').onclick=()=>{const t=$('wText').value.trim(),n=countZh(t);if(n<(cur&&
  else{xp=Math.floor(n/10)+(n>=150?20:0)+(n>=50&&st.v/n<0.015?10:0);why='写作 '+n+' 字'+(n>=150?' · 完成奖励':'')+(n>=50&&st.v/n<0.015?' · 精准奖励':'')}
  const g=wGoal(),hitGoal=before<g&&d.words>=g;if(hitGoal){xp+=10;why+=' · 今日目标达成'}
  addXP(xp,why);
- $('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};clearInterval(wTick);$('wTimer').textContent='';
+ $('wText').value='';wDraft();ws={first:0,last:0,pauses:0,pauseMs:0};clearInterval(wTick);$('wTimer').textContent='';
  if(rw){showCompare(rw.orig,e);cur=null;pickPrompt()}else{pickPrompt();showSummary(e,hitGoal)}
  analyze();renderRwBanner()};
 function showSummary(e,hit){const n=countZh(e.text),past=S.journal.filter(x=>x.type==='write'&&x.secs>=60&&x!==e).slice(0,10);const sp=e.secs>=30?Math.round(n/(e.secs/60)):0;
@@ -1142,7 +1145,7 @@ function saveEssay(text,fromIdea){text=text.trim();const n=countZh(text);if(n<4)
  addXP(Math.floor(n/10)+(n>=150?20:0),'随笔 '+n+' 字');return true}
 function startIdeaWrite(at){const o=S.journal.find(e=>e.at===at);if(!o)return;if(countZh($('wText').value)>0&&!confirm('写作框里还有没存的内容，清空它开始写这个想法？'))return;
  document.querySelector('nav [data-tab=write]').click();cur={g:'我的想法',tag:'💡 想法',q:'把这个想法写清楚：「'+o.text+'」',tip:'它是什么？你为什么会这么想？举一个具体的例子。如果它是对的，意味着什么？',tpl:'__idea',ideaOf:at,times:0};
- $('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
+ $('wText').value='';wDraft();ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
 function weekKey(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return keyOf(x)}
 function rwCandidate(){const now=Date.now(),D=86400000,done=new Set(S.journal.filter(e=>e.rewriteOf).map(e=>e.rewriteOf));
  const c=S.journal.filter(e=>e.type==='write'&&!e.rewriteOf&&!done.has(e.at)&&countZh(e.text)>=60&&now-e.at>=6*D);if(!c.length)return null;
@@ -1152,7 +1155,7 @@ function renderRwBanner(){const b=$('rwBanner');const wk=weekKey(new Date());con
  b.innerHTML=`<span>✂️ <b>本周改写挑战</b>：${days} 天前（${d.getMonth()+1} 月 ${d.getDate()} 日）你写了 ${countZh(c.text)} 字${c.prompt?'「'+esc(c.prompt.slice(0,18))+(c.prompt.length>18?'…':'')+'」':''}。把它压缩到一半，看看自己有没有进步。</span><span class="row"><button class="btn s" id="rwSkip">这周跳过</button><button class="btn sun" id="rwGo">开始改写</button></span>`;
  $('rwGo').onclick=()=>startRewrite(c.at);$('rwSkip').onclick=()=>{S.rwSkip=wk;save();renderRwBanner()}}
 function startRewrite(at){const o=S.journal.find(e=>e.at===at);if(!o)return;if(countZh($('wText').value)>0&&!confirm('写作框里还有没存的内容，清空它开始改写？'))return;
- document.querySelector('nav [data-tab=write]').click();cur={rw:true,orig:o,target:Math.floor(countZh(o.text)/2),tpl:'__rewrite'};$('wText').value='';ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();renderRwBanner();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
+ document.querySelector('nav [data-tab=write]').click();cur={rw:true,orig:o,target:Math.floor(countZh(o.text)/2),tpl:'__rewrite'};$('wText').value='';wDraft();ws={first:0,last:0,pauses:0,pauseMs:0};showPrompt();analyze();renderRwBanner();scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('wText').focus(),300)}
 function showCompare(o,e){const a=textStats(o.text),b=textStats(e.text),d1=new Date(o.at),d2=new Date(e.at),pct=Math.round(b.n/a.n*100);
  const arrow=(x,y,lowerBetter)=>`${x} → <b style="color:${(lowerBetter?y<=x:y>=x)?'var(--leaf-d)':'var(--coral)'}">${y}</b>`;
  modal(`<h3>改写前后对比</h3><div class="cmpsum">篇幅 ${arrow(a.n,b.n,true)} 字（原来的 ${pct}%${pct<=50?'，压缩达标 ✓':''}）· 模糊词 ${arrow(a.v,b.v,true)} · 平均句长 ${arrow(a.avg,b.avg,true)} 字</div>
@@ -1569,7 +1572,7 @@ renderMusic();syncPlaylist();
 $('urgeUrl').textContent=location.origin+location.pathname.replace(/index\.html$/,'xinliu.html').replace(/\/$/,'/xinliu.html')+'#urge';
 $('copyUrge').onclick=async()=>{try{await navigator.clipboard.writeText($('urgeUrl').textContent);toast('已复制')}catch(e){toast('复制失败，长按手动复制')}};
 // 启动：所有模块都定义好之后再渲染
-renderPGroups();pickPrompt();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();renderRT();renderWatch();
+renderPGroups();pickPrompt();restoreDraft();renderRwBanner();render();analyze();restoreTimer();scene();checkAway();renderRT();renderWatch();
 // 「存一个想法」链接：…/xinliu.html#idea=想法内容。# 后面的内容不会发到服务器，只存在你自己的浏览器里
 const hashTab=()=>{const h=location.hash.slice(1);if(h.startsWith('write=')){let t='';try{t=decodeURIComponent(h.slice(6)).trim()}catch(e){}history.replaceState(null,'',location.pathname+location.search);if(t){const dup=S.journal.some(e=>e.type==='write'&&e.text.trim()===t);if(!dup)saveEssay(t);document.querySelector('nav [data-tab=journal]').click();const c=document.querySelector('[data-jf=write]');if(c)c.click();toast(dup?'这篇已经存过了':'✍️ 存进写作了（随笔）')}return}if(h.startsWith('idea=')){let t='';try{t=decodeURIComponent(h.slice(5)).trim()}catch(e){}history.replaceState(null,'',location.pathname+location.search);if(t){const dup=S.journal.some(e=>e.type==='idea'&&e.text===t);if(!dup)parkAdd(t,'idea');document.querySelector('nav [data-tab=journal]').click();const c=document.querySelector('[data-jf=idea]');if(c)c.click();toast(dup?'这个想法已经存过了':'💡 存进「想法」了')}return}if(h==='warm'){history.replaceState(null,'',location.pathname+location.search);window.startWarm();return}if(h==='urge'){history.replaceState(null,'',location.pathname+location.search);document.querySelector('nav [data-tab=focus]').click();$('urgeBtn').click();return}const b=document.querySelector('nav [data-tab="'+h+'"]');if(b)b.click()};hashTab();window.addEventListener('hashchange',hashTab);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
