@@ -44,16 +44,10 @@ launchctl bootout "gui/$(id -u)/$1" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$AGENTS/$1.plist"
 }
 
-plist com.xinliu.checkin checkin "<key>StartInterval</key><integer>$((INTERVAL*60))</integer>"
+# 不再装「要不要开始专注」的定时弹窗（用户要求永远不弹）
+for old in com.xinliu.checkin com.xinliu.anchor; do launchctl bootout "gui/$(id -u)/$old" 2>/dev/null || true; rm -f "$AGENTS/$old.plist"; done
 plist com.xinliu.write write "<key>StartCalendarInterval</key><dict><key>Hour</key><integer>$WH</integer><key>Minute</key><integer>$WM</integer></dict>"
 
-if [ -n "$ANCHOR_TIME" ]; then
-  AH=$((10#${ANCHOR_TIME%%:*})); AM=$((10#${ANCHOR_TIME##*:}))
-  plist com.xinliu.anchor anchor "<key>StartCalendarInterval</key><dict><key>Hour</key><integer>$AH</integer><key>Minute</key><integer>$AM</integer></dict>"
-  echo "学习锚点：每天 $ANCHOR_TIME${ANCHOR_PLACE:+（$ANCHOR_PLACE）}弹「开始热身」"
-else
-  launchctl bootout "gui/$(id -u)/com.xinliu.anchor" 2>/dev/null || true; rm -f "$AGENTS/com.xinliu.anchor.plist"
-fi
-echo "已安装：${START_HOUR}–${END_HOUR} 点每 ${INTERVAL} 分钟检查一次，${WRITE_TIME} 写作提醒"
+echo "已安装：每天 ${WRITE_TIME} 写作提醒（不会弹窗催你开始专注）"
 echo "打开地址：$XINLIU_URL"
 echo "立刻试一下：bash \"$DEST/xinliu-remind.sh\" checkin"

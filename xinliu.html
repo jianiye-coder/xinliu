@@ -657,7 +657,7 @@ h4{margin:0 0 6px;font:700 13.5px var(--serif)}
   <div class="card">
     <h2>提醒</h2>
     <label class="set">系统通知（页面开着时，切到别的窗口也能弹）<button class="btn s" id="notifBtn">开启通知</button></label>
-    <label class="set">空闲多久提醒我开始下一轮（分钟，0=关闭）<input type="number" id="idleMin" min="0" max="120" style="width:84px"></label>
+    
     <label class="set">每日写作提醒时间<input type="time" id="writeTime"></label>
     <label class="set">提醒时播放提示音<input type="checkbox" id="sound"></label>
     <p class="mute">网页里的提醒只在页面开着时有效。Mac 上可以装 <code>mac/</code> 文件夹里的定时弹窗，页面关了也会提醒；手机上用 Safari「分享 → 添加到主屏幕」。</p>
@@ -991,7 +991,7 @@ window.startWarm=()=>{closeModal();if(mode!=='idle')return;tabTo('focus');select
 
 // idle reminder + daily write reminder
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e,()=>{lastActivity=Date.now();idleNotified=false}));
-setInterval(()=>{const st=S.settings;if(mode==='idle'&&st.idleMin>0&&!idleNotified&&Date.now()-lastActivity>st.idleMin*60000){idleNotified=true;notify('心流岛','已经 '+st.idleMin+' 分钟没开始新一轮了。手机在手上吗？')}const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.anchorTime&&hm>=st.anchorTime&&S.lastAnchor!==today()&&mode==='idle'&&day().min<5){S.lastAnchor=today();save();notify('学习时间到'+(st.anchorPlace?' · '+st.anchorPlace:''),'先做 5 分钟热身，只要开始就好');anchorModal()}if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
+setInterval(()=>{const st=S.settings;const now=new Date(),hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');if(st.writeTime&&hm>=st.writeTime&&S.lastWriteRemind!==today()&&day().writes===0){S.lastWriteRemind=today();save();notify('今天的写作还没做','花 10 分钟，写一段就好')}},20000);
 
 // ---------- writing ----------
 // 题库：[题型, 小标签, 题目, 写法提示]。题目里的 {课} 会换成你在设置里填的课程。
@@ -1217,8 +1217,8 @@ $('coursesIn').onchange=e=>{S.settings.courses=e.target.value.trim();save();if(c
 $('anchorT').value=S.settings.anchorTime||'';$('anchorP').value=S.settings.anchorPlace||'';$('anchorT').onchange=e=>{S.settings.anchorTime=e.target.value;save();renderGoalLine()};$('anchorP').onchange=e=>{S.settings.anchorPlace=e.target.value.trim();save();renderGoalLine()};
 $('awayMode').value=S.settings.awayMode||'phone';$('awayMode').onchange=e=>{S.settings.awayMode=e.target.value;if(!awayOn())S.away=null;save();renderRules();toast(awayOn()?'这台设备上，专注中离开页面会算分心':'这台设备上，离开页面不再算分心')};renderRules();
 $('pAuto').checked=!!S.settings.autoNext;$('pAuto').onchange=e=>{S.settings.autoNext=e.target.checked;save()};
-$('idleMin').value=S.settings.idleMin;$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
-$('idleMin').onchange=e=>{S.settings.idleMin=+e.target.value||0;save()};$('writeTime').onchange=e=>{S.settings.writeTime=e.target.value;save()};$('sound').onchange=e=>{S.settings.sound=e.target.checked;save()};
+$('writeTime').value=S.settings.writeTime;$('sound').checked=S.settings.sound;
+$('writeTime').onchange=e=>{S.settings.writeTime=e.target.value;save()};$('sound').onchange=e=>{S.settings.sound=e.target.checked;save()};
 function notifState(){if(!('Notification' in window)){$('notifBtn').textContent='此环境不支持';$('notifBtn').disabled=true}else if(Notification.permission==='granted'){$('notifBtn').textContent='已开启';$('notifBtn').disabled=true}}
 $('notifBtn').onclick=async()=>{try{await Notification.requestPermission()}catch(e){}notifState();if(!('Notification' in window)||Notification.permission!=='granted')toast('系统通知不可用，会用页面弹窗+提示音提醒你')};notifState();
 $('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='xinliu-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
