@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-16",
+ "updated": "2026-11-22",
  "note": "心流岛学习歌单。每 3 天由定时任务自动加入新的 B 站视频（核对过 BV 号）。网页打开时会把这里的新歌并进你的歌单，你删掉的不会再加回来。",
  "items": [
   {
@@ -241,6 +241,54 @@
    "len": "46:00",
    "vocal": false,
    "added": "2026-11-01"
+  },
+  {
+   "bv": "BV1uiD1YCEbL",
+   "title": "方大同2011香港演唱会",
+   "kind": "方大同",
+   "len": "2:25:05",
+   "vocal": true,
+   "added": "2026-11-22"
+  },
+  {
+   "bv": "BV1EwK2zFE2i",
+   "title": "方大同 Legacy音乐会现场",
+   "kind": "方大同",
+   "len": "1:06:58",
+   "vocal": true,
+   "added": "2026-11-22"
+  },
+  {
+   "bv": "BV1GNXVYaE9V",
+   "title": "王力宏100首精选",
+   "kind": "王力宏 · R&B",
+   "len": "6:41:38",
+   "vocal": true,
+   "added": "2026-11-22"
+  },
+  {
+   "bv": "BV1aAbNzoECC",
+   "title": "D'Angelo《Voodoo》专辑",
+   "kind": "Soul",
+   "len": "1:18:59",
+   "vocal": true,
+   "added": "2026-11-22"
+  },
+  {
+   "bv": "BV1hcSyBNEBn",
+   "title": "Badu《Mama's Gun》专辑",
+   "kind": "Soul",
+   "len": "1:11:58",
+   "vocal": true,
+   "added": "2026-11-22"
+  },
+  {
+   "bv": "BV17fmSYYEfj",
+   "title": "经典爵士人声歌单",
+   "kind": "爵士",
+   "len": "35:33",
+   "vocal": true,
+   "added": "2026-11-22"
   }
  ]
 }
