@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-22",
+ "updated": "2026-11-28",
  "note": "心流岛学习歌单。每 3 天由定时任务自动加入新的 B 站视频（核对过 BV 号）。网页打开时会把这里的新歌并进你的歌单，你删掉的不会再加回来。",
  "items": [
   {
@@ -289,6 +289,86 @@
    "len": "35:33",
    "vocal": true,
    "added": "2026-11-22"
+  },
+  {
+   "bv": "BV15C41187cx",
+   "title": "陶喆2003 Soul Power演唱会",
+   "kind": "陶喆 · R&B",
+   "len": "2:09:49",
+   "vocal": true,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV1v7mcB2E49",
+   "title": "丁世光 R&B精选",
+   "kind": "R&B",
+   "len": "48:26",
+   "vocal": true,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV1CZsb6pEH8",
+   "title": "华语R&B歌单·Melody",
+   "kind": "R&B",
+   "len": "41:33",
+   "vocal": true,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV15m421M7Bj",
+   "title": "律动Groove R&B歌单",
+   "kind": "R&B",
+   "len": "2:55:50",
+   "vocal": true,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV1iv42117bo",
+   "title": "新灵魂乐Soul歌单",
+   "kind": "Soul",
+   "len": "30:42",
+   "vocal": true,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV1UA4m1G75P",
+   "title": "8小时工作爵士乐",
+   "kind": "爵士",
+   "len": "8:04:32",
+   "vocal": false,
+   "added": "2026-11-25"
+  },
+  {
+   "bv": "BV14aDKBpEWE",
+   "title": "陶喆7大神级现场",
+   "kind": "陶喆 · R&B",
+   "len": "43:54",
+   "vocal": true,
+   "added": "2026-11-28"
+  },
+  {
+   "bv": "BV1zBWpeUEUA",
+   "title": "Caesar《Freudian》专辑",
+   "kind": "R&B · Soul",
+   "len": "45:05",
+   "vocal": true,
+   "added": "2026-11-28"
+  },
+  {
+   "bv": "BV16U1dY2EbE",
+   "title": "Badu《Baduizm》专辑",
+   "kind": "Soul",
+   "len": "58:25",
+   "vocal": true,
+   "added": "2026-11-28"
+  },
+  {
+   "bv": "BV1Fvk7YwEVr",
+   "title": "Norah Jones《心碎》专辑",
+   "kind": "爵士",
+   "len": "44:48",
+   "vocal": true,
+   "added": "2026-11-28"
   }
  ]
 }
